@@ -8,17 +8,14 @@ use yii\base\Model;
 /**
  * LoginForm is the model behind the login form.
  *
- * @property User|null $user This property is read-only.
- *
  */
 class LoginForm extends Model
 {
-    public $username;
+    public $userName;
     public $password;
     public $rememberMe = true;
 
     private $_user = false;
-
 
     /**
      * @return array the validation rules.
@@ -27,7 +24,11 @@ class LoginForm extends Model
     {
         return [
             // username and password are both required
-            [['username', 'password'], 'required'],
+            [['userName', 'password'], 'required'],
+            // the length of userName must between 3 and 20
+            ['userName', 'string', 'min' => 3, 'max' => 20],
+            // the length of password must between 6 and 20
+            ['password', 'string', 'min' => 6, 'max' => 20],
             // rememberMe must be a boolean value
             ['rememberMe', 'boolean'],
             // password is validated by validatePassword()
@@ -37,8 +38,6 @@ class LoginForm extends Model
 
     /**
      * Validates the password.
-     * This method serves as the inline validation for password.
-     *
      * @param string $attribute the attribute currently being validated
      * @param array $params the additional name-value pairs given in the rule
      */
@@ -46,7 +45,6 @@ class LoginForm extends Model
     {
         if (!$this->hasErrors()) {
             $user = $this->getUser();
-
             if (!$user || !$user->validatePassword($this->password)) {
                 $this->addError($attribute, 'Incorrect username or password.');
             }
@@ -67,15 +65,13 @@ class LoginForm extends Model
 
     /**
      * Finds user by [[username]]
-     *
      * @return User|null
      */
     public function getUser()
     {
         if ($this->_user === false) {
-            $this->_user = User::findByUsername($this->username);
+            $this->_user = Admin::findByUsername($this->userName);
         }
-
         return $this->_user;
     }
 }
