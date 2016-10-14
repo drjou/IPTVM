@@ -13,6 +13,7 @@ class LoginForm extends Model
 {
     public $userName;
     public $password;
+    public $captcha;
     public $rememberMe = true;
 
     private $_user = false;
@@ -24,11 +25,13 @@ class LoginForm extends Model
     {
         return [
             // username and password are both required
-            [['userName', 'password'], 'required'],
+            [['userName', 'password', 'captcha'], 'required'],
             // the length of userName must between 3 and 20
             ['userName', 'string', 'min' => 3, 'max' => 20],
             // the length of password must between 6 and 20
             ['password', 'string', 'min' => 6, 'max' => 20],
+            // verify the captcha
+            ['captcha', 'captcha', 'captchaAction' => 'admin/captcha'],
             // rememberMe must be a boolean value
             ['rememberMe', 'boolean'],
             // password is validated by validatePassword()

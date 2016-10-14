@@ -18,12 +18,19 @@ class AppAsset extends AssetBundle
     public $basePath = '@webroot';
     public $baseUrl = '@web';
     public $css = [
+        'css/webfont.css',
         'css/site.css',
+        'css/iptvm.css',
+        'plugins/metisMenu/metisMenu.min.css',
+        'plugins/font-awesome/css/font-awesome.min.css',
     ];
     public $js = [
+        'js/iptvm.js',
+        'plugins/metisMenu/metisMenu.min.js',
     ];
     public $depends = [
         'yii\web\YiiAsset',
         'yii\bootstrap\BootstrapAsset',
+        'yii\bootstrap\BootstrapPluginAsset',
     ];
 }

@@ -43,6 +43,14 @@ class AdminController extends Controller{
             'error' => [
                 'class' => 'yii\web\ErrorAction',
             ],
+            'captcha' =>  [
+                'class' => 'yii\captcha\CaptchaAction',
+                'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
+                'height' => 34,
+                'width' => 80,
+                'minLength' => 4,
+                'maxLength' => 4
+            ],
         ];
     }
     /**

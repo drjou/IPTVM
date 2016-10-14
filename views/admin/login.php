@@ -24,7 +24,7 @@ $this->title = 'Login';
 
 <div class="container">
 		<div class="row">
-			<div class="col-md-4 col-md-offset-4">
+			<div class="col-md-iptv col-md-offset-iptv">
 				<div class="login-panel panel panel-default">
 					<div class="panel-heading">
 						<h3 class="panel-title">Please Login</h3>
@@ -37,17 +37,33 @@ $this->title = 'Login';
             'class' => ''
         ],
         'fieldConfig' => [
-            'template' => "<div class=\"\">{input}</div>\n<div class=\"col-lg-8\">{error}</div>\n"
+            'template' => "<div class=\"\">{input}</div>\n<div class=\"\">{error}</div>"
         ]
     ]);
     ?>
 <fieldset>
-        <?= $form->field($model, 'userName')->textInput(['autofocus' => true, 'placeholder' => 'username', 'maxlength' => 20])?>
+        <?= $form->field($model, 'userName', 
+            ['template' => '<div class="input-group">
+                        <span class="input-group-addon"><span class="fa fa-user"></span></span>
+                        {input}
+            </div><div>{error}</div>'])->textInput(['autofocus' => true, 'placeholder' => 'username'])?>
 
-        <?= $form->field($model, 'password')->passwordInput(['placeholder' => 'password'])?>
+        <?= $form->field($model, 'password',
+            ['template' => '<div class="input-group">
+                        <span class="input-group-addon"><span class="fa fa-lock"></span></span>
+                        {input}
+            </div><div>{error}</div>'])->passwordInput(['placeholder' => 'password'])?>
 
-        <?=$form->field($model, 'rememberMe')->checkbox(['template' => "\n<div class=\"\">{input} {label}</div>\n<div class=\"col-lg-8\">{error}</div>"])?>
-
+		<?= $form->field($model,'captcha', ['options' => ['class' => 'form-group']])->widget(yii\captcha\Captcha::className(),
+		    [
+		        'template' => '<div class="captcha"><div class="captcha-img">{image}</div><div class="captcha-input">{input}</div><div style="clear:both"></div> </div>',
+		        'captchaAction'=>'admin/captcha',
+		        'imageOptions'=>['alt'=>'click to change', 'style'=>'cursor:pointer'],
+		        'options' => ['class' => 'form-control', 'placeholder' => 'verify code'],
+		]);?>
+		
+        <?=$form->field($model, 'rememberMe')->checkbox()?>
+        
 		<div class="form-group">
 			<div class="">
                 <?= Html::submitButton('Login', ['class' => 'btn btn-primary btn-full', 'name' => 'login-button'])?>

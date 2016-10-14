@@ -1,0 +1,19 @@
+@font-face {font-family: "Faster One";
+  src: url('../fonts/FasterOne-Regular.ttf') format('truetype');
+}
+
+@font-face {font-family: "Molle";
+  src: url('../fonts/Molle-Regular.ttf') format('truetype');
+}
+
+@font-face {font-family: "Racing Sans One";
+  src: url('../fonts/RacingSansOne-Regular.ttf') format('truetype');
+}
+
+@font-face {font-family: "Rammetto One";
+  src: url('../fonts/RammettoOne-Regular.ttf') format('truetype');
+}
+
+@font-face {font-family: "Trade Winds";
+  src: url('../fonts/TradeWinds-Regular.ttf') format('truetype');
+}
