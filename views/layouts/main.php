@@ -326,7 +326,7 @@ AppAsset::register($this);
                 <!-- /.col-lg-12 -->
             </div>
             <?= Breadcrumbs::widget([
-                'homeLink' => array('label' => '首页', 'url' => Yii::$app->homeUrl),
+                'homeLink' => array('label' => 'Home', 'url' => Yii::$app->homeUrl),
                 'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
             ]) ?>
             <?= $content ?>

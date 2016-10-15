@@ -438,8 +438,8 @@ table.dataTable thead .sorting:after {
 	text-align: center;
 	font-size: 50px;
 	color: #337ab7;
-	margin-top: 5%;
-	margin-bottom: 3%;
+	width: 80%;
+	margin: 5% 10% 2% 10%;
 }
 
 .panel-title {
@@ -497,4 +497,16 @@ table.dataTable thead .sorting:after {
 .captcha-input {
 	width: 70%;
 	float: left;
+}
+
+.breadcrumb {
+	background-color: #eeeeee;
+}
+
+.panel-head {
+	background-color: #eeeeee;
+}
+
+.label-grey {
+	background-color: #eeeeee;
 }
