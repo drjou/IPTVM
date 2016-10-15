@@ -24,6 +24,7 @@ $this->title = 'Login';
 
 <div class="container">
 		<div class="row">
+			<div class="login-title">KuanHong IPTV Content Management System</div>
 			<div class="col-md-iptv col-md-offset-iptv">
 				<div class="login-panel panel panel-default">
 					<div class="panel-heading">
@@ -44,13 +45,13 @@ $this->title = 'Login';
 <fieldset>
         <?= $form->field($model, 'userName', 
             ['template' => '<div class="input-group">
-                        <span class="input-group-addon"><span class="fa fa-user"></span></span>
+                        <span class="input-group-addon"><i class="fa fa-user"></i></span>
                         {input}
             </div><div>{error}</div>'])->textInput(['autofocus' => true, 'placeholder' => 'username'])?>
 
         <?= $form->field($model, 'password',
             ['template' => '<div class="input-group">
-                        <span class="input-group-addon"><span class="fa fa-lock"></span></span>
+                        <span class="input-group-addon"><i class="fa fa-lock"></i></span>
                         {input}
             </div><div>{error}</div>'])->passwordInput(['placeholder' => 'password'])?>
 

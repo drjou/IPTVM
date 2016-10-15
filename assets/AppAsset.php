@@ -19,6 +19,7 @@ class AppAsset extends AssetBundle
     public $baseUrl = '@web';
     public $css = [
         'css/webfont.css',
+        'css/iconfont.css',
         'css/site.css',
         'css/iptvm.css',
         'plugins/metisMenu/metisMenu.min.css',

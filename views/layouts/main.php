@@ -37,7 +37,7 @@ AppAsset::register($this);
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="<?=Url::to(['/site/index']) ?>">KuanHong IPTV Content Management System</a>
+                <a class="home-title" href="<?=Url::to(['/site/index']) ?>">KuanHong IPTV Content Management System</a>
             </div>
             <!-- /.navbar-header -->
     
@@ -253,16 +253,8 @@ AppAsset::register($this);
             <div class="navbar-default sidebar" role="navigation">
                 <div class="sidebar-nav navbar-collapse">
                     <ul class="nav" id="side-menu">
-                        <li class="sidebar-search">
-                            <div class="input-group custom-search-form">
-                                <input type="text" class="form-control" placeholder="Search...">
-                                <span class="input-group-btn">
-                                <button class="btn btn-default" type="button">
-                                    <i class="fa fa-search"></i>
-                                </button>
-                            </span>
-                            </div>
-                            <!-- /input-group -->
+                        <li class="dashboard">
+                            <span><i class="fa fa-dashboard"></i>Dashboard</span>
                         </li>
                         <?php
                             $dependency = [

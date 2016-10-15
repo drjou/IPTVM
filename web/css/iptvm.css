@@ -166,9 +166,9 @@ body {
   height: 350px;
   overflow-y: scroll;
 }
-.login-panel {
+/* .login-panel {
   margin-top: 25%;
-}
+} */
 .flot-chart {
   display: block;
   height: 400px;
@@ -432,10 +432,48 @@ table.dataTable thead .sorting:after {
     border-left-width: 0;
   }
 }
-.navbar-brand {
+
+.login-title {
+	font-family: 'Faster One', cursive;
+	text-align: center;
+	font-size: 50px;
+	color: #337ab7;
+	margin-top: 5%;
+	margin-bottom: 3%;
+}
+
+.panel-title {
+	font-family: 'Racing Sans One', cursive;
+	font-size: 20px;
+	color: #337ab7;
+}
+
+.home-title {
 	font-family: 'Molle', cursive;
 	font-size: 25px;
 	color: #337ab7;
+	float: left;
+  	padding: 15px 15px;
+  	line-height: 20px;
+  	height: 50px;
+}
+.home-title:HOVER, .home-title:FOCUS {
+	text-decoration: none;
+	color: #347bc7;
+}
+
+.dashboard {
+	font-family: 'Racing Sans One', cursive;
+	font-size: 20px;
+	color: #337ab7;
+	text-align: left;
+	height: 50px;
+	line-height: 50px;
+}
+
+.dashboard i {
+	padding-left: 5px;
+	padding-right: 5px;
 }
 
 .col-md-offset-iptv {

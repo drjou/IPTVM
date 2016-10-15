@@ -28,7 +28,7 @@ class AdminController extends Controller{
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'logout' => ['get'],
+                    'logout' => ['get', 'post'],
                 ]
             ],
         ];
