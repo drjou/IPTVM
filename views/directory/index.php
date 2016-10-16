@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\base\Widget;
-$this->title = 'Account List';
+$this->title = 'Directory List';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <p>
@@ -11,8 +11,8 @@ $this->params['breadcrumbs'][] = $this->title;
     	<?= Html::a('Delete Selected', [''], ['class' => 'btn btn-danger delete-all', 'disabled' => 'disabled']) ?>
     	<span class="btn btn-default delete-num">0</span>
     </div>
-    <?= Html::a('New Account', ['create'], ['class' => 'btn btn-success']) ?>
-    <?= Html::a('Import Accounts', ['import'], ['class' => 'btn btn-warning']) ?>
+    <?= Html::a('New Directory', ['create'], ['class' => 'btn btn-success']) ?>
+    <?= Html::a('Import Directories', ['import'], ['class' => 'btn btn-warning']) ?>
 </p>
 <?= GridView::widget([
     'options' => ['class' => 'gridview', 'style' => 'overflow:auto', 'id' => 'grid'],
@@ -35,8 +35,9 @@ $this->params['breadcrumbs'][] = $this->title;
             'class' => 'yii\grid\SerialColumn',
             'headerOptions' => ['width' => '10'],
         ],
-        'accountId',
-        'state',
+        'directoryName',
+        'parentId',
+        'showOrder',
         [
             'class' => 'yii\grid\ActionColumn',
             'header' => 'Operations',
@@ -45,19 +46,19 @@ $this->params['breadcrumbs'][] = $this->title;
             'buttons' => [
                 'view' => function($url, $model, $key){
                 return Html::a('<i class="glyphicon glyphicon-eye-open"></i>',
-                    ['view', 'accountId' => $key],
+                    ['view', 'directoryId' => $key],
                     ['title' => 'View']);
                 },
                 'update' => function($url, $model, $key){
                 return Html::a('<i class="glyphicon glyphicon-pencil"></i>',
-                    ['update', 'accountId' => $key],
+                    ['update', 'directoryId' => $key],
                     ['title' => 'Update']);
                 },
                 'delete' => function($url, $model, $key){
                     return Html::a('<span class="glyphicon glyphicon-trash"></span>',
-                    ['delete', 'accountId' => $key],
+                    ['delete', 'directoryId' => $key],
                     ['title' => 'Delete',
-                     'data' => ['confirm' => "Are you sure to delete account $key?"],
+                     'data' => ['confirm' => "Are you sure to delete directory $model->directoryName?"],
                     ]);
                 },
             ],
@@ -70,7 +71,7 @@ $(document).on('click', '.gridview', function () {
     if(keys.length>0){
         $('.delete-all').attr('disabled', false);
         $('.delete-num').html(keys.length);
-        $('.delete-all').attr('href', 'index.php?r=account/delete-all&keys='+keys);
+        $('.delete-all').attr('href', 'index.php?r=directory/delete-all&keys='+keys);
     }else{
         $('.delete-all').attr('disabled', 'disabled');
         $('.delete-num').html(0);
@@ -82,7 +83,7 @@ $(document).on('click', '.delete-all', function(){
         return false;
     }else{
         var num = $('.delete-num').html();
-        if(!confirm('are you sure to delete these '+num+' accounts?')){
+        if(!confirm('are you sure to delete these '+num+' directories?')){
             return false;
         }
     }
@@ -94,6 +95,6 @@ $(document).on('click', '.delete-all', function(){
     	<?= Html::a('Delete Selected', [''], ['class' => 'btn btn-danger delete-all', 'disabled' => 'disabled']) ?>
     	<span class="btn btn-default delete-num">0</span>
     </div>
-    <?= Html::a('New Account', ['create'], ['class' => 'btn btn-success']) ?>
-    <?= Html::a('Import Accounts', ['import'], ['class' => 'btn btn-warning']) ?>
+    <?= Html::a('New Directory', ['create'], ['class' => 'btn btn-success']) ?>
+    <?= Html::a('Import Directories', ['import'], ['class' => 'btn btn-warning']) ?>
 </p>

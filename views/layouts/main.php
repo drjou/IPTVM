@@ -329,8 +329,31 @@ AppAsset::register($this);
                 'homeLink' => array('label' => 'Home', 'url' => Yii::$app->homeUrl),
                 'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
             ]) ?>
-            <?= $content ?>
-            
+            <div id="page-container">
+            	<div class="row">
+            		<div class="col-lg-12">
+            		</div>
+            		<!-- /.col-lg-12 -->
+            	</div>
+            	<div class="row">
+            		<div class="col-lg-12">
+            			<div class="panel panel-default">
+            				<div class="panel-heading" style="background-color: #eeeeee;">
+            					<h4 style="font-weight: bold;"><?=Html::encode($this->title) ?></h4>
+            				</div>
+            				<!-- /.panel-heading -->
+            				<div class="panel-body">
+            					<div class="dataTable_wrapper">
+            						<?= $content ?>
+                        		</div>
+            				</div>
+            				<!-- /.panel-body -->
+            			</div>
+            			<!-- /.panel -->
+            		</div>
+            		<!-- /.col-lg-12 -->
+            	</div>
+            </div>
         </div> 
          
         <!-- /#page-wrapper -->

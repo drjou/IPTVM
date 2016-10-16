@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\base\Widget;
-$this->title = 'Account List';
+$this->title = 'Product List';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <p>
@@ -11,8 +11,8 @@ $this->params['breadcrumbs'][] = $this->title;
     	<?= Html::a('Delete Selected', [''], ['class' => 'btn btn-danger delete-all', 'disabled' => 'disabled']) ?>
     	<span class="btn btn-default delete-num">0</span>
     </div>
-    <?= Html::a('New Account', ['create'], ['class' => 'btn btn-success']) ?>
-    <?= Html::a('Import Accounts', ['import'], ['class' => 'btn btn-warning']) ?>
+    <?= Html::a('New Product', ['create'], ['class' => 'btn btn-success']) ?>
+    <?= Html::a('Import Products', ['import'], ['class' => 'btn btn-warning']) ?>
 </p>
 <?= GridView::widget([
     'options' => ['class' => 'gridview', 'style' => 'overflow:auto', 'id' => 'grid'],
@@ -35,8 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'class' => 'yii\grid\SerialColumn',
             'headerOptions' => ['width' => '10'],
         ],
-        'accountId',
-        'state',
+        'productName',
         [
             'class' => 'yii\grid\ActionColumn',
             'header' => 'Operations',
@@ -45,19 +44,19 @@ $this->params['breadcrumbs'][] = $this->title;
             'buttons' => [
                 'view' => function($url, $model, $key){
                 return Html::a('<i class="glyphicon glyphicon-eye-open"></i>',
-                    ['view', 'accountId' => $key],
+                    ['view', 'productId' => $key],
                     ['title' => 'View']);
                 },
                 'update' => function($url, $model, $key){
                 return Html::a('<i class="glyphicon glyphicon-pencil"></i>',
-                    ['update', 'accountId' => $key],
+                    ['update', 'productId' => $key],
                     ['title' => 'Update']);
                 },
                 'delete' => function($url, $model, $key){
                     return Html::a('<span class="glyphicon glyphicon-trash"></span>',
-                    ['delete', 'accountId' => $key],
+                    ['delete', 'productId' => $key],
                     ['title' => 'Delete',
-                     'data' => ['confirm' => "Are you sure to delete account $key?"],
+                     'data' => ['confirm' => "Are you sure to delete product $model->productName?"],
                     ]);
                 },
             ],
@@ -70,7 +69,7 @@ $(document).on('click', '.gridview', function () {
     if(keys.length>0){
         $('.delete-all').attr('disabled', false);
         $('.delete-num').html(keys.length);
-        $('.delete-all').attr('href', 'index.php?r=account/delete-all&keys='+keys);
+        $('.delete-all').attr('href', 'index.php?r=product/delete-all&keys='+keys);
     }else{
         $('.delete-all').attr('disabled', 'disabled');
         $('.delete-num').html(0);
@@ -82,7 +81,7 @@ $(document).on('click', '.delete-all', function(){
         return false;
     }else{
         var num = $('.delete-num').html();
-        if(!confirm('are you sure to delete these '+num+' accounts?')){
+        if(!confirm('are you sure to delete these '+num+' products?')){
             return false;
         }
     }
@@ -94,6 +93,7 @@ $(document).on('click', '.delete-all', function(){
     	<?= Html::a('Delete Selected', [''], ['class' => 'btn btn-danger delete-all', 'disabled' => 'disabled']) ?>
     	<span class="btn btn-default delete-num">0</span>
     </div>
-    <?= Html::a('New Account', ['create'], ['class' => 'btn btn-success']) ?>
-    <?= Html::a('Import Accounts', ['import'], ['class' => 'btn btn-warning']) ?>
+    <?= Html::a('New Product', ['create'], ['class' => 'btn btn-success']) ?>
+    <?= Html::a('Import Products', ['import'], ['class' => 'btn btn-warning']) ?>
 </p>
+					

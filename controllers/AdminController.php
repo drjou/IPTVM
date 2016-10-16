@@ -6,6 +6,8 @@ use yii\web\Controller;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
+use app\models\AdminSearch;
+use app\models\Admin;
 
 class AdminController extends Controller{
     /**
@@ -29,6 +31,8 @@ class AdminController extends Controller{
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'logout' => ['get', 'post'],
+                    'index' => ['get'],
+                    'delete-all' => ['get'],
                 ]
             ],
         ];
@@ -82,4 +86,35 @@ class AdminController extends Controller{
         Yii::$app->user->logout();
         return $this->goHome();
     }
+    /**
+     * Index Action 显示所有的管理员信息
+     * @return string
+     */
+    public function actionIndex(){
+        $searchModel = new AdminSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]); 
+    }
+    
+    /**
+     * 删除选中的一些管理员
+     * @param string $keys
+     * @return \yii\web\Response
+     */
+    public function actionDeleteAll($keys){
+        //将得到的字符串转为php数组
+        $ids = explode(',', $keys);
+        //使用","作为分隔符将数组转为字符串
+        $admins = implode('","', $ids);
+        //在最终的字符串前后各加一个"
+        $admins = '"' . $admins . '"';
+        $model = new Admin();
+        //调用model的deleteAll方法删除数据
+        $model->deleteAll("id in($admins)");
+        return $this->redirect(['index']);
+    }
+    
 }

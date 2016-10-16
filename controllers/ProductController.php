@@ -5,12 +5,12 @@ use Yii;
 use yii\web\Controller;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
-use app\models\Account;
-use app\models\AccountSearch;
+use app\models\ProductSearch;
+use app\models\Product;
 
-class AccountController extends Controller{
+class ProductController extends Controller{
     /**
-     * 访问权限设置
+     * 设置访问权限
      * {@inheritDoc}
      * @see \yii\base\Component::behaviors()
      */
@@ -22,8 +22,8 @@ class AccountController extends Controller{
                     [
                         'allow' => true,
                         'roles' => ['@'],
-                    ],
-                ],
+                    ]
+                ]
             ],
             'verbs' => [
                 'class' => VerbFilter::className(),
@@ -43,37 +43,36 @@ class AccountController extends Controller{
         return [
             'error' => [
                 'class' => 'yii\web\ErrorAction',
-            ]
+            ],
         ];
     }
     /**
-     * Index Action 显示所有的account信息
+     * Index Action 显示所有的产品
      * @return string
      */
     public function actionIndex(){
-        $searchModel = new AccountSearch();
+        $searchModel = new ProductSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-        ]); 
+        ]);
     }
     /**
-     * 多选删除操作
+     * 删除选中的一些产品
      * @param string $keys
-     * @return string
+     * @return \yii\web\Response
      */
     public function actionDeleteAll($keys){
         //将得到的字符串转为php数组
-        $accountIds = explode(',', $keys);
+        $productIds = explode(',', $keys);
         //使用","作为分隔符将数组转为字符串
-        $accounts = implode('","', $accountIds);
+        $products = implode('","', $productIds);
         //在最终的字符串前后各加一个"
-        $accounts = '"' . $accounts . '"';
-        $model = new Account();
+        $products = '"' . $products . '"';
+        $model = new Product();
         //调用model的deleteAll方法删除数据
-        $model->deleteAll("accountId in($accounts)");
+        $model->deleteAll("productId in($products)");
         return $this->redirect(['index']);
     }
-    
 }
