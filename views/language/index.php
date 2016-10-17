@@ -3,22 +3,16 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\base\Widget;
-$this->title = 'Account List';
+$this->title = 'Language List';
 $this->params['breadcrumbs'][] = $this->title;
-$states = [
-    '1001' => 'activated',
-    '1002' => 'need activate',
-    '1003' => 'need recharge',
-    '1004' => 'purchase activated',
-];
 ?>
 <p>
 	<div class="btn-group">
     	<?= Html::a('Delete Selected', [''], ['class' => 'btn btn-danger delete-all', 'disabled' => 'disabled']) ?>
     	<span class="btn btn-default delete-num">0</span>
     </div>
-    <?= Html::a('New Account', ['create'], ['class' => 'btn btn-success']) ?>
-    <?= Html::a('Import Accounts', ['import'], ['class' => 'btn btn-warning']) ?>
+    <?= Html::a('New Language', ['create'], ['class' => 'btn btn-success']) ?>
+    <?= Html::a('Import Language', ['import'], ['class' => 'btn btn-warning']) ?>
 </p>
 <?= GridView::widget([
     'options' => ['class' => 'gridview', 'style' => 'overflow:auto', 'id' => 'grid'],
@@ -41,22 +35,7 @@ $states = [
             'class' => 'yii\grid\SerialColumn',
             'headerOptions' => ['width' => '10'],
         ],
-        'accountId',
-        [
-            'attribute' => 'state',
-            'value' => function($model){
-                if($model->state == 1001){
-                    return 'activated';
-                }elseif($model->state == 1002){
-                    return 'need activate';
-                }elseif($model->state == 1003){
-                    return 'need recharge';
-                }elseif($model->state == 1004){
-                    return 'purchase activated';
-                }
-            },
-            'filter' => $states,
-        ],
+        'languageName',
         [
             'class' => 'yii\grid\ActionColumn',
             'header' => 'Operations',
@@ -65,19 +44,19 @@ $states = [
             'buttons' => [
                 'view' => function($url, $model, $key){
                 return Html::a('<i class="glyphicon glyphicon-eye-open"></i>',
-                    ['view', 'accountId' => $key],
+                    ['view', 'languageId' => $key],
                     ['title' => 'View']);
                 },
                 'update' => function($url, $model, $key){
                 return Html::a('<i class="glyphicon glyphicon-pencil"></i>',
-                    ['update', 'accountId' => $key],
+                    ['update', 'languageId' => $key],
                     ['title' => 'Update']);
                 },
                 'delete' => function($url, $model, $key){
                     return Html::a('<span class="glyphicon glyphicon-trash"></span>',
-                    ['delete', 'accountId' => $key],
+                    ['delete', 'languageId' => $key],
                     ['title' => 'Delete',
-                     'data' => ['confirm' => "Are you sure to delete account $key?"],
+                     'data' => ['confirm' => "Are you sure to delete language $model->languageName?"],
                     ]);
                 },
             ],
@@ -90,7 +69,7 @@ $(document).on('click', '.gridview', function () {
     if(keys.length>0){
         $('.delete-all').attr('disabled', false);
         $('.delete-num').html(keys.length);
-        $('.delete-all').attr('href', 'index.php?r=account/delete-all&keys='+keys);
+        $('.delete-all').attr('href', 'index.php?r=language/delete-all&keys='+keys);
     }else{
         $('.delete-all').attr('disabled', 'disabled');
         $('.delete-num').html(0);
@@ -102,7 +81,7 @@ $(document).on('click', '.delete-all', function(){
         return false;
     }else{
         var num = $('.delete-num').html();
-        if(!confirm('are you sure to delete these '+num+' accounts?')){
+        if(!confirm('are you sure to delete these '+num+' languages?')){
             return false;
         }
     }
@@ -114,6 +93,6 @@ $(document).on('click', '.delete-all', function(){
     	<?= Html::a('Delete Selected', [''], ['class' => 'btn btn-danger delete-all', 'disabled' => 'disabled']) ?>
     	<span class="btn btn-default delete-num">0</span>
     </div>
-    <?= Html::a('New Account', ['create'], ['class' => 'btn btn-success']) ?>
-    <?= Html::a('Import Accounts', ['import'], ['class' => 'btn btn-warning']) ?>
+    <?= Html::a('New Language', ['create'], ['class' => 'btn btn-success']) ?>
+    <?= Html::a('Import Languages', ['import'], ['class' => 'btn btn-warning']) ?>
 </p>

@@ -30,6 +30,7 @@ class ChannelController extends Controller{
                 'actions' => [
                     'index' => ['get'],
                     'delete-all' => ['get'],
+                    'view' => ['get'],
                 ],
             ],
         ];
@@ -74,5 +75,20 @@ class ChannelController extends Controller{
         //调用model的deleteAll方法删除数据
         $model->deleteAll("channelId in($channels)");
         return $this->redirect(['index']);
+    }
+    /**
+     * View Action 查看channel具体信息
+     * @param int $channelId
+     * @return string
+     */
+    public function actionView($channelId){
+        $model = Channel::findChannelById($channelId);
+        $productProvider = $model->findProducts();
+        $directoryProvider = $model->findDirectories();
+        return $this->render('view', [
+            'model' => $model,
+            'productProvider' => $productProvider,
+            'directoryProvider' => $directoryProvider,
+        ]);
     }
 }

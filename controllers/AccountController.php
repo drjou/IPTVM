@@ -7,6 +7,8 @@ use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use app\models\Account;
 use app\models\AccountSearch;
+use app\models\Product;
+use yii\helpers\ArrayHelper;
 
 class AccountController extends Controller{
     /**
@@ -30,6 +32,8 @@ class AccountController extends Controller{
                 'actions' => [
                     'index' => ['get'],
                     'delete-all' => ['get'],
+                    'view' => ['get'],
+                    'create' => ['get', 'post'],
                 ]
             ]
         ];
@@ -74,6 +78,33 @@ class AccountController extends Controller{
         //调用model的deleteAll方法删除数据
         $model->deleteAll("accountId in($accounts)");
         return $this->redirect(['index']);
+    }
+    /**
+     * View Action 查看account的详细信息
+     * @param unknown $accountId
+     */
+    public function actionView($accountId){
+        $model = Account::findAccountById($accountId);
+        $productProvider = $model->findProducts();
+        $productcardProvider = $model->findProductcards();
+        return $this->render('view', [
+            'model' => $model,
+            'productProvider' => $productProvider,
+            'productcardProvider' => $productcardProvider,
+        ]);
+    }
+    
+    /**
+     * Create Action 新增account
+     * @return string
+     */
+    public function actionCreate(){
+        $model = new Account();
+        $products = ArrayHelper::map(Product::find()->select(['productId', 'productName'])->all(), 'productId', 'productName');
+        return $this->render('create', [
+            'model' => $model,
+            'products' => $products,
+        ]);
     }
     
 }

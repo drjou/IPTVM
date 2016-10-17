@@ -23,7 +23,11 @@ class ProductSearch extends Product{
     public function scenarios(){
         return Model::scenarios();
     }
-    
+    /**
+     * 检索过滤
+     * @param string $params
+     * @return \yii\data\ActiveDataProvider
+     */
     public function search($params){
         $query = Product::find();
         $dataProvider = new ActiveDataProvider([

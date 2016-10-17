@@ -41,7 +41,11 @@ $this->params['breadcrumbs'][] = $this->title;
         'channelUrl',
         'urlType',
         'channelType',
-        'languageId',
+        [
+            'attribute' => 'languageName',
+            'value' => 'language.languageName',
+            'filter' => Html::activeTextInput($searchModel, 'languageName', ['class' => 'form-control']),
+        ],
         [
             'class' => 'yii\grid\ActionColumn',
             'header' => 'Operations',

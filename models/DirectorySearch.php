@@ -23,7 +23,11 @@ class DirectorySearch extends Directory{
     public function scenarios(){
         return Model::scenarios();
     }
-    
+    /**
+     * 检索过滤
+     * @param string $params
+     * @return \yii\data\ActiveDataProvider
+     */
     public function search($params){
         $query = Directory::find();
         $dataProvider = new ActiveDataProvider([

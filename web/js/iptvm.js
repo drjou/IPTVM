@@ -29,12 +29,19 @@ $(function() {
         }
     });
 
+    function GetQueryString(url,name)
+    {    
+    	var index = url.indexOf("?");
+         var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+         var r = url.substr(index+1).match(reg);
+         if(r!=null)return  unescape(r[2]); return null;
+    }
     var url = window.location;
     // var element = $('ul.nav a').filter(function() {
     //     return this.href == url;
     // }).addClass('active').parent().parent().addClass('in').parent();
     var element = $('ul.nav a').filter(function() {
-        return this.href == url;
+    	return (GetQueryString(url.href,"r").indexOf(GetQueryString(this.href,"r")) >= 0);
     }).addClass('active').parent();
 
     while (true) {

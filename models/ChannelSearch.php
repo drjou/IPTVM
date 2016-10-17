@@ -12,7 +12,7 @@ class ChannelSearch extends Channel{
      */
     public function rules(){
         return [
-            [['channelName', 'channelIp', 'channelPic', 'channelUrl', 'urlType', 'channelType', 'languageId'], 'safe'],
+            [['channelName', 'channelIp', 'channelPic', 'channelUrl', 'urlType', 'channelType', 'languageName'], 'safe'],
         ];
     }
     /**
@@ -23,13 +23,31 @@ class ChannelSearch extends Channel{
     public function scenarios(){
         return Model::scenarios();
     }
-    
+    /**
+     * 检索过滤
+     * @param string $params
+     * @return \yii\data\ActiveDataProvider
+     */
     public function search($params){
-        $query = Channel::find();
+        $query = Channel::find()->joinWith(['language'], true, 'INNER JOIN');
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
                 'pageSize' => 10,
+            ],
+            'sort' => [
+                'attributes' => [
+                    'channelName',
+                    'channelIp',
+                    'channelPic',
+                    'channelUrl',
+                    'urlType',
+                    'channelType',
+                    'languageName' => [
+                        'asc' => ['language.languageName' => SORT_ASC],
+                        'desc' => ['language.languageName' => SORT_DESC],
+                    ]
+                ],
             ],
         ]);
         $this->load($params);
@@ -43,7 +61,7 @@ class ChannelSearch extends Channel{
         ->andFilterWhere(['like', 'channelUrl', $this->channelUrl])
         ->andFilterWhere(['like', 'urlType', $this->urlType])
         ->andFilterWhere(['like', 'channelType', $this->channelType])
-        ->andFilterWhere(['=', 'languageId', $this->languageId]);
+        ->andFilterWhere(['like', 'language.languageName', $this->languageName]);
         return $dataProvider;
     }
 }

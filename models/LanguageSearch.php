@@ -4,19 +4,19 @@ namespace app\models;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
-class AccountSearch extends Account{
+class LanguageSearch extends Language{
     /**
-     * 表单验证规则
+     * 设置搜索验证规则，必须为safe
      * {@inheritDoc}
-     * @see \app\models\Account::rules()
+     * @see \app\models\Language::rules()
      */
     public function rules(){
         return [
-            [['accountId', 'state'], 'safe'],
+            ['languageName', 'safe'],
         ];
     }
     /**
-     * 每个场景要验证的属性
+     * 设置每个场景要验证的属性
      * {@inheritDoc}
      * @see \yii\base\Model::scenarios()
      */
@@ -29,20 +29,19 @@ class AccountSearch extends Account{
      * @return \yii\data\ActiveDataProvider
      */
     public function search($params){
-        $query = Account::find();
+        $query = Language::find();
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
                 'pageSize' => 10,
-            ]
+            ],
         ]);
         $this->load($params);
         if(!$this->validate()){
             return $dataProvider;
         }
         
-        $query->andFilterWhere(['like', 'accountId', $this->accountId])
-        ->andFilterWhere(['=', 'state', $this->state]);
+        $query->andFilterWhere(['like', 'languageName', $this->languageName]);
         return $dataProvider;
     }
 }
