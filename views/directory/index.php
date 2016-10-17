@@ -36,7 +36,10 @@ $this->params['breadcrumbs'][] = $this->title;
             'headerOptions' => ['width' => '10'],
         ],
         'directoryName',
-        'parentId',
+        [
+            'attribute' => 'parentName',
+            'value' => 'parentDirectory.directoryName',
+        ],
         'showOrder',
         [
             'class' => 'yii\grid\ActionColumn',

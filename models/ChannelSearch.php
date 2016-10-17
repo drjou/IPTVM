@@ -29,7 +29,7 @@ class ChannelSearch extends Channel{
      * @return \yii\data\ActiveDataProvider
      */
     public function search($params){
-        $query = Channel::find()->joinWith(['language'], true, 'INNER JOIN');
+        $query = Channel::find()->joinWith(['language']);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [

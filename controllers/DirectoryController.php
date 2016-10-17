@@ -76,8 +76,17 @@ class DirectoryController extends Controller{
         $model->deleteAll("directoryId in($directories)");
         return $this->redirect(['index']);
     }
-    
+    /**
+     * 查看directory的详细信息
+     * @param int $directoryId
+     * @return string
+     */
     public function actionView($directoryId){
-        
+        $model = Directory::findDirectoryById($directoryId);
+        $channelProvider = $model->findChannels();
+        return $this->render('view', [
+            'model' => $model,
+            'channelProvider' => $channelProvider,
+        ]);
     }
 }

@@ -12,7 +12,7 @@ class DirectorySearch extends Directory{
      */
     public function rules(){
         return [
-            [['directoryName', 'parentId', 'showOrder'], 'safe'],
+            [['directoryName', 'parentName', 'showOrder'], 'safe'],
         ];
     }
     /**
@@ -29,11 +29,21 @@ class DirectorySearch extends Directory{
      * @return \yii\data\ActiveDataProvider
      */
     public function search($params){
-        $query = Directory::find();
+        $query = Directory::find()->joinWith(['parentDirectory']);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
                 'pageSize' => 10,
+            ],
+            'sort' => [
+                'attributes' => [
+                    'directoryName',
+                    'parentName' => [
+                        'asc' => ['parentDirectory.directoryName' => SORT_ASC],
+                        'desc' => ['parentDirectory.directoryName' => SORT_DESC],
+                    ],
+                    'showOrder',
+                ],
             ],
         ]);
         $this->load($params);
@@ -42,7 +52,7 @@ class DirectorySearch extends Directory{
         }
         
         $query->andFilterWhere(['like', 'directoryName', $this->directoryName])
-        ->andFilterWhere(['=', 'parentId', $this->parentId])
+        ->andFilterWhere(['like', 'parentDirectory.directoryName', $this->directoryName])
         ->andFilterWhere(['=', 'showOrder', $this->showOrder]);
         return $dataProvider;        
     }

@@ -75,6 +75,8 @@ class Account extends ActiveRecord{
             'sort'=>[
                 'attributes'=>[
                     'cardNumber',
+                    'cardValue',
+                    'useDate',
                 ]
             ]
         ]);
