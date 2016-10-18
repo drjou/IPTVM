@@ -37,7 +37,10 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
         'cardNumber',
         'cardValue',
-        'productId',
+        [
+            'attribute' => 'productName',
+            'value' => 'product.productName',
+        ],
         'cardState',
         'useDate',
         'accountId',

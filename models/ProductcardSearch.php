@@ -12,7 +12,7 @@ class ProductcardSearch extends Productcard{
      */
     public function rules(){
         return [
-            [['cardNumber', 'cardValue', 'productId', 'cardState', 'useDate', 'accountId'], 'safe'],
+            [['cardNumber', 'cardValue', 'productName', 'cardState', 'useDate', 'accountId'], 'safe'],
         ];
     }
     /**
@@ -29,11 +29,24 @@ class ProductcardSearch extends Productcard{
      * @return \yii\data\ActiveDataProvider
      */
     public function search($params){
-        $query = Productcard::find();
+        $query = Productcard::find()->joinWith(['product']);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
                 'pageSize' => 10,
+            ],
+            'sort' => [
+                'attributes' => [
+                    'cardNumber',
+                    'cardValue',
+                    'productName' => [
+                        'asc' => ['product.productName' => SORT_ASC],
+                        'desc' => ['product.productName' => SORT_DESC],
+                    ],
+                    'cardState',
+                    'useDate',
+                    'accountId',
+                ],
             ],
         ]);
         $this->load($params);
@@ -43,10 +56,10 @@ class ProductcardSearch extends Productcard{
         
         $query->andFilterWhere(['like', 'cardNumber', $this->cardNumber])
         ->andFilterWhere(['like', 'cardValue', $this->cardValue])
-        ->andFilterWhere(['=', 'productId', $this->productId])
+        ->andFilterWhere(['like', 'product.productName', $this->productName])
         ->andFilterWhere(['=', 'cardState', $this->cardState])
         ->andFilterWhere(['like', 'useDate', $this->useDate])
-        ->andFilterWhere(['=', 'accountId', $this->accountId]);
+        ->andFilterWhere(['like', 'accountId', $this->accountId]);
         return $dataProvider;
         
     }

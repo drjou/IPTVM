@@ -30,6 +30,7 @@ class ProductController extends Controller{
                 'actions' => [
                     'index' => ['get'],
                     'delete-all' => ['get'],
+                    'view' => ['get'],
                 ]
             ]
         ];
@@ -74,5 +75,20 @@ class ProductController extends Controller{
         //调用model的deleteAll方法删除数据
         $model->deleteAll("productId in($products)");
         return $this->redirect(['index']);
+    }
+    /**
+     * View Action 显示product的详细信息
+     * @param int $productId
+     * @return string
+     */
+    public function actionView($productId){
+        $model = Product::findProductById($productId);
+        $accountProvider = $model->findAccounts();
+        $channelProvider = $model->findChannels();
+        return $this->render('view', [
+            'model' => $model,
+            'accountProvider' => $accountProvider,
+            'channelProvider' => $channelProvider,
+        ]);
     }
 }

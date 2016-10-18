@@ -6,6 +6,7 @@ use yii\web\Controller;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use app\models\LanguageSearch;
+use app\models\Language;
 
 class LanguageController extends Controller{
     /**
@@ -20,7 +21,7 @@ class LanguageController extends Controller{
                 'rules' => [
                     [
                         'allow' => true,
-                        'roles' =>　['@'],
+                        'roles' => ['@'],
                     ],
                 ],
             ],
@@ -56,5 +57,23 @@ class LanguageController extends Controller{
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
+    }
+    
+/**
+     * 多选删除操作
+     * @param string $keys
+     * @return string
+     */
+    public function actionDeleteAll($keys){
+        //将得到的字符串转为php数组
+        $languageIds = explode(',', $keys);
+        //使用","作为分隔符将数组转为字符串
+        $languages = implode('","', $languageIds);
+        //在最终的字符串前后各加一个"
+        $languages = '"' . $languages . '"';
+        $model = new Language();
+        //调用model的deleteAll方法删除数据
+        $model->deleteAll("accountId in($languages)");
+        return $this->redirect(['index']);
     }
 }

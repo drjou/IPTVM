@@ -34,8 +34,8 @@ class AccountController extends Controller{
                     'delete-all' => ['get'],
                     'view' => ['get'],
                     'create' => ['get', 'post'],
-                ]
-            ]
+                ],
+            ],
         ];
     }
     /**

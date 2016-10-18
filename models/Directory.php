@@ -48,7 +48,10 @@ class Directory extends ActiveRecord{
         return $this->hasMany(Channel::className(), ['channelId' => 'channelId'])
                 ->viaTable('channel_directory', ['directoryId' => 'directoryId']);
     }
-    
+    /**
+     * 根据getChannels构建dataProvider
+     * @return \yii\data\ArrayDataProvider
+     */
     public function findChannels(){
         $channelProvider = new ArrayDataProvider([
             'allModels' => $this->channels,
@@ -60,9 +63,12 @@ class Directory extends ActiveRecord{
                     'channelName',
                     'channelIp',
                     'channelType',
-                    'languageName',
+                    'languageName' => [
+                        'asc' => ['language.languageName' => SORT_ASC],
+                        'desc' => ['language.languageName' => SORT_DESC],
+                    ],
                 ],
-            ]
+            ],
         ]);
         return $channelProvider;
     }

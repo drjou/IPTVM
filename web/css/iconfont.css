@@ -20,6 +20,7 @@
 	margin:0px 4px 0px 2px;
 }
 .icon-home:before { content: "\e602"; }
+.icon-language:before { content: "\e609"; }
 .icon-channel:before { content: "\e603"; }
 .icon-product:before { content: "\e604"; }
 .icon-iconfontiptv1:before { content: "\e600"; }

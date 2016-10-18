@@ -30,8 +30,9 @@ class ProductcardController extends Controller{
                 'actions' => [
                     'index' => ['get'],
                     'delete-all' => ['get'],
-                ]
-            ]
+                    'view' => ['get'],
+                ],
+            ],
         ];
     }
     /**
@@ -75,5 +76,16 @@ class ProductcardController extends Controller{
         //调用model的deleteAll方法删除数据
         $model->deleteAll("cardNumber in($cards)");
         return $this->redirect(['index']);
+    }
+    /**
+     * View Action 显示productcar的详细信息
+     * @param string $cardNumber
+     * @return string
+     */
+    public function actionView($cardNumber){
+        $model = Productcard::findProductcardById($cardNumber);
+        return $this->render('view', [
+            'model' => $model,
+        ]);
     }
 }
