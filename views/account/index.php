@@ -35,6 +35,12 @@ $states = [
         [
             'class' => 'yii\grid\CheckboxColumn',
             'name' => 'id',
+            'checkboxOptions' => function ($model, $key, $index, $column){
+                if($model->state == '1001' || $model->state == '1004'){
+                    return ['disabled' => 'disabled'];
+                }
+                return [];
+            },
             'headerOptions' => ['width' => '10'],
         ],
         [
@@ -58,10 +64,16 @@ $states = [
             'filter' => $states,
         ],
         [
+            'attribute' => 'enable',
+            'value' => function($model){
+                return $model->enable == 1 ? 'enabled' : 'diabled';
+            }
+        ],
+        [
             'class' => 'yii\grid\ActionColumn',
             'header' => 'Operations',
-            'headerOptions' => ['width' => '90'],
-            'template' => '{view}&nbsp;&nbsp;&nbsp;{update}&nbsp;&nbsp;&nbsp;{delete}',
+            'headerOptions' => ['width' => '120'],
+            'template' => '{view}&nbsp;&nbsp;&nbsp;{update}&nbsp;&nbsp;&nbsp;{delete}&nbsp;&nbsp;&nbsp;{enable}',
             'buttons' => [
                 'view' => function($url, $model, $key){
                 return Html::a('<i class="glyphicon glyphicon-eye-open"></i>',
@@ -69,15 +81,30 @@ $states = [
                     ['title' => 'View']);
                 },
                 'update' => function($url, $model, $key){
+                if($model->state==1001 || $model->state==1004) return '<i class="glyphicon glyphicon-pencil" style="color:gray;"></i>';
                 return Html::a('<i class="glyphicon glyphicon-pencil"></i>',
                     ['update', 'accountId' => $key],
                     ['title' => 'Update']);
                 },
                 'delete' => function($url, $model, $key){
+                if($model->state==1001 || $model->state==1004) return '<i class="glyphicon glyphicon-trash" style="color:gray;"></i>';
                     return Html::a('<span class="glyphicon glyphicon-trash"></span>',
                     ['delete', 'accountId' => $key],
                     ['title' => 'Delete',
                      'data' => ['confirm' => "Are you sure to delete account $key?"],
+                    ]);
+                },
+                'enable' => function($url, $model, $key){
+                if($model->enable == 1) 
+                    return Html::a('<span class="glyphicon glyphicon-ban-circle"></span>',
+                    ['disable', 'accountId' => $key],
+                    ['title' => 'Disable',
+                        'data' => ['confirm' => "Are you sure to disable account $key?"],
+                    ]);
+                return Html::a('<span class="glyphicon glyphicon-ok-circle"></span>',
+                    ['enable', 'accountId' => $key],
+                    ['title' => 'Enable',
+                        'data' => ['confirm' => "Are you sure to enable account $key?"],
                     ]);
                 },
             ],

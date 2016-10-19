@@ -42,7 +42,7 @@ class ProductSearch extends Product{
             return $dataProvider;
         }
         
-        $query->andFilterWhere(['like', 'product', $this->productName]);
+        $query->andFilterWhere(['like', 'productName', $this->productName]);
         return $dataProvider;
     }
 }

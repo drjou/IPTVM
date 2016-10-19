@@ -32,6 +32,8 @@ class LoginForm extends Model
             ['password', 'string', 'min' => 6, 'max' => 20],
             // verify the captcha
             ['captcha', 'captcha', 'captchaAction' => 'admin/captcha'],
+            // drop the space of the attributes
+            [['userName', 'password', 'captcha'], 'trim'],
             // rememberMe must be a boolean value
             ['rememberMe', 'boolean'],
             // password is validated by validatePassword()

@@ -9,6 +9,7 @@ use app\models\Account;
 use app\models\AccountSearch;
 use app\models\Product;
 use yii\helpers\ArrayHelper;
+use yii\db\Exception;
 
 class AccountController extends Controller{
     /**
@@ -34,6 +35,8 @@ class AccountController extends Controller{
                     'delete-all' => ['get'],
                     'view' => ['get'],
                     'create' => ['get', 'post'],
+                    'update' => ['get', 'post'],
+                    'delete' => ['get'],
                 ],
             ],
         ];
@@ -85,10 +88,12 @@ class AccountController extends Controller{
      */
     public function actionView($accountId){
         $model = Account::findAccountById($accountId);
-        $productProvider = $model->findProducts();
+        $bindProvider = $model->findBindProducts();
+        $productProvider = $model->findAccountProducts();
         $productcardProvider = $model->findProductcards();
         return $this->render('view', [
             'model' => $model,
+            'bindProvider' => $bindProvider,
             'productProvider' => $productProvider,
             'productcardProvider' => $productcardProvider,
         ]);
@@ -100,11 +105,107 @@ class AccountController extends Controller{
      */
     public function actionCreate(){
         $model = new Account();
+        if($model->load(Yii::$app->request->post())){
+            if($model->state == '1003'){
+                if($model->save()){
+                    return $this->redirect(['view', 'accountId' => $model->accountId]);
+                }
+            }else{
+                $columns = ['accountId', 'productId', 'bindDay', 'isActive', 'activeDate'];
+                $rows = [];
+                foreach ($model->products as $product){
+                    $row = [$model->accountId, $product, 356, 0, '3000-01-01'];
+                    array_push($rows, $row);
+                }
+                $db = Yii::$app->db;
+                $transaction = $db->beginTransaction();//开启事务
+                try {
+                    if($model->save()){//保存account信息
+                        //将预绑定的产品 信息插入表stbbind中
+                        $db->createCommand()->batchInsert('stbbind', $columns, $rows)->execute();
+                        $transaction->commit();
+                        return $this->redirect(['view', 'accountId' => $model->accountId]);
+                    }
+                }catch (Exception $e){
+                    $transaction->rollBack();
+                    $model->addError('accountId', "add account $model->accountId failed! please try again.");
+                }
+            }
+        }
+        $model->enable = 1;
         $products = ArrayHelper::map(Product::find()->select(['productId', 'productName'])->all(), 'productId', 'productName');
         return $this->render('create', [
             'model' => $model,
             'products' => $products,
         ]);
+    }
+    /**
+     * 修改account信息
+     * @param string $accountId
+     * @return \yii\web\Response
+     */
+    public function actionUpdate($accountId){
+        $model = Account::findAccountById($accountId);
+        if($model->load(Yii::$app->request->post())){
+            $db = Yii::$app->db;
+            $transaction = $db->beginTransaction();//开启事务
+            try {
+                if($model->save()){//保存更改，stbbind表级联更改
+                    //删除表stbbind中所有该account的预绑定信息
+                    $db->createCommand()->delete('stbbind', 'accountId=:accountId', ['accountId' => $model->accountId])->execute();
+                    if($model->state == '1002'){//如果更新后的状态为1002，表示有数据要向stbbin表中插入
+                        $columns = ['accountId', 'productId', 'bindDay', 'isActive', 'activeDate'];
+                        $rows = [];
+                        foreach ($model->products as $product){
+                            $row = [$model->accountId, $product, 356, 0, '3000-01-01'];
+                            array_push($rows, $row);
+                        }
+                        $db->createCommand()->batchInsert('stbbind', $columns, $rows)->execute();
+                    }
+                }
+                $transaction->commit();
+                return $this->redirect(['view', 'accountId' => $model->accountId]);
+            }catch (Exception $e){
+                $transaction->rollBack();
+                $model->addError('accountId', "update account $model->accountId failed! please try again.");
+            }
+        }
+        $products = ArrayHelper::map(Product::find()->select(['productId', 'productName'])->all(), 'productId', 'productName');
+        return $this->render('update', [
+            'model' => $model,
+            'products' => $products,
+        ]);
+    }
+    /**
+     * 删除account
+     * @param string $accountId
+     * @return \yii\web\Response
+     */
+    public function actionDelete($accountId){
+        Account::findAccountById($accountId)->delete();
+        return $this->redirect(['index']);
+    }
+    /**
+     * 设置account禁用
+     * @param string $accountId
+     * @return \yii\web\Response
+     */
+    public function actionDisable($accountId){
+        $model = Account::findAccountById($accountId);
+        $model->enable = 0;
+        $model->save();
+        return $this->redirect(['index']);
+    }
+    /**
+     * 设置account启用
+     * @param string $accountId
+     * @return \yii\web\Response
+     */
+    public function actionEnable($accountId){
+        $model = Account::findAccountById($accountId);
+        $model->enable = 1;
+        $model->save();
+        return $this->redirect(['index']);
     }
     
 }

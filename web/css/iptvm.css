@@ -510,3 +510,10 @@ table.dataTable thead .sorting:after {
 .label-grey {
 	background-color: #eeeeee;
 }
+
+.checkgroup {
+	padding: 10px;
+	border: 1px solid;
+	border-color: #cccccc;
+	border-radius: 4px;
+}

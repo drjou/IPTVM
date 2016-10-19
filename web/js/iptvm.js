@@ -41,7 +41,9 @@ $(function() {
     //     return this.href == url;
     // }).addClass('active').parent().parent().addClass('in').parent();
     var element = $('ul.nav a').filter(function() {
-    	return (GetQueryString(url.href,"r").indexOf(GetQueryString(this.href,"r")) >= 0);
+    	var uhref = GetQueryString(url.href,"r");
+    	var thref = GetQueryString(this.href,"r");
+    	return uhref.substring(0, uhref.indexOf('/')) == thref.substring(0, thref.indexOf('/'));
     }).addClass('active').parent();
 
     while (true) {
