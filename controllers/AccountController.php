@@ -10,6 +10,7 @@ use app\models\AccountSearch;
 use app\models\Product;
 use yii\helpers\ArrayHelper;
 use yii\db\Exception;
+use yii\web\HttpException;
 
 class AccountController extends Controller{
     /**
@@ -73,6 +74,12 @@ class AccountController extends Controller{
     public function actionDeleteAll($keys){
         //将得到的字符串转为php数组
         $accountIds = explode(',', $keys);
+        foreach ($accountIds as $accountId){
+            $acc = Account::findAccountById($accountId);
+            if($acc->state == '1001' || $acc->state == '1004'){
+                throw new HttpException(500, 'you can\'t delete the account whose state is 1001 or 1004');
+            }
+        }
         //使用","作为分隔符将数组转为字符串
         $accounts = implode('","', $accountIds);
         //在最终的字符串前后各加一个"
@@ -111,16 +118,16 @@ class AccountController extends Controller{
                     return $this->redirect(['view', 'accountId' => $model->accountId]);
                 }
             }else{
-                $columns = ['accountId', 'productId', 'bindDay', 'isActive', 'activeDate'];
-                $rows = [];
-                foreach ($model->products as $product){
-                    $row = [$model->accountId, $product, 356, 0, '3000-01-01'];
-                    array_push($rows, $row);
-                }
                 $db = Yii::$app->db;
                 $transaction = $db->beginTransaction();//开启事务
                 try {
                     if($model->save()){//保存account信息
+                        $columns = ['accountId', 'productId', 'bindDay', 'isActive', 'activeDate'];
+                        $rows = [];
+                        foreach ($model->products as $product){
+                            $row = [$model->accountId, $product, 356, 0, '3000-01-01'];
+                            array_push($rows, $row);
+                        }
                         //将预绑定的产品 信息插入表stbbind中
                         $db->createCommand()->batchInsert('stbbind', $columns, $rows)->execute();
                         $transaction->commit();
@@ -146,6 +153,9 @@ class AccountController extends Controller{
      */
     public function actionUpdate($accountId){
         $model = Account::findAccountById($accountId);
+        if($model->state == '1001' || $model->state == '1004'){
+            throw new HttpException(500, 'you can\'t update the account whose state is 1001 or 1004');
+        }
         if($model->load(Yii::$app->request->post())){
             $db = Yii::$app->db;
             $transaction = $db->beginTransaction();//开启事务
@@ -161,10 +171,10 @@ class AccountController extends Controller{
                             array_push($rows, $row);
                         }
                         $db->createCommand()->batchInsert('stbbind', $columns, $rows)->execute();
+                        $transaction->commit();
+                        return $this->redirect(['view', 'accountId' => $model->accountId]);
                     }
                 }
-                $transaction->commit();
-                return $this->redirect(['view', 'accountId' => $model->accountId]);
             }catch (Exception $e){
                 $transaction->rollBack();
                 $model->addError('accountId', "update account $model->accountId failed! please try again.");
@@ -182,7 +192,11 @@ class AccountController extends Controller{
      * @return \yii\web\Response
      */
     public function actionDelete($accountId){
-        Account::findAccountById($accountId)->delete();
+        $model = Account::findAccountById($accountId);
+        if($model->state == '1001' || $model->state == '1004'){
+            throw new HttpException(500, 'you can\'t delete the account whose state is 1001 or 1004');
+        }
+        $model->delete();
         return $this->redirect(['index']);
     }
     /**

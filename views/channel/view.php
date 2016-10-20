@@ -140,3 +140,12 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= Html::a('Update', ['update', 'channelId' => $model->channelId], ['class' => 'btn btn-warning']) ?>
     <?= Html::a('Delete', ['delete', 'channelId' => $model->channelId], ['class' => 'btn btn-danger']) ?>
 </p>
+<?php 
+    $this->registerJs("
+        $(document).on('click', '.btn-danger', function(){
+            if(!confirm('are you sure to delete this channel?')){
+                return false;
+            }
+        });
+    ");
+?>

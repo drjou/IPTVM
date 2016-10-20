@@ -29,6 +29,12 @@ $this->params['breadcrumbs'][] = $this->title;
         [
             'class' => 'yii\grid\CheckboxColumn',
             'name' => 'id',
+            'checkboxOptions' => function ($model, $key, $index, $column){
+                if(!empty($model->childrenDirectories)){
+                    return ['disabled' => 'disabled'];
+                }
+                return [];
+            },
             'headerOptions' => ['width' => '10'],
         ],
         [
@@ -58,6 +64,9 @@ $this->params['breadcrumbs'][] = $this->title;
                     ['title' => 'Update']);
                 },
                 'delete' => function($url, $model, $key){
+                    if(!empty($model->childrenDirectories)){
+                        return '<i class="glyphicon glyphicon-trash" style="color:gray;"></i>';
+                    }
                     return Html::a('<span class="glyphicon glyphicon-trash"></span>',
                     ['delete', 'directoryId' => $key],
                     ['title' => 'Delete',

@@ -3,8 +3,10 @@ namespace app\models;
 
 use yii\db\ActiveRecord;
 use yii\data\ArrayDataProvider;
+use yii\helpers\ArrayHelper;
 
 class Directory extends ActiveRecord{
+    //父目录名称
     public $parentName;
     /**
      * 设置模型对应的表名
@@ -20,7 +22,11 @@ class Directory extends ActiveRecord{
      */
     public function rules(){
         return [
-            [['directoryName', 'ParentName', 'showOrder'], 'required'],
+            [['directoryName', 'showOrder'], 'required'],
+            ['directoryName', 'unique'],
+            ['directoryName', 'trim'],
+            ['showOrder', 'integer'],
+            ['channels', 'safe'],
         ];
     }
     /**
@@ -41,6 +47,22 @@ class Directory extends ActiveRecord{
                 ->from(Directory::tableName().' parentDirectory');
     }
     /**
+     * 获取该目录的所有子目录
+     * @return ActiveQuery
+     */
+    public function getChildrenDirectories(){
+        return $this->hasMany(Directory::className(), ['parentId' => 'directoryId'])
+                ->from(Directory::tableName().' childrenDirectories');
+    }
+    /**
+     * 设置channels为从表单获取的值
+     * @param array $channels
+     */
+    public function setChannels($channels){
+        $this->channels = $channels;
+    }
+    
+    /**
      * 获取目录下的channel
      * @return ActiveQuery
      */
@@ -48,6 +70,26 @@ class Directory extends ActiveRecord{
         return $this->hasMany(Channel::className(), ['channelId' => 'channelId'])
                 ->viaTable('channel_directory', ['directoryId' => 'directoryId']);
     }
+    /**
+     * 根据getChildrenDirectories方法构建dataProvider
+     * @return \yii\data\ArrayDataProvider
+     */
+    public function findChildrenDirectories(){
+        $childrenProvider = new ArrayDataProvider([
+            'allModels' => $this->childrenDirectories,
+            'pagination' => [
+                'pageSize' => 10,
+            ],
+            'sort' => [
+                'attributes' => [
+                    'directoryName',
+                    'showOrder',
+                ],
+            ],
+        ]);
+        return $childrenProvider;
+    }
+    
     /**
      * 根据getChannels构建dataProvider
      * @return \yii\data\ArrayDataProvider
@@ -71,5 +113,25 @@ class Directory extends ActiveRecord{
             ],
         ]);
         return $channelProvider;
+    }
+    /**
+     * 获取所有目录信息
+     */
+    public function getAllDirectories(){
+        $directories = self::find()->select(['directoryId', 'directoryName'])->all();
+        return ArrayHelper::map($directories, 'directoryId', 'directoryName');
+    }
+    /**
+     * 在保存之前对parentId赋值
+     * {@inheritDoc}
+     * @see \yii\db\BaseActiveRecord::beforeSave()
+     */
+    public function beforeSave($insert){
+        if(empty($this->parentName)){
+            $this->parentId = null;
+        }else{
+            $this->parentId = $this->parentName;
+        }
+        return parent::beforeSave($insert);
     }
 }
