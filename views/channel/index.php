@@ -37,7 +37,19 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
         'channelName',
         'channelIp',
-        'channelPic',
+        [
+            'attribute' => 'thumbnail',
+            'format' => [
+                'image',
+                [
+                    'width' => 20,
+                    'height' => 20,
+                ],
+            ],
+            'value' => function($model){
+                return '/IPTVM/web' . $model->channelPic;
+            }
+        ],
         'channelUrl',
         'urlType',
         'channelType',

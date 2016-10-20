@@ -23,6 +23,7 @@ class Account extends ActiveRecord{
         return [
             [['accountId', 'state', 'enable'], 'required'],
             ['accountId', 'unique'],
+            ['accountId', 'trim'],
             ['products', 'required', 'when' => function($model){
                 return $model->state == '1002';
             }, 'whenClient' => "function (attribute, value) {

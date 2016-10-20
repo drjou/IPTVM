@@ -7,6 +7,11 @@ use yii\data\ArrayDataProvider;
 class Channel extends ActiveRecord{
     //语言名
     public $languageName;
+    //channel对应的图片
+    public $thumbnail;
+    
+    const SCENARIO_ADD = 'add';
+    const SCENARIO_UPDATE = 'update';
     /**
      * 设置模型对应表名
      * @return string
@@ -21,7 +26,37 @@ class Channel extends ActiveRecord{
      */
     public function rules(){
         return [
-            [['channelName', 'channelIp', 'channelPic', 'channelUrl', 'urlType', 'channelType', 'languageName'], 'required'],
+            [['channelName', 'channelIp', 'channelUrl', 'urlType', 'channelType', 'languageName'], 'required'],
+            ['channelPic', 'required', 'on' => self::SCENARIO_UPDATE],
+            [['channelName', 'channelIp', 'channelUrl'], 'trim'],
+            ['channelName', 'string', 'length' => [3, 10]],
+            ['channelName', 'unique'],
+            ['channelIp', 'ip'],
+            ['thumbnail', 'file', 'mimeTypes' => 'image/*', 'extensions' => ['jpg', 'png', 'gif'], 'maxSize' => 1024*1024],
+            ['thumbnail', 'file', 'skipOnEmpty' => false, 'on' => self::SCENARIO_ADD],
+        ];
+    }
+    /**
+     * 设置不同场景下要验证的属性
+     * {@inheritDoc}
+     * @see \yii\base\Model::scenarios()
+     */
+    public function scenarios(){
+        return [
+            self::SCENARIO_ADD => ['channelName', 'channelIp', 'thumbnail', 'channelUrl', 'urlType', 'channelType', 'languageName'],
+            self::SCENARIO_UPDATE => ['channelName', 'channelIp', 'channelPic', 'thumbnail', 'channelUrl', 'urlType', 'channelType', 'languageName'],
+        ];
+    }
+    
+    /**
+     * 设置表单显示的名称
+     * {@inheritDoc}
+     * @see \yii\base\Model::attributeLabels()
+     */
+    public function attributeLabels(){
+        return [
+            'channelIp' => 'Channel IP Address',
+            'channelPic' => 'Channel Picture Path'
         ];
     }
     /**
@@ -67,8 +102,8 @@ class Channel extends ActiveRecord{
             'sort'=>[
                 'attributes'=>[
                     'productName',
-                ]
-            ]
+                ],
+            ],
         ]);
         return $productProvider;
     }
@@ -85,9 +120,21 @@ class Channel extends ActiveRecord{
             'sort'=>[
                 'attributes'=>[
                     'directoryName',
-                ]
+                ],
             ]
         ]);
         return $directoryProvider;
+    }
+    /**
+     * 设置在save前要进行的操作
+     * {@inheritDoc}
+     * @see \yii\db\BaseActiveRecord::beforeSave()
+     */
+    public function beforeSave($insert){
+        if(!empty($this->thumbnail)){
+            $this->channelPic = '/images/channels' . '/' . $this->thumbnail->baseName . '.' . $this->thumbnail->extension;
+        }
+        $this->languageId = $this->languageName;
+        return parent::beforeSave($insert);
     }
 }

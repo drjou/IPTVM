@@ -7,6 +7,9 @@ use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use app\models\ChannelSearch;
 use app\models\Channel;
+use app\models\Language;
+use yii\helpers\ArrayHelper;
+use yii\web\UploadedFile;
 
 class ChannelController extends Controller{
     /**
@@ -31,6 +34,9 @@ class ChannelController extends Controller{
                     'index' => ['get'],
                     'delete-all' => ['get'],
                     'view' => ['get'],
+                    'create' => ['get', 'post'],
+                    'update' => ['get', 'post'],
+                    'delete' => ['get'],
                 ],
             ],
         ];
@@ -90,5 +96,76 @@ class ChannelController extends Controller{
             'productProvider' => $productProvider,
             'directoryProvider' => $directoryProvider,
         ]);
+    }
+    /**
+     * 创建新的channel
+     * @return string
+     */
+    public function actionCreate(){
+        $model = new Channel();
+        $model->scenario = Channel::SCENARIO_ADD;
+        if($model->load(Yii::$app->request->post())){
+            $model->thumbnail = UploadedFile::getInstance($model, 'thumbnail');
+            if($model->thumbnail && $model->save()){
+                $dir = dirname(__DIR__) . '/web/images/channels';
+                if(!is_dir($dir)){
+                    mkdir($dir);
+                }
+                $model->thumbnail->saveAs('images/channels' . '/' . $model->thumbnail->baseName . '.' . $model->thumbnail->extension);
+                return $this->redirect(['view', 'channelId' => $model->channelId]);
+            }
+        }
+        $languages = ArrayHelper::map(Language::find()->all(), 'languageId', 'languageName');
+        return $this->render('create', [
+            'model' => $model,
+            'languages' => $languages,
+        ]);
+    }
+    /**
+     * 更新指定的channel信息
+     * @param int $channelId
+     * @return \yii\web\Response
+     */
+    public function actionUpdate($channelId){
+        $model = Channel::findChannelById($channelId);
+        $model->scenario = Channel::SCENARIO_UPDATE;
+        if($model->load(Yii::$app->request->post())){
+            $model->thumbnail = UploadedFile::getInstance($model, 'thumbnail');
+            if(!empty($model->thumbnail)){//如果更改了图片
+                //先删除原图
+                unlink(dirname(__DIR__) . '/web' . $model->channelPic);
+                //保存结果到数据库
+                if($model->save()){
+                    $dir = dirname(__DIR__) . '/web/images/channels';
+                    if(!is_dir($dir)){
+                        mkdir($dir);
+                    }
+                    //保存新图到服务器
+                    $model->thumbnail->saveAs('images/channels' . '/' . $model->thumbnail->baseName . '.' . $model->thumbnail->extension);
+                    return $this->redirect(['view', 'channelId' => $model->channelId]);
+                }
+            }else{
+                if($model->save()){
+                    return $this->redirect(['view', 'channelId' => $model->channelId]);
+                }
+            }
+        }
+        $languages = ArrayHelper::map(Language::find()->all(), 'languageId', 'languageName');
+        return $this->render('update', [
+            'model' => $model,
+            'languages' => $languages,
+        ]);
+    }
+    
+    /**
+     * 删除指定的channel
+     * @param int $channelId
+     * @return \yii\web\Response
+     */
+    public function actionDelete($channelId){
+        $model = Channel::findChannelById($channelId);
+        unlink(dirname(__DIR__) . '/web' . $model->channelPic);
+        $model->delete();
+        return $this->redirect(['index']);
     }
 }

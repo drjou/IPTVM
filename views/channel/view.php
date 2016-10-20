@@ -29,13 +29,18 @@ $this->params['breadcrumbs'][] = $this->title;
                             'channelName',
                             'channelIp',
                             'channelPic',
+                            [
+                                'attribute' => 'thumbnail',
+                                'format' => 'html',
+                                'value' => Html::img('/IPTVM/web' . $model->channelPic),
+					        ],
                             'channelUrl',
                             'urlType',
                             'channelType',
                             [
                                 'attribute' => 'languageName',
                                 'value' => $model->language->languageName,
-                            ]
+                            ],
                         ],
                     ]) ?>
 				</div>
@@ -132,4 +137,6 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <p>
     <?= Html::a('Back to Channel List', ['index'], ['class' => 'btn btn-primary']) ?>
+    <?= Html::a('Update', ['update', 'channelId' => $model->channelId], ['class' => 'btn btn-warning']) ?>
+    <?= Html::a('Delete', ['delete', 'channelId' => $model->channelId], ['class' => 'btn btn-danger']) ?>
 </p>
