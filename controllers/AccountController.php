@@ -156,28 +156,46 @@ class AccountController extends Controller{
         if($model->state == '1001' || $model->state == '1004'){
             throw new HttpException(500, 'you can\'t update the account whose state is 1001 or 1004');
         }
+        //修改前对应的products
+        $oldProducts = ArrayHelper::getColumn($model->products, 'productId');
         if($model->load(Yii::$app->request->post())){
-            $db = Yii::$app->db;
-            $transaction = $db->beginTransaction();//开启事务
-            try {
-                if($model->save()){//保存更改，stbbind表级联更改
-                    //删除表stbbind中所有该account的预绑定信息
-                    $db->createCommand()->delete('stbbind', 'accountId=:accountId', ['accountId' => $model->accountId])->execute();
-                    if($model->state == '1002'){//如果更新后的状态为1002，表示有数据要向stbbin表中插入
-                        $columns = ['accountId', 'productId', 'bindDay', 'isActive', 'activeDate'];
-                        $rows = [];
-                        foreach ($model->products as $product){
-                            $row = [$model->accountId, $product, 356, 0, '3000-01-01'];
-                            array_push($rows, $row);
+            //修改后对应的products
+            $newProducts = $model->products;
+            if(empty($newProducts)){//默认为空字符串，赋值为空数组防止后面array_diff出错
+                $newProducts = [];
+            }
+            //修改后新增的products
+            $addProducts = array_diff($newProducts, $oldProducts);
+            //修改后删除的products
+            $delProducts = array_diff($oldProducts, $newProducts);
+            if(!empty($addProducts) || !empty($delProducts)){//channels相比之前发生了变化
+                $db = Yii::$app->db;
+                $transaction = $db->beginTransaction();
+                try{
+                    if($model->save()){
+                        if(!empty($addProducts)){//增加的products不为空，则向stbbind表中添加
+                            $columns = ['accountId', 'productId', 'bindDay', 'isActive', 'activeDate'];
+                            $rows = [];
+                            foreach ($addProducts as $product){
+                                $row = [$model->accountId, $product, 356, 0, '3000-01-01'];
+                                array_push($rows, $row);
+                            }
+                            $db->createCommand()->batchInsert('stbbind', $columns, $rows)->execute();
                         }
-                        $db->createCommand()->batchInsert('stbbind', $columns, $rows)->execute();
+                        if(!empty($delProducts)){//删除的products不为空，则从stbbind表中删除
+                            $db->createCommand()->delete('stbbind', ['accountId' => $model->accountId, 'productId' => $delProducts])->execute();
+                        }
                         $transaction->commit();
                         return $this->redirect(['view', 'accountId' => $model->accountId]);
                     }
+                }catch (Exception $e){
+                    $transaction->rollBack();
+                    $model->addError('accountId', "update account $model->accountId failed! please try again.");
                 }
-            }catch (Exception $e){
-                $transaction->rollBack();
-                $model->addError('accountId', "update account $model->accountId failed! please try again.");
+            }else{
+                if($model->save()){
+                    return $this->redirect(['view', 'accountId' => $model->accountId]);
+                }
             }
         }
         $products = ArrayHelper::map(Product::find()->select(['productId', 'productName'])->all(), 'productId', 'productName');

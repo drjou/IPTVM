@@ -41,6 +41,9 @@ $states = [
         $('#account-state').change(function(){
     		if($(this).val() == 1003){
     			$('.field-account-products').hide();
+                $('#account-products input').each(function(){
+                    $(this).prop('checked', false);
+                });
     		}else{
     			$('.field-account-products').show();
     		}

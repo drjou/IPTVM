@@ -3,6 +3,7 @@ namespace app\models;
 
 use yii\db\ActiveRecord;
 use yii\data\ArrayDataProvider;
+use yii\web\NotFoundHttpException;
 
 class Channel extends ActiveRecord{
     //语言名
@@ -65,7 +66,11 @@ class Channel extends ActiveRecord{
      * @return \app\models\Channel|NULL
      */
     public static function findChannelById($channelId){
-        return self::findOne($channelId);
+        if(($model = self::findOne($channelId)) !== null){
+            return $model;
+        }else{
+            throw new NotFoundHttpException("The channel whose channelId is $channelId don't exist, please try the right way to access channel.");
+        }
     }
     
     /**

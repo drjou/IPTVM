@@ -156,6 +156,9 @@ class DirectoryController extends Controller{
         if($model->load(Yii::$app->request->post())){
             //计算channels的差别，然后进行差量同步到数据库
             $newChannels = $model->channels;
+            if(empty($newChannels)){//默认为空字符串，赋值为空数组防止后面array_diff出错
+                $newChannels = [];
+            }
             //增加的channels
             $addChannels = array_diff($newChannels, $oldChannels);
             //删除的channels
@@ -182,7 +185,7 @@ class DirectoryController extends Controller{
                     }
                 }catch (Exception $e){
                     $transaction->rollBack();
-                    $model->addError('directoryName', "update account $model->directoryName failed! please try again.");
+                    $model->addError('directoryName', "update directory $model->directoryName failed! please try again.");
                 }
             }else{
                 if($model->save()){

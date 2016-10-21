@@ -4,6 +4,7 @@ namespace app\models;
 use yii\db\ActiveRecord;
 use yii\data\ArrayDataProvider;
 use yii\helpers\ArrayHelper;
+use yii\web\NotFoundHttpException;
 
 class Directory extends ActiveRecord{
     //父目录名称
@@ -35,7 +36,11 @@ class Directory extends ActiveRecord{
      * @return \app\models\Directory|NULL
      */
     public static function findDirectoryById($directoryId){
-        return self::findOne($directoryId);
+        if(($model = self::findOne($directoryId)) !== null){
+            return $model;
+        }else{
+            throw new NotFoundHttpException("The directory whose directoryId is $directoryId don't exist, please try the right way to access directory.");
+        }
     }
     
     /**

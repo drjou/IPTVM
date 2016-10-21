@@ -3,6 +3,7 @@ namespace app\models;
 
 use yii\db\ActiveRecord;
 use yii\data\ArrayDataProvider;
+use yii\web\NotFoundHttpException;
 
 class Account extends ActiveRecord{
     //产品包
@@ -62,7 +63,11 @@ class Account extends ActiveRecord{
      * @return \app\models\Account|NULL
      */
     public static function findAccountById($accountId){
-        return self::findOne($accountId);
+        if(($model = self::findOne($accountId)) !== null){
+            return $model;
+        }else{
+            throw new NotFoundHttpException("The account whose accountId is $accountId don't exist, please try the right way to access account.");
+        }
     }
     /**
      * 获取账户初始预绑定的产品

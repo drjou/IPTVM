@@ -3,6 +3,7 @@ namespace app\models;
 
 use yii\db\ActiveRecord;
 use yii\data\ArrayDataProvider;
+use yii\web\NotFoundHttpException;
 
 class Product extends ActiveRecord{
     /**
@@ -28,7 +29,11 @@ class Product extends ActiveRecord{
      * @return \app\models\Product|NULL
      */
     public static function findProductById($productId){
-        return self::findOne($productId);
+        if(($model = self::findOne($productId)) !== null){
+            return $model;
+        }else{
+            throw new NotFoundHttpException("The product whose productId is $productId don't exist, please try the right way to access product.");
+        }
     }
     /**
      * 获取产品包所属账户列表

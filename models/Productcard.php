@@ -2,6 +2,7 @@
 namespace app\models;
 
 use yii\db\ActiveRecord;
+use yii\web\NotFoundHttpException;
 
 class Productcard extends ActiveRecord{
     public $productName;
@@ -28,7 +29,11 @@ class Productcard extends ActiveRecord{
      * @return \app\models\Productcard|NULL
      */
     public static function findProductcardById($cardNumber){
-        return self::findOne($cardNumber);
+        if(($model = self::findOne($cardNumber)) !== null){
+            return $model;
+        }else{
+            throw new NotFoundHttpException("The productcard whose cardNumber is $cardNumber don't exist, please try the right way to access productcard.");
+        }
     }
     
     /**
