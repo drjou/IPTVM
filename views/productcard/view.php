@@ -30,11 +30,22 @@ $this->params['breadcrumbs'][] = $this->title;
                             'cardValue',
                             [
                                 'attribute' => 'productName',
-                                'value' => $model->product->productName,
+                                'format' => 'raw',
+                                'value'=>  Html::a($model->product->productName, ['product/view', 'productId' => $model->productId], ['class' => 'profile-link','title' => 'view']),
                             ],
-                            'cardState',
-                            'useDate',
-                            'accountId',
+                            [
+                                'attribute' => 'cardState',
+                                'value' => $model->cardState ? 'used' : 'not used',
+                            ],
+                            [
+                                'attribute' => 'useDate',
+                                'value' => empty($model->useDate) ? '(not set)' : $model->useDate,
+                            ],
+                            [
+                                'attribute' => 'accountId',
+                                'format' => 'raw',
+                                'value'=>  empty($model->accountId) ? '(not set)' : Html::a($model->accountId, ['account/view', 'accountId' => $model->accountId], ['class' => 'profile-link','title' => 'view']),
+                            ],
                         ],
                     ]) ?>
 				</div>
@@ -47,4 +58,22 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 <p>
     <?= Html::a('Back to Productcard List', ['index'], ['class' => 'btn btn-primary']) ?>
+    <?php 
+        if($model->cardState == 1){
+            echo Html::a('Update', ['update', 'cardNumber' => $model->cardNumber], ['class' => 'btn btn-warning disabled']);
+            echo '&nbsp;';
+            echo Html::a('Delete', ['delete', 'cardNumber' => $model->cardNumber], ['class' => 'btn btn-danger disabled']);
+        }else{
+            echo Html::a('Update', ['update', 'cardNumber' => $model->cardNumber], ['class' => 'btn btn-warning']);
+            echo '&nbsp;';
+            echo Html::a('Delete', ['delete', 'cardNumber' => $model->cardNumber], ['class' => 'btn btn-danger']);
+        }
+        $this->registerJs("
+            $(document).on('click', '.btn-danger', function(){
+                if(!confirm('are you sure to delete this productcard?')){
+                    return false;
+                }
+            });
+        ");
+    ?>
 </p>

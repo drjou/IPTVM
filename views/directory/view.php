@@ -29,7 +29,8 @@ $this->params['breadcrumbs'][] = $this->title;
                             'directoryName',
                             [
                                 'attribute' => 'parentName',
-                                'value' => empty($model->parentDirectory) ? '(not set)' : $model->parentDirectory->directoryName,
+                                'format' => 'raw',
+                                'value' => empty($model->parentDirectory) ? '(not set)' : Html::a($model->parentDirectory->directoryName, ['directory/view', 'directoryId' => $model->parentId], ['class' => 'profile-link','title' => 'view']),
                             ],
                             'showOrder',
                         ],
@@ -140,7 +141,7 @@ $this->params['breadcrumbs'][] = $this->title;
         if(!empty($model->childrenDirectories)){
             echo Html::a('Delete', ['delete', 'directoryId' => $model->directoryId], ['class' => 'btn btn-danger disabled']);
         }else{
-            Html::a('Delete', ['delete', 'directoryId' => $model->directoryId], ['class' => 'btn btn-danger']);
+            echo Html::a('Delete', ['delete', 'directoryId' => $model->directoryId], ['class' => 'btn btn-danger']);
         }
     ?>
 </p>

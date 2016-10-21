@@ -29,6 +29,12 @@ $this->params['breadcrumbs'][] = $this->title;
         [
             'class' => 'yii\grid\CheckboxColumn',
             'name' => 'id',
+            'checkboxOptions' => function ($model, $key, $index, $column){
+                if($model->cardState == 1){
+                    return ['disabled' => 'disabled'];
+                }
+                return [];
+            },
             'headerOptions' => ['width' => '10'],
         ],
         [
@@ -41,7 +47,12 @@ $this->params['breadcrumbs'][] = $this->title;
             'attribute' => 'productName',
             'value' => 'product.productName',
         ],
-        'cardState',
+        [
+            'attribute' => 'cardState',
+            'value' => function($model){
+                return $model->cardState ? 'used' : 'not used';
+            },
+        ],
         'useDate',
         'accountId',
         [
@@ -51,16 +62,18 @@ $this->params['breadcrumbs'][] = $this->title;
             'template' => '{view}&nbsp;&nbsp;&nbsp;{update}&nbsp;&nbsp;&nbsp;{delete}',
             'buttons' => [
                 'view' => function($url, $model, $key){
-                return Html::a('<i class="glyphicon glyphicon-eye-open"></i>',
+                    return Html::a('<i class="glyphicon glyphicon-eye-open"></i>',
                     ['view', 'cardNumber' => $key],
                     ['title' => 'View']);
                 },
                 'update' => function($url, $model, $key){
-                return Html::a('<i class="glyphicon glyphicon-pencil"></i>',
+                    if($model->cardState == 1) return '<i class="glyphicon glyphicon-pencil" style="color:gray;"></i>';
+                    return Html::a('<i class="glyphicon glyphicon-pencil"></i>',
                     ['update', 'cardNumber' => $key],
                     ['title' => 'Update']);
                 },
                 'delete' => function($url, $model, $key){
+                if($model->cardState == 1) return '<i class="glyphicon glyphicon-trash" style="color:gray;"></i>';
                     return Html::a('<span class="glyphicon glyphicon-trash"></span>',
                     ['delete', 'cardNumber' => $key],
                     ['title' => 'Delete',

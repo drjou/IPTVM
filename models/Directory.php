@@ -24,8 +24,9 @@ class Directory extends ActiveRecord{
     public function rules(){
         return [
             [['directoryName', 'showOrder'], 'required'],
-            ['directoryName', 'unique'],
             ['directoryName', 'trim'],
+            ['directoryName', 'string', 'length' => [4, 20]],
+            ['directoryName', 'unique'],
             ['showOrder', 'integer'],
             ['channels', 'safe'],
         ];

@@ -23,8 +23,9 @@ class Account extends ActiveRecord{
     public function rules(){
         return [
             [['accountId', 'state', 'enable'], 'required'],
-            ['accountId', 'unique'],
             ['accountId', 'trim'],
+            ['accountId', 'string', 'length' => [4, 20]],
+            ['accountId', 'unique'],
             ['products', 'required', 'when' => function($model){
                 return $model->state == '1002';
             }, 'whenClient' => "function (attribute, value) {

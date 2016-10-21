@@ -38,6 +38,22 @@ $states = [
         if($('#account-state').val() == 1003){
             $('.field-account-products').hide();
         }
+        function checkall(){
+            var checkAll = true;
+        	$('#account-products input').each(function(){
+        		if(!$(this).prop('checked')){
+        			checkAll = false;
+        			$('.all').prop('checked', false);
+        			$('.label-all').html('Check All');
+        			return false;
+        		}
+        	});
+        	if(checkAll){
+        		$('.all').prop('checked', true);
+        		$('.label-all').html('Deselect All');
+        	}
+        }
+        checkall();
         $('#account-state').change(function(){
     		if($(this).val() == 1003){
     			$('.field-account-products').hide();
@@ -59,19 +75,7 @@ $states = [
 	    });
         
         $('#account-products input').change(function(){
-    		var checkAll = true;
-        	$('#account-products input').each(function(){
-        		if(!$(this).prop('checked')){
-        			checkAll = false;
-        			$('.all').prop('checked', false);
-        			$('.label-all').html('Check All');
-        			return false;
-        		}
-        	});
-        	if(checkAll){
-        		$('.all').prop('checked', true);
-        		$('.label-all').html('Deselect All');
-        	}
+    		checkall();
 	    });
     ");
 ?>

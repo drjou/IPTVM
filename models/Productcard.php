@@ -20,7 +20,18 @@ class Productcard extends ActiveRecord{
      */
     public function rules(){
         return [
-            [['cardNumber', 'cardValue', 'productId', 'cardState', 'useDate', 'accountId'], 'required'],
+            [['cardNumber', 'cardValue', 'productName', 'cardState'], 'required'],
+            ['cardNumber', 'trim'],
+            ['cardNumber', 'string', 'length' => [4,20]],
+            ['cardNumber', 'unique'],
+        ];
+    }
+    
+    public function attributeLabels(){
+        return [
+            'cardValue' => 'Days',
+            'productName' => 'For Product',
+            'cardState' => 'Used',
         ];
     }
     /**
@@ -42,5 +53,10 @@ class Productcard extends ActiveRecord{
      */
     public function getProduct(){
         return $this->hasOne(Product::className(), ['productId' => 'productId']);
+    }
+    
+    public function beforeSave($insert){
+        $this->productId = $this->productName;
+        return parent::beforeSave($insert);
     }
 }

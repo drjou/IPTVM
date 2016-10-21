@@ -39,7 +39,8 @@ $this->params['breadcrumbs'][] = $this->title;
                             'channelType',
                             [
                                 'attribute' => 'languageName',
-                                'value' => $model->language->languageName,
+                                'format' => 'raw',
+                                'value' => Html::a($model->language->languageName, ['language/view', 'languageId' => $model->languageId], ['class' => 'profile-link','title' => 'view']),
                             ],
                         ],
                     ]) ?>

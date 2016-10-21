@@ -21,6 +21,8 @@ class Language extends ActiveRecord{
     public function rules(){
         return [
             ['languageName', 'required'],
+            ['languageName', 'trim'],
+            ['languageName', 'string', 'length' => [2, 20]],
             ['languageName', 'unique'],
         ];
     }

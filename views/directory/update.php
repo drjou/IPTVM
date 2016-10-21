@@ -32,17 +32,8 @@ $model->parentName = $model->parentId;
 <?php ActiveForm::end(); ?>
 <?php 
     $this->registerJs("
-        $('.all').change(function(){
-    		if(this.checked){
-    			$('.label-all').html('Deselect All');
-    		}else{
-    			$('.label-all').html('Check All');
-    		}
-            $('#directory-channels input').prop('checked', this.checked);
-	    });
-        
-        $('#directory-channels input').change(function(){
-    		var checkAll = true;
+        function checkall(){
+            var checkAll = true;
         	$('#directory-channels input').each(function(){
         		if(!$(this).prop('checked')){
         			checkAll = false;
@@ -55,6 +46,19 @@ $model->parentName = $model->parentId;
         		$('.all').prop('checked', true);
         		$('.label-all').html('Deselect All');
         	}
+        }
+        checkall();
+        $('.all').change(function(){
+    		if(this.checked){
+    			$('.label-all').html('Deselect All');
+    		}else{
+    			$('.label-all').html('Check All');
+    		}
+            $('#directory-channels input').prop('checked', this.checked);
+	    });
+        
+        $('#directory-channels input').change(function(){
+    		checkall();
 	    });
     ");
 ?>
