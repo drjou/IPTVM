@@ -8,6 +8,14 @@ use yii\web\Controller;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
+use app\models\Admin;
+use yii\helpers\VarDumper;
+use app\models\Account;
+use app\models\Product;
+use app\models\Channel;
+use app\models\Directory;
+use app\models\Productcard;
+use app\models\Language;
 
 class SiteController extends Controller
 {
@@ -54,6 +62,25 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        $counts = [
+            'admin' => 0,
+            'account' => 0,
+            'product' => 0,
+            'channel' => 0,
+            'directory' => 0,
+            'productcard' => 0,
+            'language' => 0,
+            'log' => 0,
+        ];
+        $counts['admin'] = count(Admin::find()->all());
+        $counts['account'] = count(Account::find()->all());
+        $counts['product'] = count(Product::find()->all());
+        $counts['channel'] = count(Channel::find()->all());
+        $counts['directory'] = count(Directory::find()->all());
+        $counts['productcard'] = count(Productcard::find()->all());
+        $counts['language'] = count(Language::find()->all());
+        return $this->render('index', [
+            'counts' => $counts,
+        ]);
     }
 }

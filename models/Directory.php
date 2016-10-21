@@ -28,7 +28,7 @@ class Directory extends ActiveRecord{
             ['directoryName', 'string', 'length' => [4, 20]],
             ['directoryName', 'unique'],
             ['showOrder', 'integer'],
-            ['channels', 'safe'],
+            [['parentName', 'channels'], 'safe'],
         ];
     }
     /**

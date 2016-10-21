@@ -517,3 +517,7 @@ table.dataTable thead .sorting:after {
 	border-color: #cccccc;
 	border-radius: 4px;
 }
+
+.icon-index {
+	font-size: 5em;
+}

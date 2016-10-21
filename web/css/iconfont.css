@@ -26,6 +26,8 @@
 .icon-iconfontiptv1:before { content: "\e600"; }
 .icon-productcard:before { content: "\e605"; }
 .icon-user:before { content: "\e606"; }
+.icon-menu:before { content: "\e60a"; }
 .icon-directory:before { content: "\e607"; }
+.icon-log:before { content: "\e60b"; }
 .icon-admin:before { content: "\e608"; }
 .icon-houtaiguanli:before { content: "\e601"; }

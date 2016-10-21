@@ -21,6 +21,10 @@ class Product extends ActiveRecord{
     public function rules(){
         return [
             ['productName', 'required'],
+            ['productName', 'trim'],
+            ['productName', 'string', 'length' => [4, 20]],
+            ['productName', 'unique'],
+            ['channels', 'safe'],
         ];
     }
     /**
@@ -36,6 +40,22 @@ class Product extends ActiveRecord{
         }
     }
     /**
+     * 获取该产品的产品充值卡信息
+     * @return ActiveQuery
+     */
+    public function getProductcards(){
+        return $this->hasMany(Productcard::className(), ['productId' => 'productId']);
+    }
+    
+    /**
+     * 获取产品包的预绑定信息
+     * @return ActiveQuery
+     */
+    public function getBindAccounts(){
+        return $this->hasMany(Stbbind::className(), ['productId' => 'productId']);
+    }
+    
+    /**
      * 获取产品包所属账户列表
      */
     public function getAccounts(){
@@ -43,12 +63,62 @@ class Product extends ActiveRecord{
                 ->viaTable('account_product', ['productId' => 'productId']);
     }
     /**
+     * 设置表单传入的channels值
+     * @param array $channels
+     */
+    public function setChannels($channels){
+        $this->channels = $channels;
+    }
+    
+    /**
      * 获取产品包下的channel列表
      */
     public function getChannels(){
         return $this->hasMany(Channel::className(), ['channelId' => 'channelId'])
                 ->viaTable('product_channel', ['productId' => 'productId']);
     }
+    
+    public function findProductcards(){
+        $cardProvider = new ArrayDataProvider([
+            'allModels' => $this->productcards,
+            'pagination' => [
+                'pageSize' => 10,
+            ],
+            'sort' => [
+                'attributes' => [
+                    'cardNumber',
+                    'cardValue',
+                    'cardState',
+                    'useDate',
+                    'accountId',
+                ],
+            ]
+        ]);
+        return $cardProvider;
+    }
+    
+    /**
+     * 根据getBindAccounts构建dataProvider
+     * @return \yii\data\ArrayDataProvider
+     */
+    public function findBindAccounts(){
+        $bindProvider = new ArrayDataProvider([
+            'allModels' => $this->bindAccounts,
+            'pagination' => [
+                'pageSize' => 10,
+            ],
+            'sort' => [
+                'attributes' => [
+                    'accountId',
+                    'bindDay',
+                    'isActive',
+                    'activeDate',
+                ],
+            ]
+        ]);
+        return $bindProvider;
+    }
+    
     /**
      * 根据getAccount构建dataProvider
      * @return \yii\data\ArrayDataProvider

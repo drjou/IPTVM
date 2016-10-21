@@ -2,6 +2,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\DetailView;
+use yii\helpers\ArrayHelper;
 $this->title = 'Product ' . $model->productName;
 $this->params['breadcrumbs'][] = ['label' => 'Product List', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
@@ -41,13 +42,13 @@ $this->params['breadcrumbs'][] = $this->title;
 	<div class="col-lg-12">
 		<div class="panel panel-default">
 			<div class="panel-heading" style="background-color: #eeeeee;">
-				<h5 style="font-weight: bold;">Accounts Belongs</h5>
+				<h5 style="font-weight: bold;">Productcards Associates</h5>
 			</div>
 			<!-- /.panel-heading -->
 			<div class="panel-body">
 				<div class="dataTable_wrapper">
 					<?= GridView::widget([
-                        'dataProvider' => $accountProvider,
+                        'dataProvider' => $cardProvider,
                         'pager' => [
                             'firstPageLabel' => 'First Page',
                             'lastPageLabel' => 'Last Page',
@@ -61,14 +62,30 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'headerOptions' => ['width' => '10'],
 					        ],
                             [
+                                'attribute'=>"cardNumber",
+                                'format'=>'raw',
+                                'value'=> function($model){
+                                    //超链接
+                                    return Html::a($model->cardNumber, ['productcard/view', 'cardNumber' => $model->cardNumber], ['class' => 'profile-link','title' => 'view']);
+                                }
+                            ],
+                            'cardValue',
+                            [
+    					        'attribute'=>"cardState",
+    					        'value'=> function($model){
+    					           return $model->cardState ? 'used' : 'not used';
+    					        }
+					        ],
+                            'useDate',
+                            [
                                 'attribute'=>"accountId",
                                 'format'=>'raw',
                                 'value'=> function($model){
+                                    if(empty($model->accountId)) return;
                                     //超链接
                                     return Html::a($model->accountId, ['account/view', 'accountId' => $model->accountId], ['class' => 'profile-link','title' => 'view']);
                                 }
                             ],
-                            'state',
                         ],
                       ]);
                     ?>
@@ -128,6 +145,115 @@ $this->params['breadcrumbs'][] = $this->title;
 	</div>
 	<!-- /.col-lg-12 -->
 </div>
+<div class="row">
+	<div class="col-lg-12">
+		<div class="panel panel-default">
+			<div class="panel-heading" style="background-color: #eeeeee;">
+				<h5 style="font-weight: bold;">Accounts Belongs</h5>
+			</div>
+			<!-- /.panel-heading -->
+			<div class="panel-body">
+				<div class="dataTable_wrapper">
+					<?= GridView::widget([
+                        'dataProvider' => $accountProvider,
+                        'pager' => [
+                            'firstPageLabel' => 'First Page',
+                            'lastPageLabel' => 'Last Page',
+                        ],
+					    'rowOptions' => function($model, $key, $index, $grid){
+					         return ['class' => $index % 2 == 0 ? 'label-white' : 'label-grey' ];
+					    },
+                        'columns' =>[
+                            [
+                                'class' => 'yii\grid\SerialColumn',
+                                'headerOptions' => ['width' => '10'],
+					        ],
+                            [
+                                'attribute'=>"accountId",
+                                'format'=>'raw',
+                                'value'=> function($model){
+                                    //超链接
+                                    return Html::a($model->accountId, ['account/view', 'accountId' => $model->accountId], ['class' => 'profile-link','title' => 'view']);
+                                }
+                            ],
+                            'state',
+                        ],
+                      ]);
+                    ?>
+				</div>
+			</div>
+			<!-- /.panel-body -->
+		</div>
+		<!-- /.panel -->
+	</div>
+	<!-- /.col-lg-12 -->
+</div>
+<div class="row">
+	<div class="col-lg-12">
+		<div class="panel panel-default">
+			<div class="panel-heading" style="background-color: #eeeeee;">
+				<h5 style="font-weight: bold;">Accounts Binded</h5>
+			</div>
+			<!-- /.panel-heading -->
+			<div class="panel-body">
+				<div class="dataTable_wrapper">
+					<?= GridView::widget([
+                        'dataProvider' => $bindProvider,
+                        'pager' => [
+                            'firstPageLabel' => 'First Page',
+                            'lastPageLabel' => 'Last Page',
+                        ],
+					    'rowOptions' => function($model, $key, $index, $grid){
+					         return ['class' => $index % 2 == 0 ? 'label-white' : 'label-grey' ];
+					    },
+                        'columns' =>[
+                            [
+                                'class' => 'yii\grid\SerialColumn',
+                                'headerOptions' => ['width' => '10'],
+					        ],
+                            [
+                                'attribute'=>"accountId",
+                                'format'=>'raw',
+                                'value'=> function($model){
+                                    //超链接
+                                    return Html::a($model->accountId, ['account/view', 'accountId' => $model->accountId], ['class' => 'profile-link','title' => 'view']);
+                                }
+                            ],
+                            'bindDay',
+                            [
+    					        'attribute'=>"isActive",
+    					        'value'=> function($model){
+    					           return $model->isActive ? 'yes' : 'no';
+    					        }
+					        ],
+                            'activeDate',
+                        ],
+                      ]);
+                    ?>
+				</div>
+			</div>
+			<!-- /.panel-body -->
+		</div>
+		<!-- /.panel -->
+	</div>
+	<!-- /.col-lg-12 -->
+</div>
 <p>
     <?= Html::a('Back to Product List', ['index'], ['class' => 'btn btn-primary']) ?>
+    <?= Html::a('Update', ['update', 'productId' => $model->productId], ['class' => 'btn btn-warning']) ?>
+    <?php
+        $states = ArrayHelper::getColumn($model->productcards, 'cardState');
+        if(in_array(1, $states)){
+            echo Html::a('Delete', ['delete', 'productId' => $model->productId], ['class' => 'btn btn-danger disabled']);
+        }else{
+            echo Html::a('Delete', ['delete', 'productId' => $model->productId], ['class' => 'btn btn-danger']);
+        }
+        $this->registerJs("
+            $(document).on('click', '.btn-danger', function(){
+                if(!confirm('are you sure to delete this product?')){
+                    return false;
+                }
+            });
+        ");
+    ?>
 </p>

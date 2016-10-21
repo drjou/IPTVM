@@ -129,7 +129,7 @@ class DirectoryController extends Controller{
                     }
                 }catch(Exception $e){
                     $transaction->rollBack();
-                    $model->addError('directoryName', "add account $model->directoryName failed! please try again.");
+                    $model->addError('directoryName', "add directory $model->directoryName failed! please try again.");
                 }
             }else{
                 if($model->save()){

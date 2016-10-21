@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\base\Widget;
+use yii\helpers\ArrayHelper;
 $this->title = 'Product List';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -29,6 +30,13 @@ $this->params['breadcrumbs'][] = $this->title;
         [
             'class' => 'yii\grid\CheckboxColumn',
             'name' => 'id',
+            'checkboxOptions' => function ($model, $key, $index, $column){
+            $states = ArrayHelper::getColumn($model->productcards, 'cardState');
+                if(in_array(1, $states)){
+                    return ['disabled' => 'disabled'];
+                }
+                return [];
+            },
             'headerOptions' => ['width' => '10'],
         ],
         [
@@ -53,6 +61,8 @@ $this->params['breadcrumbs'][] = $this->title;
                     ['title' => 'Update']);
                 },
                 'delete' => function($url, $model, $key){
+                    $states = ArrayHelper::getColumn($model->productcards, 'cardState');
+                    if(in_array(1, $states)) return '<i class="glyphicon glyphicon-trash" style="color: gray;"></i>';
                     return Html::a('<span class="glyphicon glyphicon-trash"></span>',
                     ['delete', 'productId' => $key],
                     ['title' => 'Delete',

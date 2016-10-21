@@ -122,10 +122,10 @@ class AccountController extends Controller{
                 $transaction = $db->beginTransaction();//开启事务
                 try {
                     if($model->save()){//保存account信息
-                        $columns = ['accountId', 'productId', 'bindDay', 'isActive', 'activeDate'];
+                        $columns = ['accountId', 'productId', 'bindDay', 'isActive'];
                         $rows = [];
                         foreach ($model->products as $product){
-                            $row = [$model->accountId, $product, 356, 0, '3000-01-01'];
+                            $row = [$model->accountId, $product, 356, 0];
                             array_push($rows, $row);
                         }
                         //将预绑定的产品 信息插入表stbbind中
@@ -174,10 +174,10 @@ class AccountController extends Controller{
                 try{
                     if($model->save()){
                         if(!empty($addProducts)){//增加的products不为空，则向stbbind表中添加
-                            $columns = ['accountId', 'productId', 'bindDay', 'isActive', 'activeDate'];
+                            $columns = ['accountId', 'productId', 'bindDay', 'isActive'];
                             $rows = [];
                             foreach ($addProducts as $product){
-                                $row = [$model->accountId, $product, 356, 0, '3000-01-01'];
+                                $row = [$model->accountId, $product, 356, 0];
                                 array_push($rows, $row);
                             }
                             $db->createCommand()->batchInsert('stbbind', $columns, $rows)->execute();

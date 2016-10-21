@@ -83,7 +83,12 @@ $states = [
                                 }
                             ],
 					        'bindDay',
-					        'isActive',
+					        [
+    					        'attribute'=>"isActive",
+    					        'value'=> function($model){
+    					           return $model->isActive ? 'yes' : 'no';
+    					        }
+					        ],
 					        'activeDate',
                         ],
                       ]);
