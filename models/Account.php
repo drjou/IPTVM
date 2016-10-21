@@ -108,7 +108,7 @@ class Account extends ActiveRecord{
                     ],
                     'activeDate',
                 ],
-            ]
+            ],
         ]);
         return $bindProvider;
     }
