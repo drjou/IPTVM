@@ -2,8 +2,14 @@
 namespace app\models;
 
 use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
+use yii\web\NotFoundHttpException;
 
 class Menu extends ActiveRecord{
+    //父menu名称
+    public $parentName;
+    //在分级获取菜单是需要（左侧菜单栏的显示）
+    public $children;
     /**
      * 设置模型对应的表名
      * @return string
@@ -11,7 +17,70 @@ class Menu extends ActiveRecord{
     public static function tableName(){
         return 'menu';
     }
+    /**
+     * 设置验证规则
+     * {@inheritDoc}
+     * @see \yii\base\Model::rules()
+     */
+    public function rules(){
+        return [
+            [['menuName', 'route', 'showLevel', 'showOrder', 'icon'], 'required'],
+            ['parentName', 'safe'],
+            ['route', 'match', 'pattern'=>'/^(\/\S+\/\S+|javascript:void\(0\))$/', 'message' => 'please input with the prompt'],
+            ['showLevel', 'integer', 'min' => 1, 'max' => 3, 'integerOnly' => true],
+            ['showOrder', 'integer'],
+        ];
+    }
+    /**
+     * 根据id获取menu信息
+     * @param int $id
+     * @throws NotFoundHttpException
+     * @return \app\models\Menu|NULL
+     */
+    public static function findMenuById($id){
+        if(($model = self::findOne($id)) !== null){
+            return $model;
+        }else {
+            throw new NotFoundHttpException("The menu whose id is $id don't exist, please try the right way to access menu.");
+        }
+    }
     
+    /**
+     * 与自身进行关联，查询父级的名称
+     */
+    public function getParentMenu(){
+        return $this->hasOne(Menu::className(), ['id' => 'parentId'])
+                ->from(Menu::tableName().' parentMenu');
+    }
+    /**
+     * 获取menu下的所有子menu
+     */
+    public function getChildrenMenus(){
+        return $this->hasMany(Menu::className(), ['parentId' => 'id'])
+                ->from(Menu::tableName().' childrenMenus');
+    }
+    
+    /**
+     * 获取menu表中所有的非第三级菜单名称，新增修改时用到
+     */
+    public function getMenuItems(){
+        $items = $this->find()->select(['id','menuName'])->where('showLevel in (1,2)')->all();
+        return ArrayHelper::map($items, 'id', 'menuName');
+    }
+    /**
+     * 进行赋值操作
+     * {@inheritDoc}
+     * @see \yii\db\BaseActiveRecord::beforeSave($insert)
+     */
+    public function beforeSave($insert){
+        if(empty($this->parentName)){
+            $this->parentId = null;
+        }else{
+            $this->parentId = $this->parentName;
+        }
+        $this->lastModifyTime = date('Y-m-d H:i:s', time());
+        return parent::beforeSave($insert);
+    }
     /**
      * 按级获取所有的菜单
      */

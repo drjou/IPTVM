@@ -77,7 +77,7 @@ class AccountController extends Controller{
         foreach ($accountIds as $accountId){
             $acc = Account::findAccountById($accountId);
             if($acc->state == '1001' || $acc->state == '1004'){
-                throw new HttpException(500, 'you can\'t delete the account whose state is 1001 or 1004');
+                throw new HttpException(500, 'these accounts contain account whose state is 1001 or 1004, you can\'t delete it');
             }
         }
         //使用","作为分隔符将数组转为字符串

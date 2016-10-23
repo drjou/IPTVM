@@ -77,7 +77,7 @@ class DirectoryController extends Controller{
         foreach ($directoryIds as $directoryId){
             $dir = Directory::findDirectoryById($directoryId);
             if(!empty($dir->childrenDirectories)){
-                throw new HttpException(500, 'these directories have directory that has children, you can\'t delete it');
+                throw new HttpException(500, 'these directories contain directory that has children, you can\'t delete it');
             }
         }
         //使用","作为分隔符将数组转为字符串

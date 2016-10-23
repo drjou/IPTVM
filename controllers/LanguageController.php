@@ -75,7 +75,7 @@ class LanguageController extends Controller{
         foreach ($languageIds as $languageId){
             $lang = Language::findLanguageById($languageId);
             if(!empty($lang->channels)){
-                throw new HttpException(500, "You can't delete the language with channels using it.");
+                throw new HttpException(500, "these languages contain language with channels using it, you can't delete it");
             }
         }
         //使用","作为分隔符将数组转为字符串

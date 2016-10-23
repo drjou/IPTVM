@@ -37,7 +37,12 @@ $this->params['breadcrumbs'][] = $this->title;
         'userName',
         'realName',
         'email',
-        'type',
+        [
+            'attribute' => 'type',
+            'value' => function($model){
+                return $model->type ? 'super' : 'genernal';
+            },
+        ],
         'lastLoginTime',
         'createTime',
         [

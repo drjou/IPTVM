@@ -27,7 +27,7 @@ $model->parentName = $model->parentId;
 
 <div class="form-group">
     <?= Html::submitButton('Update', ['class' => 'btn btn-success']) ?>
-    <?= Html::a('Cancel', ['index'], ['class' => 'btn btn-warning']) ?>
+    <?= Html::a('Cancel', \Yii::$app->request->referrer, ['class' => 'btn btn-warning cancel']) ?>
 </div>
 <?php ActiveForm::end(); ?>
 <?php 
@@ -60,5 +60,8 @@ $model->parentName = $model->parentId;
         $('#directory-channels input').change(function(){
     		checkall();
 	    });
+        $(document).on('click', '.cancel', function(){
+            window.history.back();
+        });
     ");
 ?>

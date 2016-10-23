@@ -2,7 +2,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\DetailView;
-$this->title = 'Language ' . $model->languageId;
+$this->title = 'Language ' . $model->languageName;
 $this->params['breadcrumbs'][] = ['label' => 'Language List', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>

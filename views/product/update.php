@@ -22,7 +22,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <div class="form-group">
     <?= Html::submitButton('Update', ['class' => 'btn btn-success']) ?>
-    <?= Html::a('Cancel', ['index'], ['class' => 'btn btn-warning']) ?>
+    <?= Html::a('Cancel', \Yii::$app->request->referrer, ['class' => 'btn btn-warning cancel']) ?>
 </div>
 <?php ActiveForm::end(); ?>
 <?php 
@@ -55,5 +55,8 @@ $this->params['breadcrumbs'][] = $this->title;
         $('#product-channels input').change(function(){
     		checkall();
 	    });
+        $(document).on('click', '.cancel', function(){
+            window.history.back();
+        });
     ");
 ?>

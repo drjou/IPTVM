@@ -75,7 +75,7 @@ class ProductController extends Controller{
             $prod = Product::findProductById($productId);
             $states = ArrayHelper::getColumn($prod->productcards, 'cardState');
             if(in_array(1, $states)){
-                throw new HttpException(500, "You can't delete the product whose productcards have been used.");
+                throw new HttpException(500, "these products contain product whose productcards have been used, you can't delete it.");
             }
         }
         //使用","作为分隔符将数组转为字符串

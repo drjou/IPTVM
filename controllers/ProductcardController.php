@@ -77,7 +77,7 @@ class ProductcardController extends Controller{
         foreach ($cardNumbers as $cardNumber){
             $card = Productcard::findProductcardById($cardNumber);
             if($card->cardState == 1){
-                throw new HttpException(500, "you can't delete the productcard that has been used.");
+                throw new HttpException(500, "these productcards contain productcard that has been used, you can't delete it");
             }
         }
         //使用","作为分隔符将数组转为字符串
