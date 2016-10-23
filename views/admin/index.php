@@ -11,7 +11,13 @@ $this->params['breadcrumbs'][] = $this->title;
     	<?= Html::a('Delete Selected', [''], ['class' => 'btn btn-danger delete-all', 'disabled' => 'disabled']) ?>
     	<span class="btn btn-default delete-num">0</span>
     </div>
-    <?= Html::a('New Administrator', ['create'], ['class' => 'btn btn-success']) ?>
+    <?php 
+        if(Yii::$app->user->identity->type == 0){
+            echo Html::a('New Administrator', ['create'], ['class' => 'btn btn-success disabled']);
+        }else {
+            echo Html::a('New Administrator', ['create'], ['class' => 'btn btn-success']);
+        }
+    ?>
 </p>
 <?= GridView::widget([
     'options' => ['class' => 'gridview', 'style' => 'overflow:auto', 'id' => 'grid'],
@@ -28,6 +34,12 @@ $this->params['breadcrumbs'][] = $this->title;
         [
             'class' => 'yii\grid\CheckboxColumn',
             'name' => 'id',
+            'checkboxOptions' => function ($model, $key, $index, $column){
+                if(Yii::$app->user->identity->type == 0 || Yii::$app->user->identity->userName == $model->userName){
+                    return ['disabled' => 'disabled'];
+                }
+                return [];
+            },
             'headerOptions' => ['width' => '10'],
         ],
         [
@@ -57,11 +69,14 @@ $this->params['breadcrumbs'][] = $this->title;
                     ['title' => 'View']);
                 },
                 'update' => function($url, $model, $key){
-                return Html::a('<i class="glyphicon glyphicon-pencil"></i>',
+                    if(Yii::$app->user->identity->type == 0) return '<i class="glyphicon glyphicon-pencil" style="color: gray;"></i>';
+                    return Html::a('<i class="glyphicon glyphicon-pencil"></i>',
                     ['update', 'id' => $key],
                     ['title' => 'Update']);
                 },
                 'delete' => function($url, $model, $key){
+                    if(Yii::$app->user->identity->type == 0 || Yii::$app->user->identity->userName == $model->userName) 
+                        return '<i class="glyphicon glyphicon-trash" style="color: gray;"></i>';
                     return Html::a('<span class="glyphicon glyphicon-trash"></span>',
                     ['delete', 'id' => $key],
                     ['title' => 'Delete',
@@ -102,5 +117,11 @@ $(document).on('click', '.delete-all', function(){
     	<?= Html::a('Delete Selected', [''], ['class' => 'btn btn-danger delete-all', 'disabled' => 'disabled']) ?>
     	<span class="btn btn-default delete-num">0</span>
     </div>
-    <?= Html::a('New Administrator', ['create'], ['class' => 'btn btn-success']) ?>
+    <?php 
+        if(Yii::$app->user->identity->type == 0){
+            echo Html::a('New Administrator', ['create'], ['class' => 'btn btn-success disabled']);
+        }else {
+            echo Html::a('New Administrator', ['create'], ['class' => 'btn btn-success']);
+        }
+    ?>
 </p>

@@ -8,6 +8,7 @@ use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\AdminSearch;
 use app\models\Admin;
+use yii\web\HttpException;
 
 class AdminController extends Controller{
     /**
@@ -33,6 +34,10 @@ class AdminController extends Controller{
                     'logout' => ['get', 'post'],
                     'index' => ['get'],
                     'delete-all' => ['get'],
+                    'view' => ['get'],
+                    'create' => ['get', 'post'],
+                    'update' => ['get', 'post'],
+                    'delete' => ['get'],
                 ]
             ],
         ];
@@ -105,8 +110,17 @@ class AdminController extends Controller{
      * @return \yii\web\Response
      */
     public function actionDeleteAll($keys){
+        if(Yii::$app->user->identity->type == 0){
+            throw new HttpException(500, "you don't have the authority to delete administrators");
+        }
         //将得到的字符串转为php数组
         $ids = explode(',', $keys);
+        foreach ($ids as $id){
+            $admin = Admin::findAdminById($id);
+            if(Yii::$app->user->identity->userName == $admin->userName){
+                throw new HttpException(500, "these administrators contain yourself, you can't delete it");
+            }
+        }
         //使用","作为分隔符将数组转为字符串
         $admins = implode('","', $ids);
         //在最终的字符串前后各加一个"
@@ -114,6 +128,71 @@ class AdminController extends Controller{
         $model = new Admin();
         //调用model的deleteAll方法删除数据
         $model->deleteAll("id in($admins)");
+        return $this->redirect(['index']);
+    }
+    /**
+     * 查看指定的administrator
+     * @param int $id
+     * @return string
+     */
+    public function actionView($id){
+        $model = Admin::findAdminById($id);
+        return $this->render('view', [
+            'model' => $model,
+        ]);
+    }
+    
+    /**
+     * 创建新的administrator
+     * @return string
+     */
+    public function actionCreate(){
+        if(Yii::$app->user->identity->type == 0){
+            throw new HttpException(500, "you don't have the authority to create administrator");
+        }
+        $model = new Admin();
+        $model->scenario = Admin::SCENARIO_ADD;
+        if($model->load(Yii::$app->request->post()) && $model->save()){
+            return $this->redirect(['index']);
+        }
+        return $this->render('create', [
+            'model' => $model,
+        ]);
+    }
+    /**
+     * 更新指定的administrator
+     * @param int $id
+     * @throws HttpException
+     * @return string
+     */
+    public function actionUpdate($id){
+        if(Yii::$app->user->identity->type == 0){
+            throw new HttpException(500, "you don't have the authority to update administrator");
+        }
+        $model = Admin::findAdminById($id);
+        $model->scenario = Admin::SCENARIO_UPDATE;
+        if($model->load(Yii::$app->request->post()) && $model->save()){
+            return $this->redirect(['index']);
+        }
+        return $this->render('update', [
+            'model' => $model,
+        ]);
+    }
+    /**
+     * 删除指定的administrator
+     * @param int $id
+     * @throws HttpException
+     * @return \yii\web\Response
+     */
+    public function actionDelete($id){
+        if(Yii::$app->user->identity->type == 0){
+            throw new HttpException(500, "you don't have the authority to delete administrator");
+        }
+        $model = Admin::findAdminById($id);
+        if(Yii::$app->user->identity->userName == $model->userName){
+            throw new HttpException(500, "you can't delete yourself");
+        }
+        $model->delete();
         return $this->redirect(['index']);
     }
     

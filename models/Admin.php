@@ -3,9 +3,13 @@ namespace app\models;
 
 use Yii;
 use yii\db\ActiveRecord;
+use yii\web\NotFoundHttpException;
 
 class Admin extends ActiveRecord implements \yii\web\IdentityInterface{
-    
+    //新建admin时重新输入密码
+    public $rePassword;
+    const SCENARIO_ADD = 'add';
+    const SCENARIO_UPDATE = 'update';
     /**
      * 设置模型对应的表名
      * @return string
@@ -20,10 +24,68 @@ class Admin extends ActiveRecord implements \yii\web\IdentityInterface{
      */
     public function rules(){
         return [
-            [['userName', 'password'], 'required'],
-            ['userName', 'string', 'min' => 3, 'max' => 20],
-            ['password', 'string', 'min' => 6, 'max' => 20],
+            [['userName', 'realName','password', 'rePassword','email'], 'required'],
+            [['userName', 'realName', 'password', 'rePassword', 'email'], 'trim'],
+            ['email', 'email'],
+            ['userName', 'unique'],
+            ['userName', 'string', 'length' => [3, 20]],
+            ['realName', 'string', 'length' => [3, 20]],
+            ['password', 'string', 'length' => [6, 20]],
+            ['rePassword', 'string', 'length' => [6, 20]],
+            ['rePassword', 'compare', 'compareAttribute' => 'password'],
         ];
+    }
+    /**
+     * 设置不同场景要验证的属性
+     * {@inheritDoc}
+     * @see \yii\base\Model::scenarios()
+     */
+    public function scenarios(){
+        return [
+            self::SCENARIO_ADD => ['userName', 'realName', 'password', 'rePassword', 'email'],
+            self::SCENARIO_UPDATE => ['realName', 'email'],
+        ];
+    }
+    
+    /**
+     * 根据id去获取到admin对象信息
+     * @param int $id
+     * @throws NotFoundHttpException
+     * @return \app\models\Admin|NULL
+     */
+    public static function findAdminById($id){
+        if(($model = Admin::findOne($id)) !== null){
+            return $model;
+        }else {
+            throw new NotFoundHttpException("The administrator whose id is $id doesn't exist, please try the right way to access administrator.");
+        }
+    }
+    
+    /**
+     * 在save前的操作
+     * {@inheritDoc}
+     * @see \yii\db\BaseActiveRecord::beforeSave()
+     */
+    public function beforeSave($insert){
+        if($this->isNewRecord){//新创建administrator在存入数据库前做如下操作
+            $this->password = Yii::$app->getSecurity()->generatePasswordHash($this->password);
+            $this->type = 0;
+            $now = date('Y-m-d H:i:s', time());
+            $this->lastLoginTime = $now;
+            $this->createTime = $now;
+            $this->authKey = $this->randStr();
+        }
+        return parent::beforeSave($insert);
+    }
+    
+    private function randStr($len = 6) {
+        $str = "";
+        $data = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJIKLMNOPQRSTUVWXYZ";
+        for($i = 0 ; $i < $len; $i++){
+            $num = $data[rand(0,strlen($data)-1)];
+            $str .=  $num;
+        }
+        return $str;
     }
     
     /**
