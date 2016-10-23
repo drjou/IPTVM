@@ -6,10 +6,13 @@ use yii\db\ActiveRecord;
 use yii\web\NotFoundHttpException;
 
 class Admin extends ActiveRecord implements \yii\web\IdentityInterface{
+    //修改个人信息时用到
+    public $oldPassword;
     //新建admin时重新输入密码
     public $rePassword;
     const SCENARIO_ADD = 'add';
     const SCENARIO_UPDATE = 'update';
+    const SCENARIO_PASSWORD = 'password'; 
     /**
      * 设置模型对应的表名
      * @return string
@@ -24,12 +27,14 @@ class Admin extends ActiveRecord implements \yii\web\IdentityInterface{
      */
     public function rules(){
         return [
-            [['userName', 'realName','password', 'rePassword','email'], 'required'],
-            [['userName', 'realName', 'password', 'rePassword', 'email'], 'trim'],
+            [['userName', 'realName', 'oldPassword','password', 'rePassword','email'], 'required'],
+            [['userName', 'realName', 'oldPassword','password', 'rePassword', 'email'], 'trim'],
             ['email', 'email'],
             ['userName', 'unique'],
             ['userName', 'string', 'length' => [3, 20]],
             ['realName', 'string', 'length' => [3, 20]],
+            ['oldPassword', 'string', 'length' => [6, 20]],
+            ['oldPassword', 'validateOldPassword'],
             ['password', 'string', 'length' => [6, 20]],
             ['rePassword', 'string', 'length' => [6, 20]],
             ['rePassword', 'compare', 'compareAttribute' => 'password'],
@@ -44,7 +49,15 @@ class Admin extends ActiveRecord implements \yii\web\IdentityInterface{
         return [
             self::SCENARIO_ADD => ['userName', 'realName', 'password', 'rePassword', 'email'],
             self::SCENARIO_UPDATE => ['realName', 'email'],
+            self::SCENARIO_PASSWORD => ['oldPassword', 'password', 'rePassword'],
         ];
+    }
+    
+    public function validateOldPassword($attribute, $params){
+        $user = Admin::findAdminById(Yii::$app->user->identity->id);
+        if(!Yii::$app->getSecurity()->validatePassword($this->oldPassword, $user->password)){
+            $this->addError($attribute, "Old Password is wrong.");
+        }
     }
     
     /**
@@ -67,13 +80,16 @@ class Admin extends ActiveRecord implements \yii\web\IdentityInterface{
      * @see \yii\db\BaseActiveRecord::beforeSave()
      */
     public function beforeSave($insert){
-        if($this->isNewRecord){//新创建administrator在存入数据库前做如下操作
+        if($this->scenario == self::SCENARIO_ADD){//新创建administrator在存入数据库前做如下操作
             $this->password = Yii::$app->getSecurity()->generatePasswordHash($this->password);
             $this->type = 0;
             $now = date('Y-m-d H:i:s', time());
             $this->lastLoginTime = $now;
             $this->createTime = $now;
             $this->authKey = $this->randStr();
+        }
+        if($this->scenario == self::SCENARIO_PASSWORD){
+            $this->password = Yii::$app->getSecurity()->generatePasswordHash($this->password);
         }
         return parent::beforeSave($insert);
     }

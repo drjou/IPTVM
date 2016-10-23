@@ -239,7 +239,7 @@ AppAsset::register($this);
                     <ul class="dropdown-menu dropdown-user">
                         <li><a href="<?=Url::to(['/profile/index'])?>"><i class="fa fa-user fa-fw"></i> <?=\Yii::$app->user->identity->userName ?></a>
                         </li>
-                        <li><a href="<?=Url::to(['/profile/modify-password'])?>"><i class="fa fa-gear fa-fw"></i> Password Modify</a>
+                        <li><a href="<?=Url::to(['/profile/password-modify'])?>"><i class="fa fa-gear fa-fw"></i> Password Modify</a>
                         </li>
                         <li class="divider"></li>
                         <li><a href="<?=Url::to(['/admin/logout'])?>"><i class="fa fa-sign-out fa-fw"></i> Sign Out</a>

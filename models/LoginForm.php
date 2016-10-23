@@ -68,6 +68,7 @@ class LoginForm extends Model
             if($state){
                 //更新最后一次登录时间
                 $user->lastLoginTime = date('Y-m-d H:i:s',time());
+                $user->scenario = Admin::SCENARIO_UPDATE;
                 $user->save();
             }
             return $state;
