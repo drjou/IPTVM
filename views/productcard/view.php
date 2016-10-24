@@ -44,6 +44,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'format' => 'raw',
                                 'value'=>  empty($model->accountId) ? '(not set)' : Html::a($model->accountId, ['account/view', 'accountId' => $model->accountId], ['class' => 'profile-link','title' => 'view']),
                             ],
+                            'createTime',
+                            'updateTime',
                         ],
                     ]) ?>
 				</div>

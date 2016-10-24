@@ -5,6 +5,14 @@ use yii\grid\GridView;
 use yii\base\Widget;
 $this->title = 'Channel List';
 $this->params['breadcrumbs'][] = $this->title;
+$urlTypes = [
+    'entire' => 'entire',
+    'sep' => 'sep',
+];
+$channelTypes = [
+    'live' => 'live',
+    'vod' => 'vod',
+];
 ?>
 <p>
 	<div class="btn-group">
@@ -50,9 +58,14 @@ $this->params['breadcrumbs'][] = $this->title;
                 return '/IPTVM/web' . $model->channelPic;
             }
         ],
-        'channelUrl',
-        'urlType',
-        'channelType',
+        [
+            'attribute' => 'urlType',
+            'filter' => $urlTypes,
+        ],
+        [
+            'attribute' => 'channelType',
+            'filter' => $channelTypes,
+        ],
         [
             'attribute' => 'languageName',
             'format' => 'raw',
@@ -61,6 +74,7 @@ $this->params['breadcrumbs'][] = $this->title;
             },
             'filter' => Html::activeTextInput($searchModel, 'languageName', ['class' => 'form-control']),
         ],
+        'createTime',
         [
             'class' => 'yii\grid\ActionColumn',
             'header' => 'Operations',

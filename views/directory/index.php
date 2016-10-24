@@ -52,6 +52,7 @@ $this->params['breadcrumbs'][] = $this->title;
             }
         ],
         'showOrder',
+        'createTime',
         [
             'class' => 'yii\grid\ActionColumn',
             'header' => 'Operations',

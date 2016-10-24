@@ -259,7 +259,7 @@ AppAsset::register($this);
                         <?php
                             $dependency = [
                                 'class' => 'yii\caching\DbDependency',
-                                'sql' => 'SELECT SUM(id), MAX(lastModifyTime) FROM menu',
+                                'sql' => 'SELECT SUM(id), MAX(updateTime) FROM menu',
                             ];
                             //Yii::$app->cache->flush();
                             if($this->beginCache('menu_sidebar', ['duration' => 86400, 'dependency' => $dependency])){

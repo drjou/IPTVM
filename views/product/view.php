@@ -28,6 +28,8 @@ $this->params['breadcrumbs'][] = $this->title;
 					    },
                         'attributes' => [
                             'productName',
+                            'createTime',
+                            'updateTime',
                         ],
                     ]) ?>
 				</div>

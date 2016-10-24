@@ -42,6 +42,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'format' => 'raw',
                                 'value' => Html::a($model->language->languageName, ['language/view', 'languageId' => $model->languageId], ['class' => 'profile-link','title' => 'view']),
                             ],
+                            'createTime',
+                            'updateTime',
                         ],
                     ]) ?>
 				</div>

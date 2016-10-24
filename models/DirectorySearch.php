@@ -12,7 +12,7 @@ class DirectorySearch extends Directory{
      */
     public function rules(){
         return [
-            [['directoryName', 'parentName', 'showOrder'], 'safe'],
+            [['directoryName', 'parentName', 'showOrder', 'createTime'], 'safe'],
         ];
     }
     /**
@@ -43,6 +43,7 @@ class DirectorySearch extends Directory{
                         'desc' => ['parentDirectory.directoryName' => SORT_DESC],
                     ],
                     'showOrder',
+                    'createTime',
                 ],
             ],
         ]);
@@ -51,9 +52,10 @@ class DirectorySearch extends Directory{
             return $dataProvider;
         }
         
-        $query->andFilterWhere(['like', 'directoryName', $this->directoryName])
-        ->andFilterWhere(['like', 'parentDirectory.directoryName', $this->directoryName])
-        ->andFilterWhere(['=', 'showOrder', $this->showOrder]);
+        $query->andFilterWhere(['like', 'directory.directoryName', $this->directoryName])
+        ->andFilterWhere(['like', 'parentDirectory.directoryName', $this->parentName])
+        ->andFilterWhere(['=', 'directory.showOrder', $this->showOrder])
+        ->andFilterWhere(['like', 'directory.createTime', $this->createTime]);
         return $dataProvider;        
     }
 }

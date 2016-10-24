@@ -27,6 +27,8 @@ $this->params['breadcrumbs'][] = $this->title;
 					    },
                         'attributes' => [
                             'languageName',
+                            'createTime',
+                            'updateTime',
                         ],
                     ]) ?>
 				</div>

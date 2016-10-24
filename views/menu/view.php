@@ -34,7 +34,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'value' => $model->icon . '<span class="' . $model->icon . '"></span>',
                                 'format' => 'html',
                             ],
-                            'lastModifyTime',
+                            'createTime',
+                            'updateTime',
                         ],
                     ]) ?>
 				</div>

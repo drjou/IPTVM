@@ -4,6 +4,8 @@ namespace app\models;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\web\NotFoundHttpException;
+use yii\behaviors\TimestampBehavior;
+use yii\db\Expression;
 
 class Admin extends ActiveRecord implements \yii\web\IdentityInterface{
     //修改个人信息时用到
@@ -20,6 +22,23 @@ class Admin extends ActiveRecord implements \yii\web\IdentityInterface{
     public static function tableName(){
         return 'administrator';
     }
+    
+    /**
+     * 自动更新创建时间和修改时间
+     * {@inheritDoc}
+     * @see \yii\base\Component::behaviors()
+     */
+    public function behaviors(){
+        return [
+            [
+                'class' => TimestampBehavior::className(),
+                'createdAtAttribute' => 'createTime',
+                'updatedAtAttribute' => 'updateTime',
+                'value' => new Expression('NOW()'),
+            ],
+        ];
+    }
+    
     /**
      * 设置验证规则
      * {@inheritDoc}
@@ -85,7 +104,6 @@ class Admin extends ActiveRecord implements \yii\web\IdentityInterface{
             $this->type = 0;
             $now = date('Y-m-d H:i:s', time());
             $this->lastLoginTime = $now;
-            $this->createTime = $now;
             $this->authKey = $this->randStr();
         }
         if($this->scenario == self::SCENARIO_PASSWORD){

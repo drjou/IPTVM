@@ -5,6 +5,10 @@ use yii\grid\GridView;
 use yii\base\Widget;
 $this->title = 'Administrator List';
 $this->params['breadcrumbs'][] = $this->title;
+$types = [
+    0 => 'genernal',
+    1 => 'super',
+];
 ?>
 <p>
 	<div class="btn-group">
@@ -54,6 +58,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'value' => function($model){
                 return $model->type ? 'super' : 'genernal';
             },
+            'filter' => $types,
         ],
         'lastLoginTime',
         'createTime',

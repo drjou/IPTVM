@@ -57,7 +57,7 @@ $config = [
                         $userName = Yii::$app->user->identity->userName;
                         return "$userName";
                     }
-                ]
+                ],
             ],
         ],
         'db' => require(__DIR__ . '/db.php'),

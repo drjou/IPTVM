@@ -12,7 +12,7 @@ class ChannelSearch extends Channel{
      */
     public function rules(){
         return [
-            [['channelName', 'channelIp', 'channelPic', 'channelUrl', 'urlType', 'channelType', 'languageName'], 'safe'],
+            [['channelName', 'channelIp', 'channelPic', 'channelUrl', 'urlType', 'channelType', 'languageName', 'createTime'], 'safe'],
         ];
     }
     /**
@@ -46,7 +46,8 @@ class ChannelSearch extends Channel{
                     'languageName' => [
                         'asc' => ['language.languageName' => SORT_ASC],
                         'desc' => ['language.languageName' => SORT_DESC],
-                    ]
+                    ],
+                    'createTime',
                 ],
             ],
         ]);
@@ -61,7 +62,8 @@ class ChannelSearch extends Channel{
         ->andFilterWhere(['like', 'channelUrl', $this->channelUrl])
         ->andFilterWhere(['like', 'urlType', $this->urlType])
         ->andFilterWhere(['like', 'channelType', $this->channelType])
-        ->andFilterWhere(['like', 'language.languageName', $this->languageName]);
+        ->andFilterWhere(['like', 'language.languageName', $this->languageName])
+        ->andFilterWhere(['like', 'channel.createTime', $this->createTime]);
         return $dataProvider;
     }
 }

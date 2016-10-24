@@ -41,6 +41,8 @@ $states = [
                                 'attribute' => 'enable',
                                 'value' => $model->enable == 1 ? 'enabled' : 'disabled',
 				            ],
+                            'createTime',
+                            'updateTime',
                         ],
                     ]) ?>
 				</div>

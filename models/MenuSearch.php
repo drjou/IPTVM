@@ -11,8 +11,8 @@ class MenuSearch extends Menu{
      */
     public function rules(){
         return [
-            [['menuName', 'parentName', 'route', 'showLevel', 'lastModifyTime'], 'safe'],
-            [['menuName', 'parentName', 'route', 'lastModifyTime'], 'string'],
+            [['menuName', 'parentName', 'route', 'showLevel', 'updateTime'], 'safe'],
+            [['menuName', 'parentName', 'route', 'updateTime'], 'string'],
         ];
     }
     /**
@@ -49,9 +49,10 @@ class MenuSearch extends Menu{
             return $dataProvider;
         }
         
-        $query->andFilterWhere(['like', 'menuName', $this->menuName])
+        $query->andFilterWhere(['like', 'menu.menuName', $this->menuName])
         ->andFilterWhere(['like', 'parentMenu.menuName', $this->parentName])
-        ->andFilterWhere(['like', 'route', $this->route]);
+        ->andFilterWhere(['like', 'menu.route', $this->route])
+        ->andFilterWhere(['=', 'menu.showLevel', $this->showLevel]);
         
         return $dataProvider;
     }

@@ -12,7 +12,7 @@ class LanguageSearch extends Language{
      */
     public function rules(){
         return [
-            ['languageName', 'safe'],
+            [['languageName', 'createTime'], 'safe'],
         ];
     }
     /**
@@ -41,7 +41,8 @@ class LanguageSearch extends Language{
             return $dataProvider;
         }
         
-        $query->andFilterWhere(['like', 'languageName', $this->languageName]);
+        $query->andFilterWhere(['like', 'languageName', $this->languageName])
+        ->andFilterWhere(['like', 'createTime', $this->createTime]);
         return $dataProvider;
     }
 }

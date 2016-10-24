@@ -12,7 +12,7 @@ class ProductSearch extends Product{
      */
     public function rules(){
         return [
-            ['productName', 'safe'],
+            [['productName', 'createTime'], 'safe'],
         ];
     }
     /**
@@ -42,7 +42,8 @@ class ProductSearch extends Product{
             return $dataProvider;
         }
         
-        $query->andFilterWhere(['like', 'productName', $this->productName]);
+        $query->andFilterWhere(['like', 'productName', $this->productName])
+        ->andFilterWhere(['like', 'createTime', $this->createTime]);
         return $dataProvider;
     }
 }

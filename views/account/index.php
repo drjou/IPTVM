@@ -11,6 +11,10 @@ $states = [
     '1003' => 'need recharge',
     '1004' => 'purchase activated',
 ];
+$enables = [
+    0 => 'disabled',
+    1 => 'enabled',
+]
 ?>
 <p>
 	<div class="btn-group">
@@ -68,8 +72,10 @@ $states = [
             'attribute' => 'enable',
             'value' => function($model){
                 return $model->enable == 1 ? 'enabled' : 'diabled';
-            }
+            },
+            'filter' => $enables,
         ],
+        'createTime',
         [
             'class' => 'yii\grid\ActionColumn',
             'header' => 'Operations',

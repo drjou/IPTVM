@@ -12,7 +12,7 @@ class ProductcardSearch extends Productcard{
      */
     public function rules(){
         return [
-            [['cardNumber', 'cardValue', 'productName', 'cardState', 'useDate', 'accountId'], 'safe'],
+            [['cardNumber', 'cardValue', 'productName', 'cardState', 'useDate', 'accountId', 'createTime'], 'safe'],
         ];
     }
     /**
@@ -46,6 +46,7 @@ class ProductcardSearch extends Productcard{
                     'cardState',
                     'useDate',
                     'accountId',
+                    'createTime',
                 ],
             ],
         ]);
@@ -59,7 +60,8 @@ class ProductcardSearch extends Productcard{
         ->andFilterWhere(['like', 'product.productName', $this->productName])
         ->andFilterWhere(['=', 'cardState', $this->cardState])
         ->andFilterWhere(['like', 'useDate', $this->useDate])
-        ->andFilterWhere(['like', 'accountId', $this->accountId]);
+        ->andFilterWhere(['like', 'accountId', $this->accountId])
+        ->andFilterWhere(['like', 'productcard.createTime', $this->createTime]);
         return $dataProvider;
         
     }

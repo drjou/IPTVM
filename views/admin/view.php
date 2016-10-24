@@ -28,6 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                             'lastLoginTime',
                             'createTime',
+                            'updateTime',
                         ],
                     ]) ?>
 				</div>

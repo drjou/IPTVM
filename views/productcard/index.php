@@ -5,6 +5,10 @@ use yii\grid\GridView;
 use yii\base\Widget;
 $this->title = 'Productcard List';
 $this->params['breadcrumbs'][] = $this->title;
+$types = [
+    0 => 'not used',
+    1 => 'used',
+];
 ?>
 <p>
 	<div class="btn-group">
@@ -55,6 +59,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'value' => function($model){
                 return $model->cardState ? 'used' : 'not used';
             },
+            'filter' => $types,
         ],
         'useDate',
         [
@@ -66,6 +71,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
             }
         ],
+        'createTime',
         [
             'class' => 'yii\grid\ActionColumn',
             'header' => 'Operations',

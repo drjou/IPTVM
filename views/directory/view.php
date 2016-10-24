@@ -33,6 +33,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'value' => empty($model->parentDirectory) ? '(not set)' : Html::a($model->parentDirectory->directoryName, ['directory/view', 'directoryId' => $model->parentId], ['class' => 'profile-link','title' => 'view']),
                             ],
                             'showOrder',
+                            'createTime',
+                            'updateTime',
                         ],
                     ]) ?>
 				</div>

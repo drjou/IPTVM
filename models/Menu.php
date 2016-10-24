@@ -5,6 +5,8 @@ use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 use yii\data\ArrayDataProvider;
+use yii\behaviors\TimestampBehavior;
+use yii\db\Expression;
 
 class Menu extends ActiveRecord{
     //父menu名称
@@ -18,6 +20,23 @@ class Menu extends ActiveRecord{
     public static function tableName(){
         return 'menu';
     }
+    
+    /**
+     * 自动更新创建时间和修改时间
+     * {@inheritDoc}
+     * @see \yii\base\Component::behaviors()
+     */
+    public function behaviors(){
+        return [
+            [
+                'class' => TimestampBehavior::className(),
+                'createdAtAttribute' => 'createTime',
+                'updatedAtAttribute' => 'updateTime',
+                'value' => new Expression('NOW()'),
+            ],
+        ];
+    }
+    
     /**
      * 设置验证规则
      * {@inheritDoc}
@@ -96,7 +115,6 @@ class Menu extends ActiveRecord{
         }else{
             $this->parentId = $this->parentName;
         }
-        $this->lastModifyTime = date('Y-m-d H:i:s', time());
         return parent::beforeSave($insert);
     }
     /**

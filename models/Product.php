@@ -4,6 +4,8 @@ namespace app\models;
 use yii\db\ActiveRecord;
 use yii\data\ArrayDataProvider;
 use yii\web\NotFoundHttpException;
+use yii\behaviors\TimestampBehavior;
+use yii\db\Expression;
 
 class Product extends ActiveRecord{
     /**
@@ -13,6 +15,23 @@ class Product extends ActiveRecord{
     public static function tableName(){
         return 'product';
     }
+    
+    /**
+     * 自动更新创建时间和修改时间
+     * {@inheritDoc}
+     * @see \yii\base\Component::behaviors()
+     */
+    public function behaviors(){
+        return [
+            [
+                'class' => TimestampBehavior::className(),
+                'createdAtAttribute' => 'createTime',
+                'updatedAtAttribute' => 'updateTime',
+                'value' => new Expression('NOW()'),
+            ],
+        ];
+    }
+    
     /**
      * 设置表单验证规则
      * {@inheritDoc}

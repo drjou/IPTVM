@@ -42,6 +42,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'headerOptions' => ['width' => '10'],
         ],
         'languageName',
+        'createTime',
         [
             'class' => 'yii\grid\ActionColumn',
             'header' => 'Operations',
