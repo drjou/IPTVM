@@ -22,24 +22,23 @@ $this->params['breadcrumbs'][] = $this->title;
         'menuName',
         [
             'attribute' => 'parentName',
-            'value' => 'parentMenu.menuName',
+            'format' => 'raw',
+            'value' => function($model){
+                if(!empty($model->parentMenu)){
+                    return Html::a($model->parentMenu->menuName, ['menu/view', 'id' => $model->parentId], ['title' => 'view']);
+                }
+            },
             'filter'=>Html::activeTextInput($searchModel, 'parentName',['class'=>'form-control']),
         ],
         'route',
         [
             'attribute' => 'showLevel',
-            'value' => function($model){
-                return $model->showLevel;
-            },
             'headerOptions' => [
                 'width' => 30,
             ],
         ],
         [
             'attribute' => 'showOrder',
-            'value' => function($model){
-                return $model->showOrder;
-            },
             'headerOptions' => [
                 'width' => 30,
             ],

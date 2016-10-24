@@ -68,8 +68,10 @@ class MenuController extends Controller{
      */
     public function actionView($id){
         $model = Menu::findMenuById($id);
+        $childrenProvider = $model->findChildrenMenus();
         return $this->render('view',[
             'model' => $model,
+            'childrenProvider' => $childrenProvider,
         ]);
     }
     

@@ -44,7 +44,12 @@ $this->params['breadcrumbs'][] = $this->title;
         'directoryName',
         [
             'attribute' => 'parentName',
-            'value' => 'parentDirectory.directoryName',
+            'format' => 'raw',
+            'value' => function($model){
+                if(!empty($model->parentDirectory)){
+                    return Html::a($model->parentDirectory->directoryName, ['directory/view', 'directoryId' => $model->parentId], ['title' => 'view']);
+                }
+            }
         ],
         'showOrder',
         [

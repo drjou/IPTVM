@@ -4,6 +4,7 @@ namespace app\models;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
+use yii\data\ArrayDataProvider;
 
 class Menu extends ActiveRecord{
     //父menu名称
@@ -58,6 +59,23 @@ class Menu extends ActiveRecord{
     public function getChildrenMenus(){
         return $this->hasMany(Menu::className(), ['parentId' => 'id'])
                 ->from(Menu::tableName().' childrenMenus');
+    }
+    
+    public function findChildrenMenus(){
+        $childrenProvider = new ArrayDataProvider([
+            'allModels' => $this->childrenMenus,
+            'pagination' => [
+                'pageSize' => 10,
+            ],
+            'sort' => [
+                'attributes' => [
+                    'menuName',
+                    'showLevel',
+                    'showOrder',
+                ],
+            ],
+        ]);
+        return $childrenProvider;
     }
     
     /**

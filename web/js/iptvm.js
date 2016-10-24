@@ -43,7 +43,13 @@ $(function() {
     var element = $('ul.nav a').filter(function() {
     	var uhref = GetQueryString(url.href,"r");
     	var thref = GetQueryString(this.href,"r");
-    	return uhref.substring(0, uhref.indexOf('/')) == thref.substring(0, thref.indexOf('/'));
+    	if(thref == "" || thref == undefined || thref == null) return false;
+    	if(uhref == thref){
+    		return true;
+    	}
+    	var category = (uhref.indexOf('index') >=0) || (uhref.indexOf('create') >=0) || (uhref.indexOf('update') >=0) || (uhref.indexOf('view') >=0);
+    	console.log(category);
+    	return uhref.substring(0, uhref.indexOf('/')) == thref.substring(0, thref.indexOf('/')) && category;
     }).addClass('active').parent();
 
     while (true) {

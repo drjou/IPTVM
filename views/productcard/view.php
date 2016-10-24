@@ -1,12 +1,10 @@
 <?php
 use yii\helpers\Html;
-use yii\grid\GridView;
 use yii\widgets\DetailView;
 $this->title = 'Productcard ' . $model->cardNumber;
 $this->params['breadcrumbs'][] = ['label' => 'Productcard List', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-
 <div class="row">
 	<div class="col-lg-12">
 		<div class="panel panel-default">

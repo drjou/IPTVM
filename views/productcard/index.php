@@ -45,7 +45,10 @@ $this->params['breadcrumbs'][] = $this->title;
         'cardValue',
         [
             'attribute' => 'productName',
-            'value' => 'product.productName',
+            'format' => 'raw',
+            'value' => function($model){
+                return Html::a($model->product->productName, ['product/view', 'productId' => $model->productId], ['title' => 'view']);
+            }
         ],
         [
             'attribute' => 'cardState',
@@ -54,7 +57,15 @@ $this->params['breadcrumbs'][] = $this->title;
             },
         ],
         'useDate',
-        'accountId',
+        [
+            'attribute' => 'accountId',
+            'format' => 'raw',
+            'value' => function($model){
+                if(!empty($model->accountId)){
+                    return Html::a($model->accountId, ['account/view', 'accountId' => $model->accountId], ['title' => 'view']);
+                }
+            }
+        ],
         [
             'class' => 'yii\grid\ActionColumn',
             'header' => 'Operations',

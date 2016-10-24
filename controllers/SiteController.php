@@ -13,6 +13,8 @@ use app\models\Channel;
 use app\models\Directory;
 use app\models\Productcard;
 use app\models\Language;
+use app\models\AdminLog;
+use app\models\StbLog;
 
 class SiteController extends Controller
 {
@@ -76,6 +78,7 @@ class SiteController extends Controller
         $counts['directory'] = count(Directory::find()->all());
         $counts['productcard'] = count(Productcard::find()->all());
         $counts['language'] = count(Language::find()->all());
+        $counts['log'] = count(AdminLog::find()->all()) + count(StbLog::find()->all());
         return $this->render('index', [
             'counts' => $counts,
         ]);

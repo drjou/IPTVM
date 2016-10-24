@@ -1,5 +1,8 @@
 <?php
 
+use yii\behaviors\AttributeBehavior;
+use yii\db\ActiveRecord;
+
 $params = require(__DIR__ . '/params.php');
 
 $config = [
@@ -8,6 +11,7 @@ $config = [
     'bootstrap' => ['log'],
     //默认的路由
     'defaultRoute' => 'admin/login',
+    'timeZone' => 'PRC',
     'components' => [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
@@ -41,6 +45,7 @@ $config = [
                 ],
                 [
                     'class' => 'yii\log\DbTarget',
+                    'logTable' => 'admin_log',
                     'levels' => ['info'],
                     'categories' => [
                         'administrator',

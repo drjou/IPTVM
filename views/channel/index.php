@@ -55,7 +55,10 @@ $this->params['breadcrumbs'][] = $this->title;
         'channelType',
         [
             'attribute' => 'languageName',
-            'value' => 'language.languageName',
+            'format' => 'raw',
+            'value' => function($model){
+                return Html::a($model->language->languageName, ['language/view', 'languageId' => $model->languageId]);
+            },
             'filter' => Html::activeTextInput($searchModel, 'languageName', ['class' => 'form-control']),
         ],
         [
