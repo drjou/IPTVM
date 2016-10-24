@@ -46,10 +46,17 @@ $(function() {
     	if(thref == "" || thref == undefined || thref == null) return false;
     	if(uhref == thref){
     		return true;
+    	}else{
+    		if(uhref.substring(0, uhref.indexOf('/')) == thref.substring(0, thref.indexOf('/'))){
+    			var uri = uhref.substring(uhref.indexOf('/')+1);
+    			var category = (uri == 'index') || (uri == 'create') || (uri == 'update') || (uri == 'view');
+    			if(category){
+    				return true;
+    			}else{
+    				return uhref.indexOf(thref)>=0;
+    			}
+    		}
     	}
-    	var category = (uhref.indexOf('index') >=0) || (uhref.indexOf('create') >=0) || (uhref.indexOf('update') >=0) || (uhref.indexOf('view') >=0);
-    	console.log(category);
-    	return uhref.substring(0, uhref.indexOf('/')) == thref.substring(0, thref.indexOf('/')) && category;
     }).addClass('active').parent();
 
     while (true) {
