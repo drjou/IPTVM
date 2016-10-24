@@ -74,11 +74,13 @@ class DirectoryController extends Controller{
         //将得到的字符串转为php数组
         $directoryIds = explode(',', $keys);
         //防止用户在url中手动输入参数执行删除操作
+        $directoryNames = [];
         foreach ($directoryIds as $directoryId){
             $dir = Directory::findDirectoryById($directoryId);
             if(!empty($dir->childrenDirectories)){
                 throw new HttpException(500, 'these directories contain directory that has children, you can\'t delete it');
             }
+            array_push($directoryNames, $dir->directoryName);
         }
         //使用","作为分隔符将数组转为字符串
         $directories = implode('","', $directoryIds);
@@ -87,6 +89,7 @@ class DirectoryController extends Controller{
         $model =new Directory();
         //调用model的deleteAll方法删除数据
         $model->deleteAll("directoryId in($directories)");
+        Yii::info('delete selected ' . count($directoryNames) . ' directories, they are ' . implode(',', $directoryNames), 'administrator');
         return $this->redirect(['index']);
     }
     /**
@@ -125,6 +128,7 @@ class DirectoryController extends Controller{
                         }
                         $db->createCommand()->batchInsert('channel_directory', $columns, $rows)->execute();
                         $transaction->commit();
+                        Yii::info("create directory $model->directoryName", 'administrator');
                         return $this->redirect(['view', 'directoryId' => $model->directoryId]);
                     }
                 }catch(Exception $e){
@@ -133,6 +137,7 @@ class DirectoryController extends Controller{
                 }
             }else{
                 if($model->save()){
+                    Yii::info("create directory $model->directoryName", 'administrator');
                     return $this->redirect(['view', 'directoryId' => $model->directoryId]);
                 }
             }
@@ -181,6 +186,7 @@ class DirectoryController extends Controller{
                             $db->createCommand()->delete('channel_directory', ['directoryId' => $model->directoryId, 'channelId' => $delChannels])->execute();
                         }
                         $transaction->commit();
+                        Yii::info("update directory $model->directoryName", 'administrator');
                         return $this->redirect(['view', 'directoryId' => $model->directoryId]);
                     }
                 }catch (Exception $e){
@@ -189,6 +195,7 @@ class DirectoryController extends Controller{
                 }
             }else{
                 if($model->save()){
+                    Yii::info("update directory $model->directoryName", 'administrator');
                     return $this->redirect(['view', 'directoryId' => $model->directoryId]);
                 }
             }
@@ -214,6 +221,7 @@ class DirectoryController extends Controller{
             throw new HttpException(500, 'you can\'t delete the directory that has children.');
         }
         $model->delete();
+        Yii::info("delete directory $model->directoryName", 'administrator');
         return $this->redirect(['index']);
     }
 }

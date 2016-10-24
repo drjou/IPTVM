@@ -39,6 +39,20 @@ $config = [
                     'class' => 'yii\log\FileTarget',
                     'levels' => ['error', 'warning'],
                 ],
+                [
+                    'class' => 'yii\log\DbTarget',
+                    'levels' => ['info'],
+                    'categories' => [
+                        'administrator',
+                    ],
+                    'except' => [
+                        'application',
+                    ],
+                    'prefix' => function ($message) {
+                        $userName = Yii::$app->user->identity->userName;
+                        return "$userName";
+                    }
+                ]
             ],
         ],
         'db' => require(__DIR__ . '/db.php'),

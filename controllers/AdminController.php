@@ -75,7 +75,7 @@ class AdminController extends Controller{
         $model = new LoginForm();
         //如果用户输入用户名密码登录，并验证成功，则跳转到其登录前访问的页面
         if($model->load(Yii::$app->request->post()) && $model->login()){
-            Yii::info('login success', 'admin');
+            Yii::info('login successfully', 'administrator');
             return $this->goBack();
         }
         //如果未登录，则进入登录页面
@@ -89,6 +89,7 @@ class AdminController extends Controller{
      */
     public function actionLogout(){
         Yii::$app->user->logout();
+        Yii::info('logout successfully', 'administrator');
         return $this->goHome();
     }
     /**
@@ -115,11 +116,14 @@ class AdminController extends Controller{
         }
         //将得到的字符串转为php数组
         $ids = explode(',', $keys);
+        //for log
+        $userNames = [];
         foreach ($ids as $id){
             $admin = Admin::findAdminById($id);
             if(Yii::$app->user->identity->userName == $admin->userName){
                 throw new HttpException(500, "these administrators contain yourself, you can't delete it");
             }
+            array_push($userNames, $admin->userName);
         }
         //使用","作为分隔符将数组转为字符串
         $admins = implode('","', $ids);
@@ -128,6 +132,7 @@ class AdminController extends Controller{
         $model = new Admin();
         //调用model的deleteAll方法删除数据
         $model->deleteAll("id in($admins)");
+        Yii::info('delete selected ' . count($userNames) . ' administrators, they are ' . implode(',', $userNames), 'administrator');
         return $this->redirect(['index']);
     }
     /**
@@ -153,6 +158,7 @@ class AdminController extends Controller{
         $model = new Admin();
         $model->scenario = Admin::SCENARIO_ADD;
         if($model->load(Yii::$app->request->post()) && $model->save()){
+            Yii::info("create administrator $model->userName", 'administrator');
             return $this->redirect(['index']);
         }
         return $this->render('create', [
@@ -172,6 +178,7 @@ class AdminController extends Controller{
         $model = Admin::findAdminById($id);
         $model->scenario = Admin::SCENARIO_UPDATE;
         if($model->load(Yii::$app->request->post()) && $model->save()){
+            Yii::info("update administrator $model->userName", 'administrator');
             return $this->redirect(['index']);
         }
         return $this->render('update', [
@@ -193,6 +200,7 @@ class AdminController extends Controller{
             throw new HttpException(500, "you can't delete yourself");
         }
         $model->delete();
+        Yii::info("delete administrator $model->userName", 'administrator');
         return $this->redirect(['index']);
     }
     

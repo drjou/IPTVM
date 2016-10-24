@@ -87,6 +87,7 @@ class ProductcardController extends Controller{
         $model = new Productcard();
         //调用model的deleteAll方法删除数据
         $model->deleteAll("cardNumber in($cards)");
+        Yii::info('delete selected ' . count($cardNumbers) . ' productcards, they are ' . $keys, 'administrator');
         return $this->redirect(['index']);
     }
     /**
@@ -107,6 +108,7 @@ class ProductcardController extends Controller{
     public function actionCreate(){
         $model = new Productcard();
         if($model->load(Yii::$app->request->post()) && $model->save()){
+            Yii::info("create productcard $model->cardNumber", 'administrator');
             return $this->redirect(['view', 'cardNumber' => $model->cardNumber]);
         }
         $products = ArrayHelper::map(Product::find()->all(), 'productId', 'productName');
@@ -126,6 +128,7 @@ class ProductcardController extends Controller{
             throw new HttpException(500, "You can't update the productcard that has been used.");
         }
         if($model->load(Yii::$app->request->post()) && $model->save()){
+            Yii::info("update productcard $model->cardNumber", 'administrator');
             return $this->redirect(['view', 'cardNumber' => $model->cardNumber]);
         }
         $products = ArrayHelper::map(Product::find()->all(), 'productId', 'productName');
@@ -146,6 +149,7 @@ class ProductcardController extends Controller{
             throw new HttpException(500, "You can't delete the productcard that has been used.");
         }
         $model->delete();
+        Yii::info("delete productcard $model->cardNumber", 'administrator');
         return $this->redirect(['index']);
     }
 }

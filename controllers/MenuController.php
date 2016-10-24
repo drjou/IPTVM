@@ -81,6 +81,7 @@ class MenuController extends Controller{
     public function actionCreate(){
         $model = new Menu();
         if($model->load(Yii::$app->request->post()) && $model->validate() && $model->save()){
+            Yii::info("create menu $model->menuName", 'administrator');
             return $this->redirect(['view', 'id' => $model->id]);
         }
         $menu_items = $model->getMenuItems();
@@ -98,6 +99,7 @@ class MenuController extends Controller{
     public function actionUpdate($id){
         $model = Menu::findMenuById($id);
         if($model->load(Yii::$app->request->post()) && $model->validate() && $model->save()){
+            Yii::info("update menu $model->menuName", 'administrator');
             return $this->redirect(['view', 'id' => $model->id]);
         }
         $menu_items = array_diff($model->getMenuItems(), $model->childrenMenus, [$model->id => $model->menuName]);
@@ -117,6 +119,7 @@ class MenuController extends Controller{
             throw new HttpException(500, "you can't delete the menu that has sub menus.");
         }
         $model->delete();
+        Yii::info("delete menu $model->menuName", 'administrator');
         return $this->redirect(['index']);
     }
 }

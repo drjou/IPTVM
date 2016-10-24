@@ -72,11 +72,14 @@ class LanguageController extends Controller{
     public function actionDeleteAll($keys){
         //将得到的字符串转为php数组
         $languageIds = explode(',', $keys);
+        // for log
+        $languageNames = [];
         foreach ($languageIds as $languageId){
             $lang = Language::findLanguageById($languageId);
             if(!empty($lang->channels)){
                 throw new HttpException(500, "these languages contain language with channels using it, you can't delete it");
             }
+            array_push($languageNames, $lang->languageName);
         }
         //使用","作为分隔符将数组转为字符串
         $languages = implode('","', $languageIds);
@@ -84,7 +87,8 @@ class LanguageController extends Controller{
         $languages = '"' . $languages . '"';
         $model = new Language();
         //调用model的deleteAll方法删除数据
-        $model->deleteAll("accountId in($languages)");
+        $model->deleteAll("languageId in($languages)");
+        Yii::info('delete selected ' . count($languageNames) . ' languages, they are ' . implode(',', $languageNames), 'administrator');
         return $this->redirect(['index']);
     }
     /**
@@ -107,6 +111,7 @@ class LanguageController extends Controller{
     public function actionCreate(){
         $model = new Language();
         if($model->load(Yii::$app->request->post()) && $model->save()){
+            Yii::info("create language $model->languageName", 'administrator');
             return $this->redirect(['view', 'languageId' => $model->languageId]);
         }
         return $this->render('create', [
@@ -121,6 +126,7 @@ class LanguageController extends Controller{
     public function actionUpdate($languageId){
         $model = Language::findLanguageById($languageId);
         if($model->load(Yii::$app->request->post()) && $model->save()){
+            Yii::info("update language $model->languageName", 'administrator');
             return $this->redirect(['view', 'languageId' => $model->languageId]);
         }
         return $this->render('update', [
@@ -139,6 +145,7 @@ class LanguageController extends Controller{
             throw new HttpException(500, "You can't delete the language with channels using it.");
         }
         $model->delete();
+        Yii::info("delete language $model->languageName", 'administrator');
         return $this->redirect(['index']);
     }
 }

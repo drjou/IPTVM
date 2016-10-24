@@ -87,6 +87,7 @@ class AccountController extends Controller{
         $model = new Account();
         //调用model的deleteAll方法删除数据
         $model->deleteAll("accountId in($accounts)");
+        Yii::info("delete selected " . count($accountIds) . " stb accounts, they are $keys", 'administrator');
         return $this->redirect(['index']);
     }
     /**
@@ -115,6 +116,7 @@ class AccountController extends Controller{
         if($model->load(Yii::$app->request->post())){
             if($model->state == '1003'){
                 if($model->save()){
+                    Yii::info("create stb account $model->accountId", 'administrator');
                     return $this->redirect(['view', 'accountId' => $model->accountId]);
                 }
             }else{
@@ -131,6 +133,7 @@ class AccountController extends Controller{
                         //将预绑定的产品 信息插入表stbbind中
                         $db->createCommand()->batchInsert('stbbind', $columns, $rows)->execute();
                         $transaction->commit();
+                        Yii::info("create stb account $model->accountId", 'administrator');
                         return $this->redirect(['view', 'accountId' => $model->accountId]);
                     }
                 }catch (Exception $e){
@@ -186,6 +189,7 @@ class AccountController extends Controller{
                             $db->createCommand()->delete('stbbind', ['accountId' => $model->accountId, 'productId' => $delProducts])->execute();
                         }
                         $transaction->commit();
+                        Yii::info("update stb account $model->accountId", 'administrator');
                         return $this->redirect(['view', 'accountId' => $model->accountId]);
                     }
                 }catch (Exception $e){
@@ -194,6 +198,7 @@ class AccountController extends Controller{
                 }
             }else{
                 if($model->save()){
+                    Yii::info("update stb account $model->accountId", 'administrator');
                     return $this->redirect(['view', 'accountId' => $model->accountId]);
                 }
             }
@@ -215,6 +220,7 @@ class AccountController extends Controller{
             throw new HttpException(500, 'you can\'t delete the account whose state is 1001 or 1004');
         }
         $model->delete();
+        Yii::info("delete stb account $model->accountId", 'administrator');
         return $this->redirect(['index']);
     }
     /**
@@ -226,6 +232,7 @@ class AccountController extends Controller{
         $model = Account::findAccountById($accountId);
         $model->enable = 0;
         $model->save();
+        Yii::info("disabled stb account $model->accountId", 'administrator');
         return $this->redirect(['index']);
     }
     /**
@@ -237,6 +244,7 @@ class AccountController extends Controller{
         $model = Account::findAccountById($accountId);
         $model->enable = 1;
         $model->save();
+        Yii::info("enabled stb account $model->accountId", 'administrator');
         return $this->redirect(['index']);
     }
     

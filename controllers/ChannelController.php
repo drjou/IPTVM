@@ -73,6 +73,11 @@ class ChannelController extends Controller{
     public function actionDeleteAll($keys){
         //将得到的字符串转为php数组
         $channelIds = explode(',', $keys);
+        $channelNames = [];
+        foreach ($channelIds as $channelId){
+            $channel = Channel::findChannelById($channelId);
+            array_push($channelNames, $channel->channelName);
+        }
         //使用","作为分隔符将数组转为字符串
         $channels = implode('","', $channelIds);
         //在最终的字符串前后各加一个"
@@ -80,6 +85,7 @@ class ChannelController extends Controller{
         $model = new Channel();
         //调用model的deleteAll方法删除数据
         $model->deleteAll("channelId in($channels)");
+        Yii::info('delete selected ' . count($channelNames) . ' channels, they are ' . implode(',', $channelNames), 'administrator');
         return $this->redirect(['index']);
     }
     /**
@@ -112,6 +118,7 @@ class ChannelController extends Controller{
                     mkdir($dir);
                 }
                 $model->thumbnail->saveAs('images/channels' . '/' . $model->thumbnail->baseName . '.' . $model->thumbnail->extension);
+                Yii::info("create channel $model->channelName", 'administrator');
                 return $this->redirect(['view', 'channelId' => $model->channelId]);
             }
         }
@@ -142,10 +149,12 @@ class ChannelController extends Controller{
                     }
                     //保存新图到服务器
                     $model->thumbnail->saveAs('images/channels' . '/' . $model->thumbnail->baseName . '.' . $model->thumbnail->extension);
+                    Yii::info("update channel $model->channelName", 'administrator');
                     return $this->redirect(['view', 'channelId' => $model->channelId]);
                 }
             }else{
                 if($model->save()){
+                    Yii::info("update channel $model->channelName", 'administrator');
                     return $this->redirect(['view', 'channelId' => $model->channelId]);
                 }
             }
@@ -166,6 +175,7 @@ class ChannelController extends Controller{
         $model = Channel::findChannelById($channelId);
         unlink(dirname(__DIR__) . '/web' . $model->channelPic);
         $model->delete();
+        Yii::info("delete channel $model->channelName", 'administrator');
         return $this->redirect(['index']);
     }
 }

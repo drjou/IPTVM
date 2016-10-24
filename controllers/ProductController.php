@@ -71,12 +71,14 @@ class ProductController extends Controller{
     public function actionDeleteAll($keys){
         //将得到的字符串转为php数组
         $productIds = explode(',', $keys);
+        $productNames = [];
         foreach ($productIds as $productId){
             $prod = Product::findProductById($productId);
             $states = ArrayHelper::getColumn($prod->productcards, 'cardState');
             if(in_array(1, $states)){
                 throw new HttpException(500, "these products contain product whose productcards have been used, you can't delete it.");
             }
+            array_push($productNames, $prod->productName);
         }
         //使用","作为分隔符将数组转为字符串
         $products = implode('","', $productIds);
@@ -85,6 +87,7 @@ class ProductController extends Controller{
         $model = new Product();
         //调用model的deleteAll方法删除数据
         $model->deleteAll("productId in($products)");
+        Yii::info('delete selected ' . count($productNames) . ' products, they are ' . implode(',', $productNames), 'administrator');
         return $this->redirect(['index']);
     }
     /**
@@ -127,6 +130,7 @@ class ProductController extends Controller{
                         }
                         $db->createCommand()->batchInsert('product_channel', $columns, $rows)->execute();
                         $transaction->commit();
+                        Yii::info("create product $model->productName", 'administrator');
                         return $this->redirect(['view', 'productId' => $model->productId]);
                     }
                 }catch(Exception $e){
@@ -135,6 +139,7 @@ class ProductController extends Controller{
                 }
             }else{
                 if($model->save()){
+                    Yii::info("create product $model->productName", 'administrator');
                     return $this->redirect(['view', 'productId' => $model->productId]);
                 }
             }
@@ -182,6 +187,7 @@ class ProductController extends Controller{
                             $db->createCommand()->delete('product_channel', ['productId' => $model->productId, 'channelId' => $delChannels])->execute();
                         }
                         $transaction->commit();
+                        Yii::info("update product $model->productName", 'administrator');
                         return $this->redirect(['view', 'productId' => $productId]);
                     }
                 }catch (Exception $e){
@@ -190,6 +196,7 @@ class ProductController extends Controller{
                 }
             }else{
                 if($model->save()){
+                    Yii::info("update product $model->productName", 'administrator');
                     return $this->redirect(['view', 'productId' => $model->productId]);
                 }
             }
@@ -209,11 +216,12 @@ class ProductController extends Controller{
      */
     public function actionDelete($productId){
         $model = Product::findProductById($productId);
-        $states = ArrayHelper::getColumn($model->channels, 'cardState');
+        $states = ArrayHelper::getColumn($model->productcards, 'cardState');
         if(in_array(1, $states)){
             throw new HttpException(500, "You can't delete the product whose productcards have been used.");
         }
         $model->delete();
+        Yii::info("delete product $model->productName", 'administrator');
         return $this->redirect(['index']);
     }
 }
