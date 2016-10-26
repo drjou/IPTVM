@@ -11,6 +11,7 @@ use app\models\Product;
 use yii\helpers\ArrayHelper;
 use yii\db\Exception;
 use yii\web\HttpException;
+use yii\web\UploadedFile;
 
 class AccountController extends Controller{
     /**
@@ -34,6 +35,8 @@ class AccountController extends Controller{
                 'actions' => [
                     'index' => ['get'],
                     'delete-all' => ['get'],
+                    'import' => ['get', 'post'],
+                    'export' => ['get'],
                     'view' => ['get'],
                     'create' => ['get', 'post'],
                     'update' => ['get', 'post'],
@@ -90,6 +93,113 @@ class AccountController extends Controller{
         Yii::info("delete selected " . count($accountIds) . " stb accounts, they are $keys", 'administrator');
         return $this->redirect(['index']);
     }
+    
+    public function actionImport(){
+        $model = new Account();
+        if($model->load(Yii::$app->request->post())){
+            $model->importFile = UploadedFile::getInstance($model, 'importFile');
+            //$xmlStr = file_get_contents($model->importFile->tempName);
+            try {
+                $xmlArray = simplexml_load_file($model->importFile->tempName);
+                $accouts = json_decode(json_encode($xmlArray), true);
+                $columns = ['accountId', 'state', 'enable', 'createTime', 'updateTime'];
+                $rows = ArrayHelper::getColumn($accouts['Account'], function($element){
+                    $now = date('Y-m-d H:i:s', time());
+                    return [$element['accountId'], $element['state'], $element['enable'], $now, $now];
+                });
+                $db = Yii::$app->db;
+                $db->createCommand()->batchInsert('account', $columns, $rows)->execute();
+                return $this->render('import', [
+                    'model' => $model,
+                    'percent' => 100,
+                    'label' => '100% complete',
+                ]);
+            }catch (\Exception $e){
+                $model->addError('importFile', $e->getMessage());
+            }
+            //var_dump($accouts);
+            //$columns = ['accountId', 'state', 'enable', 'createTime', 'updateTime'];
+            //$rows = [];
+            //foreach ($accouts['Account'] as $account){
+                //var_dump($account);
+                //var_dump($account['accountId']);
+                //$model->load($account);
+                /* $model->accountId = $account['accountId'];
+                $model->state = $account['state'];
+                $model->enable = $account['enable'];
+                var_dump($model);
+                var_dump($model->save()); */
+                /* $now = date('Y-m-d H:i:s', time());
+                $row = [$account['accountId'], $account['state'], $account['enable'], $now, $now];
+                array_push($rows, $row); */
+            //}
+            //$db = Yii::$app->db;
+            //$db->createCommand()->batchInsert('account', $columns, $rows)->execute();
+            /* var_dump(ArrayHelper::getColumn($accouts['Account'], function($element){
+                $now = date('Y-m-d H:i:s', time());
+                return [$element['accountId'], $element['state'], $element['enable'], $now, $now];
+            })); */
+            //$result = simplexml_load_string(file_get_contents($model->importFile->tempName), 'SimpleXMLElement', LIBXML_NOCDATA);
+            //var_dump($result);
+            //var_dump(json_decode(json_encode($result), true));
+            /* return $this->renderAjax('import', [
+                'model' => $model,
+                'percent' => 5,
+                'label' => '5%',
+            ]); */
+        }
+        return $this->render('import', [
+            'model' => $model,
+            'percent' => 0,
+            'label' => '0%',
+        ]);
+    }
+    
+    public function actionProgress(){
+        echo $this->renderAjax('progress', [
+            'percent' => 10,
+            'label' => '10%',
+        ]);
+    }
+    
+    /**
+     * 导出xml格式的文件
+     * @return \yii\db\ActiveRecord[]
+     */
+    public function actionExport(){
+        /* Yii::$app->response->format = \yii\web\Response::FORMAT_XML;
+        $model = new Account();
+        $accounts = $model->find()->all();
+        Yii::$app->response->data = $accounts;
+        Yii::$app->response->sendContentAsFile(Yii::$app->response->content, 'accounts.xml')->send();
+        return $accounts; */
+        $model = new Account();
+        $accounts = $model->find()->all();
+        
+        //Yii::$app->response->sendContentAsFile(json_encode($accounts), 'accounts.json')->send();
+        $response = Yii::createObject([
+            'class' => 'yii\web\Response',
+            'format' => \yii\web\Response::FORMAT_XML,
+            'formatters' => [
+                \yii\web\Response::FORMAT_XML => [
+                    'class' => 'yii\web\XmlResponseFormatter',
+                    'rootTag' => 'message', //根节点
+                    'itemTag' => 'account',
+                ],
+            ],
+            'data' => $accounts,
+        ]);
+        //var_dump($response);
+        //return $response;
+        //$response->send();
+        $formatter = new \yii\web\XmlResponseFormatter();
+        $formatter->rootTag = 'message';
+        $formatter->format($response);
+        //var_dump($response->content);
+        //$response->sendContentAsFile($response->content, 'accounts.xml')->send();
+        Yii::$app->response->sendContentAsFile($response->content, 'accounts.xml')->send();
+    }
+    
     /**
      * View Action 查看account的详细信息
      * @param unknown $accountId
