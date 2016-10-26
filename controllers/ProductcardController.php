@@ -10,6 +10,7 @@ use app\models\Productcard;
 use yii\web\HttpException;
 use yii\helpers\ArrayHelper;
 use app\models\Product;
+use yii\web\UploadedFile;
 
 class ProductcardController extends Controller{
     /**
@@ -33,6 +34,8 @@ class ProductcardController extends Controller{
                 'actions' => [
                     'index' => ['get'],
                     'delete-all' => ['get'],
+                    'import' => ['get', 'post'],
+                    'export' => ['get'],
                     'view' => ['get'],
                     'create' => ['get', 'post'],
                     'update' => ['get', 'post'],
@@ -90,6 +93,83 @@ class ProductcardController extends Controller{
         Yii::info('delete selected ' . count($cardNumbers) . ' productcards, they are ' . $keys, 'administrator');
         return $this->redirect(['index']);
     }
+    
+    /**
+     * import productcards
+     */
+    public function actionImport(){
+        $model = new Productcard();
+        $state = [
+            'message' => 'Info:please import a xml file. Format as below:</br>'
+            . '&lt;?xml version="1.0" encoding="UTF-8"?&gt;</br>'
+            . '&lt;message&gt;</br>'
+            . '&nbsp;&nbsp;&lt;Productcard&gt;</br>'
+            . '&nbsp;&nbsp;&nbsp;&nbsp;&lt;cardNumber&gt;0909201220130001&lt;/cardNumber&gt;</br>'
+            . '&nbsp;&nbsp;&nbsp;&nbsp;&lt;cardValue&gt;365&lt;/cardValue&gt;</br>'
+            . '&nbsp;&nbsp;&nbsp;&nbsp;&lt;productId&gt;1&lt;/productId&gt;</br>'
+            . '&nbsp;&nbsp;&nbsp;&nbsp;&lt;cardState&gt;1&lt;/cardState&gt;</br>'
+            . '&nbsp;&nbsp;&lt;/Productcard&gt;</br>'
+            . '&nbsp;&nbsp;&lt;Productcard&gt;</br>'
+            . '&nbsp;&nbsp;&nbsp;&nbsp;······</br>'
+            . '&nbsp;&nbsp;&lt;/Productcard&gt;</br>'
+            . '&lt;/message&gt;</br>',
+            'class' => 'alert-info',
+            'percent' => 0,
+            'label' => '0%',
+        ];
+        if($model->load(Yii::$app->request->post())){
+            $model->importFile = UploadedFile::getInstance($model, 'importFile');
+            try {
+                $xmlArray = simplexml_load_file($model->importFile->tempName);
+                $productcards = json_decode(json_encode($xmlArray), true);
+                $columns = ['cardNumber', 'cardValue', 'productId', 'cardState', 'createTime', 'updateTime'];
+                $rows = ArrayHelper::getColumn($productcards['Productcard'], function($element){
+                    $now = date('Y-m-d H:i:s', time());
+                    return [$element['cardNumber'], $element['cardValue'], $element['productId'], $element['cardState'], $now, $now];
+                });
+                    $db = Yii::$app->db;
+                    $db->createCommand()->batchInsert('productcard', $columns, $rows)->execute();
+                    $productcardStr = implode(',', ArrayHelper::getColumn($productcards['Productcard'], 'cardNumber'));
+                    Yii::info("import " . count($rows) . " productcards, they are $productcardStr", 'administrator');
+                    $state['message'] = 'Success:import success, there are totally ' . count($rows) .' productcards added to DB, they are ' . $productcardStr;
+                    $state['class'] = 'alert-success';
+                    $state['percent'] = 100;
+                    $state['label'] = '100% completed';
+            }catch (\Exception $e){
+                $state['message'] = 'Error:' . $e->getMessage();
+                $state['class'] = 'alert-danger';
+            }
+        }
+        return $this->render('import', [
+            'model' => $model,
+            'state' => $state,
+        ]);
+    }
+    /**
+     * 导出所有的productcards
+     */
+    public function actionExport(){
+        $model = new Productcard();
+        $productcards = $model->find()->all();
+        $response = Yii::createObject([
+            'class' => 'yii\web\Response',
+            'format' => \yii\web\Response::FORMAT_XML,
+            'formatters' => [
+                \yii\web\Response::FORMAT_XML => [
+                    'class' => 'yii\web\XmlResponseFormatter',
+                    'rootTag' => 'message', //根节点
+                    'itemTag' => 'productcard',
+                ],
+            ],
+            'data' => $productcards,
+        ]);
+        $formatter = new \yii\web\XmlResponseFormatter();
+        $formatter->rootTag = 'message';
+        $formatter->format($response);
+        Yii::$app->response->sendContentAsFile($response->content, 'productcards.xml')->send();
+        Yii::info('export all productcards', 'administrator');
+    }
+    
     /**
      * View Action 显示productcar的详细信息
      * @param string $cardNumber

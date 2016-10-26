@@ -9,6 +9,7 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
 
 class Directory extends ActiveRecord{
+    public $importFile;
     //父目录名称
     public $parentName;
     /**
@@ -43,6 +44,7 @@ class Directory extends ActiveRecord{
     public function rules(){
         return [
             [['directoryName', 'showOrder'], 'required'],
+            ['importFile', 'file', 'skipOnEmpty' => false, 'mimeTypes' => ['application/xml', 'text/xml'],'extensions' => ['xml'], 'maxSize' => 50*1024*1024],
             ['directoryName', 'trim'],
             ['directoryName', 'string', 'length' => [4, 20]],
             ['directoryName', 'unique'],

@@ -8,6 +8,7 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
 
 class Language extends ActiveRecord{
+    public $importFile;
     /**
      * 设置模型对应表名
      * @return string
@@ -40,6 +41,7 @@ class Language extends ActiveRecord{
     public function rules(){
         return [
             ['languageName', 'required'],
+            ['importFile', 'file', 'skipOnEmpty' => false, 'mimeTypes' => ['application/xml', 'text/xml'],'extensions' => ['xml'], 'maxSize' => 50*1024*1024],
             ['languageName', 'trim'],
             ['languageName', 'string', 'length' => [2, 20]],
             ['languageName', 'unique'],

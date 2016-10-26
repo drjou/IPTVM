@@ -8,6 +8,7 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
 
 class Product extends ActiveRecord{
+    public $importFile;
     /**
      * 设置模型对应的表名
      * @return string
@@ -40,6 +41,7 @@ class Product extends ActiveRecord{
     public function rules(){
         return [
             ['productName', 'required'],
+            ['importFile', 'file', 'skipOnEmpty' => false, 'mimeTypes' => ['application/xml', 'text/xml'],'extensions' => ['xml'], 'maxSize' => 50*1024*1024],
             ['productName', 'trim'],
             ['productName', 'string', 'length' => [4, 20]],
             ['productName', 'unique'],

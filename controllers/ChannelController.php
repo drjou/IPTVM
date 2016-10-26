@@ -33,6 +33,8 @@ class ChannelController extends Controller{
                 'actions' => [
                     'index' => ['get'],
                     'delete-all' => ['get'],
+                    'import' => ['get', 'post'],
+                    'export' => ['get'],
                     'view' => ['get'],
                     'create' => ['get', 'post'],
                     'update' => ['get', 'post'],
@@ -87,6 +89,87 @@ class ChannelController extends Controller{
         $model->deleteAll("channelId in($channels)");
         Yii::info('delete selected ' . count($channelNames) . ' channels, they are ' . implode(',', $channelNames), 'administrator');
         return $this->redirect(['index']);
+    }
+    /**
+     * 文件导入channels信息
+     * @return string
+     */
+    public function actionImport(){
+        $model = new Channel();
+        $model->scenario = Channel::SCENARIO_IMPORT;
+        $state = [
+            'message' => 'Info:please import a xml file. Format as below:</br>'
+                        . '&lt;?xml version="1.0" encoding="UTF-8"?&gt;</br>'
+                        . '&lt;message&gt;</br>'
+                        . '&nbsp;&nbsp;&lt;Channel&gt;</br>'
+                        . '&nbsp;&nbsp;&nbsp;&nbsp;&lt;channelName&gt;bein&lt;/channelName&gt;</br>'
+                        . '&nbsp;&nbsp;&nbsp;&nbsp;&lt;channelIp&gt;188.138.89.40&lt;/channelIp&gt;</br>'
+                        . '&nbsp;&nbsp;&nbsp;&nbsp;&lt;channelPic&gt;/images/bein1.jpg&lt;/channelPic&gt;</br>'
+                        . '&nbsp;&nbsp;&nbsp;&nbsp;&lt;channelUrl&gt;http://188.138.89.40/IPTV_Files/bein1/bein1.m3u8.jpg&lt;/channelUrl&gt;</br>'
+                        . '&nbsp;&nbsp;&nbsp;&nbsp;&lt;urlType&gt;entire&lt;/urlType&gt;</br>'
+                        . '&nbsp;&nbsp;&nbsp;&nbsp;&lt;channelType&gt;live&lt;/channelType&gt;</br>'
+                        . '&nbsp;&nbsp;&nbsp;&nbsp;&lt;languageId&gt;1&lt;/languageId&gt;</br>'
+                        . '&nbsp;&nbsp;&lt;/Channel&gt;</br>'
+                        . '&nbsp;&nbsp;&lt;Channel&gt;</br>'
+                        . '&nbsp;&nbsp;&nbsp;&nbsp;······</br>'
+                        . '&nbsp;&nbsp;&lt;/Channel&gt;</br>'
+                        . '&lt;/message&gt;</br>',
+            'class' => 'alert-info',
+            'percent' => 0,
+            'label' => '0%',
+        ];
+        if($model->load(Yii::$app->request->post())){
+            $model->importFile = UploadedFile::getInstance($model, 'importFile');
+            try {
+                $xmlArray = simplexml_load_file($model->importFile->tempName);
+                $channels = json_decode(json_encode($xmlArray), true);
+                $columns = ['channelName', 'channelIp', 'channelPic', 'channelUrl', 'urlType', 'channelType', 'languageId', 'createTime', 'updateTime'];
+                $rows = ArrayHelper::getColumn($channels['Channel'], function($element){
+                    $now = date('Y-m-d H:i:s', time());
+                    return [$element['channelName'], $element['channelIp'], $element['channelPic'], $element['channelUrl'], $element['urlType'], $element['channelType'], $element['languageId'], $now, $now];
+                });
+                    $db = Yii::$app->db;
+                    $db->createCommand()->batchInsert('channel', $columns, $rows)->execute();
+                    $channelStr = implode(',', ArrayHelper::getColumn($channels['Channel'], 'channelName'));
+                    Yii::info("import " . count($rows) . " channels, they are $channelStr", 'administrator');
+                    $state['message'] = 'Success:import success, there are totally ' . count($rows) .' channels added to DB, they are ' . $channelStr;
+                    $state['class'] = 'alert-success';
+                    $state['percent'] = 100;
+                    $state['label'] = '100% completed';
+            }catch (\Exception $e){
+                $state['message'] = 'Error:' . $e->getMessage();
+                $state['class'] = 'alert-danger';
+            }
+        }
+        return $this->render('import', [
+            'model' => $model,
+            'state' => $state,
+        ]);
+    }
+    
+    /**
+     * 导出所有的channels信息
+     */
+    public function actionExport(){
+        $model = new Channel();
+        $channels = $model->find()->all();
+        $response = Yii::createObject([
+            'class' => 'yii\web\Response',
+            'format' => \yii\web\Response::FORMAT_XML,
+            'formatters' => [
+                \yii\web\Response::FORMAT_XML => [
+                    'class' => 'yii\web\XmlResponseFormatter',
+                    'rootTag' => 'message', //根节点
+                    'itemTag' => 'channel',
+                ],
+            ],
+            'data' => $channels,
+        ]);
+        $formatter = new \yii\web\XmlResponseFormatter();
+        $formatter->rootTag = 'message';
+        $formatter->format($response);
+        Yii::$app->response->sendContentAsFile($response->content, 'channels.xml')->send();
+        Yii::info('export all channels', 'administrator');
     }
     /**
      * View Action 查看channel具体信息

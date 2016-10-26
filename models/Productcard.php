@@ -7,6 +7,7 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
 
 class Productcard extends ActiveRecord{
+    public $importFile;
     public $productName;
     /**
      * 设置模型对应的表名
@@ -40,6 +41,7 @@ class Productcard extends ActiveRecord{
     public function rules(){
         return [
             [['cardNumber', 'cardValue', 'productName', 'cardState'], 'required'],
+            ['importFile', 'file', 'skipOnEmpty' => false, 'mimeTypes' => ['application/xml', 'text/xml'],'extensions' => ['xml'], 'maxSize' => 50*1024*1024],
             ['cardNumber', 'trim'],
             ['cardNumber', 'string', 'length' => [4,20]],
             ['cardNumber', 'unique'],

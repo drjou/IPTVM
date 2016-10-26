@@ -40,7 +40,7 @@ class Account extends ActiveRecord{
     public function rules(){
         return [
             [['accountId', 'state', 'enable'], 'required'],
-            ['importFile', 'file','skipOnEmpty' => false],
+            ['importFile', 'file','skipOnEmpty' => false, 'mimeTypes' => ['application/xml', 'text/xml'], 'extensions' => ['xml'], 'maxSize' => 50*1024*1024],
             ['accountId', 'trim'],
             ['accountId', 'string', 'length' => [4, 20]],
             ['accountId', 'unique'],

@@ -12,7 +12,8 @@ $this->params['breadcrumbs'][] = $this->title;
     	<span class="btn btn-default delete-num">0</span>
     </div>
     <?= Html::a('New Language', ['create'], ['class' => 'btn btn-success']) ?>
-    <?= Html::a('Import Language', ['import'], ['class' => 'btn btn-warning']) ?>
+    <?= Html::a('Import Languages', ['import'], ['class' => 'btn btn-warning']) ?>
+    <?= Html::a('Export Languages', ['export'], ['class' => 'btn btn-info']) ?>
 </p>
 <?= GridView::widget([
     'options' => ['class' => 'gridview', 'style' => 'overflow:auto', 'id' => 'grid'],
@@ -103,4 +104,5 @@ $(document).on('click', '.delete-all', function(){
     </div>
     <?= Html::a('New Language', ['create'], ['class' => 'btn btn-success']) ?>
     <?= Html::a('Import Languages', ['import'], ['class' => 'btn btn-warning']) ?>
+    <?= Html::a('Export Languages', ['export'], ['class' => 'btn btn-info']) ?>
 </p>

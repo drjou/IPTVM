@@ -88,8 +88,8 @@ class AdminController extends Controller{
      * @return \yii\web\Response
      */
     public function actionLogout(){
-        Yii::$app->user->logout();
         Yii::info('logout successfully', 'administrator');
+        Yii::$app->user->logout();
         return $this->goHome();
     }
     /**

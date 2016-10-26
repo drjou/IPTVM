@@ -96,6 +96,23 @@ class AccountController extends Controller{
     
     public function actionImport(){
         $model = new Account();
+        $state = [
+            'message' => 'Info:please import a xml file. Format as below:</br>'
+                        . '&lt;?xml version="1.0" encoding="UTF-8"?&gt;</br>'
+                        . '&lt;message&gt;</br>'
+                        . '&nbsp;&nbsp;&lt;Account&gt;</br>'
+                        . '&nbsp;&nbsp;&nbsp;&nbsp;&lt;accountId&gt;00110568C712&lt;/accountId&gt;</br>'
+                        . '&nbsp;&nbsp;&nbsp;&nbsp;&lt;state&gt;1&lt;/state&gt;</br>'
+                        . '&nbsp;&nbsp;&nbsp;&nbsp;&lt;enable&gt;1&lt;/enable&gt;</br>'
+                        . '&nbsp;&nbsp;&lt;/Account&gt;</br>'
+                        . '&nbsp;&nbsp;&lt;Account&gt;</br>'
+                        . '&nbsp;&nbsp;&nbsp;&nbsp;······</br>'
+                        . '&nbsp;&nbsp;&lt;/Account&gt;</br>'
+                        . '&lt;/message&gt;</br>',
+            'class' => 'alert-info',
+            'percent' => 0,
+            'label' => '0%',
+        ];
         if($model->load(Yii::$app->request->post())){
             $model->importFile = UploadedFile::getInstance($model, 'importFile');
             //$xmlStr = file_get_contents($model->importFile->tempName);
@@ -109,15 +126,16 @@ class AccountController extends Controller{
                 });
                 $db = Yii::$app->db;
                 $db->createCommand()->batchInsert('account', $columns, $rows)->execute();
-                return $this->render('import', [
-                    'model' => $model,
-                    'percent' => 100,
-                    'label' => '100% complete',
-                ]);
+                $accountStr = implode(',', ArrayHelper::getColumn($accouts['Account'], 'accountId'));
+                Yii::info("import " . count($rows) . " stb accounts, they are $accountStr", 'administrator');
+                $state['message'] = 'Success:import success, there are totally ' . count($rows) .' accounts added to DB, they are ' . $accountStr;
+                $state['class'] = 'alert-success';
+                $state['percent'] = 100;
+                $state['label'] = '100% completed';
             }catch (\Exception $e){
-                $model->addError('importFile', $e->getMessage());
+                $state['message'] = 'Error:' . $e->getMessage();
+                $state['class'] = 'alert-danger';
             }
-            //var_dump($accouts);
             //$columns = ['accountId', 'state', 'enable', 'createTime', 'updateTime'];
             //$rows = [];
             //foreach ($accouts['Account'] as $account){
@@ -127,8 +145,6 @@ class AccountController extends Controller{
                 /* $model->accountId = $account['accountId'];
                 $model->state = $account['state'];
                 $model->enable = $account['enable'];
-                var_dump($model);
-                var_dump($model->save()); */
                 /* $now = date('Y-m-d H:i:s', time());
                 $row = [$account['accountId'], $account['state'], $account['enable'], $now, $now];
                 array_push($rows, $row); */
@@ -140,25 +156,10 @@ class AccountController extends Controller{
                 return [$element['accountId'], $element['state'], $element['enable'], $now, $now];
             })); */
             //$result = simplexml_load_string(file_get_contents($model->importFile->tempName), 'SimpleXMLElement', LIBXML_NOCDATA);
-            //var_dump($result);
-            //var_dump(json_decode(json_encode($result), true));
-            /* return $this->renderAjax('import', [
-                'model' => $model,
-                'percent' => 5,
-                'label' => '5%',
-            ]); */
         }
         return $this->render('import', [
             'model' => $model,
-            'percent' => 0,
-            'label' => '0%',
-        ]);
-    }
-    
-    public function actionProgress(){
-        echo $this->renderAjax('progress', [
-            'percent' => 10,
-            'label' => '10%',
+            'state' => $state,
         ]);
     }
     
@@ -176,7 +177,6 @@ class AccountController extends Controller{
         $model = new Account();
         $accounts = $model->find()->all();
         
-        //Yii::$app->response->sendContentAsFile(json_encode($accounts), 'accounts.json')->send();
         $response = Yii::createObject([
             'class' => 'yii\web\Response',
             'format' => \yii\web\Response::FORMAT_XML,
@@ -189,15 +189,11 @@ class AccountController extends Controller{
             ],
             'data' => $accounts,
         ]);
-        //var_dump($response);
-        //return $response;
-        //$response->send();
         $formatter = new \yii\web\XmlResponseFormatter();
         $formatter->rootTag = 'message';
-        $formatter->format($response);
-        //var_dump($response->content);
-        //$response->sendContentAsFile($response->content, 'accounts.xml')->send();
+        $formatter->format($response); 
         Yii::$app->response->sendContentAsFile($response->content, 'accounts.xml')->send();
+        Yii::info('export all accouts', 'administrator');
     }
     
     /**

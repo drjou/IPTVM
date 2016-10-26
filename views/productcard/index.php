@@ -17,6 +17,7 @@ $types = [
     </div>
     <?= Html::a('New Productcard', ['create'], ['class' => 'btn btn-success']) ?>
     <?= Html::a('Import Productcards', ['import'], ['class' => 'btn btn-warning']) ?>
+    <?= Html::a('Export Productcards', ['export'], ['class' => 'btn btn-info']) ?>
 </p>
 <?= GridView::widget([
     'options' => ['class' => 'gridview', 'style' => 'overflow:auto', 'id' => 'grid'],
@@ -133,4 +134,5 @@ $(document).on('click', '.delete-all', function(){
     </div>
     <?= Html::a('New Productcard', ['create'], ['class' => 'btn btn-success']) ?>
     <?= Html::a('Import Productcards', ['import'], ['class' => 'btn btn-warning']) ?>
+    <?= Html::a('Export Productcards', ['export'], ['class' => 'btn btn-info']) ?>
 </p>

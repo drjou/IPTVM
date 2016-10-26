@@ -8,8 +8,8 @@ use yii\base\Widget;
 use yii\bootstrap\Modal;
 use yii\helpers\Url;
 
-$this->title = 'Import Accounts';
-$this->params['breadcrumbs'][] = ['label' => 'Account List', 'url' => ['index']];
+$this->title = 'Import Products';
+$this->params['breadcrumbs'][] = ['label' => 'Product List', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 FileInputAsset::register($this);
 ?>
@@ -33,48 +33,15 @@ FileInputAsset::register($this);
 ]) ?>
 
 <div class="form-group">
-    <?= Html::submitButton('Import', [
-        'class' => 'btn btn-success import',
-        'data-toggle' => 'modall',
-        'data-target' => '#progress-modal',
-    ]) ?>
+    <?= Html::submitButton('Import', ['class' => 'btn btn-success']) ?>
     <?= Html::a('Cancel', \Yii::$app->request->referrer, ['class' => 'btn btn-warning cancel']) ?>
 </div>
 <?php ActiveForm::end(); ?>
-<?php Modal::begin([
-    'id' => 'progress-modal',
-    'header' => '<h4 class="modal-title">Progress</h4>',
-    'footer' => '<a href="#" class="btn btn-primary" data-dismiss="modal">Close</a>',
-]); 
-Modal::end();
-?>
 <?php
-    $requestUrl = Url::toRoute('progress');
-    $js = "
-        $(document).on('click', '.import', function () {
-            $.get('{$requestUrl}', {},
-                function (data) {
-                    $('.modal-body').html(data);
-                }
-            );
-        });
-    ";
-    //$this->registerJs($js);
     $this->registerJs("
         $('#file-input').fileinput({
             showUpload: false,
             maxFileSize: 51200, //52M
-        });
-        $(document).on('click', '.imrt', function(){
-            $.ajax({
-                type: 'post',
-                url: 'index.php?r=account/progress',
-                data: {},
-                dataType: 'html',
-                success: function(html){
-                    $('.form-group').append(html);
-                }
-            });
         });
         $(document).on('click', '.cancel', function(){
             window.history.back();

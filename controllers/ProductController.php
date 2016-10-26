@@ -11,6 +11,7 @@ use yii\helpers\ArrayHelper;
 use yii\web\HttpException;
 use app\models\Channel;
 use yii\db\Exception;
+use yii\web\UploadedFile;
 
 class ProductController extends Controller{
     /**
@@ -34,7 +35,12 @@ class ProductController extends Controller{
                 'actions' => [
                     'index' => ['get'],
                     'delete-all' => ['get'],
+                    'import' => ['get', 'post'],
+                    'export' => ['get'],
                     'view' => ['get'],
+                    'create' => ['get', 'post'],
+                    'update' => ['get', 'post'],
+                    'delete' => ['get'],
                 ]
             ]
         ];
@@ -90,6 +96,79 @@ class ProductController extends Controller{
         Yii::info('delete selected ' . count($productNames) . ' products, they are ' . implode(',', $productNames), 'administrator');
         return $this->redirect(['index']);
     }
+    /**
+     * import products
+     */
+    public function actionImport(){
+        $model = new Product();
+        $state = [
+            'message' => 'Info:please import a xml file. Format as below:</br>'
+            . '&lt;?xml version="1.0" encoding="UTF-8"?&gt;</br>'
+            . '&lt;message&gt;</br>'
+            . '&nbsp;&nbsp;&lt;Product&gt;</br>'
+            . '&nbsp;&nbsp;&nbsp;&nbsp;&lt;productName&gt;MiddleEastVIP&lt;/productName&gt;</br>'
+            . '&nbsp;&nbsp;&lt;/Product&gt;</br>'
+            . '&nbsp;&nbsp;&lt;Product&gt;</br>'
+            . '&nbsp;&nbsp;&nbsp;&nbsp;······</br>'
+            . '&nbsp;&nbsp;&lt;/Product&gt;</br>'
+            . '&lt;/message&gt;</br>',
+            'class' => 'alert-info',
+            'percent' => 0,
+            'label' => '0%',
+        ];
+        if($model->load(Yii::$app->request->post())){
+            $model->importFile = UploadedFile::getInstance($model, 'importFile');
+            try {
+                $xmlArray = simplexml_load_file($model->importFile->tempName);
+                $products = json_decode(json_encode($xmlArray), true);
+                $columns = ['productName', 'createTime', 'updateTime'];
+                $rows = ArrayHelper::getColumn($products['Product'], function($element){
+                    $now = date('Y-m-d H:i:s', time());
+                    return [$element['productName'], $now, $now];
+                });
+                    $db = Yii::$app->db;
+                    $db->createCommand()->batchInsert('product', $columns, $rows)->execute();
+                    $productStr = implode(',', ArrayHelper::getColumn($products['Product'], 'productName'));
+                    Yii::info("import " . count($rows) . " products, they are $productStr", 'administrator');
+                    $state['message'] = 'Success:import success, there are totally ' . count($rows) .' products added to DB, they are ' . $productStr;
+                    $state['class'] = 'alert-success';
+                    $state['percent'] = 100;
+                    $state['label'] = '100% completed';
+            }catch (\Exception $e){
+                $state['message'] = 'Error:' . $e->getMessage();
+                $state['class'] = 'alert-danger';
+            }
+        }
+        return $this->render('import', [
+            'model' => $model,
+            'state' => $state,
+        ]);
+    }
+    /**
+     * 导出所有的products
+     */
+    public function actionExport(){
+        $model = new Product();
+        $products = $model->find()->all();
+        $response = Yii::createObject([
+            'class' => 'yii\web\Response',
+            'format' => \yii\web\Response::FORMAT_XML,
+            'formatters' => [
+                \yii\web\Response::FORMAT_XML => [
+                    'class' => 'yii\web\XmlResponseFormatter',
+                    'rootTag' => 'message', //根节点
+                    'itemTag' => 'product',
+                ],
+            ],
+            'data' => $products,
+        ]);
+        $formatter = new \yii\web\XmlResponseFormatter();
+        $formatter->rootTag = 'message';
+        $formatter->format($response);
+        Yii::$app->response->sendContentAsFile($response->content, 'products.xml')->send();
+        Yii::info('export all products', 'administrator');
+    }
+    
     /**
      * View Action 显示product的详细信息
      * @param int $productId

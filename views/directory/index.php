@@ -13,6 +13,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
     <?= Html::a('New Directory', ['create'], ['class' => 'btn btn-success']) ?>
     <?= Html::a('Import Directories', ['import'], ['class' => 'btn btn-warning']) ?>
+    <?= Html::a('Export Directories', ['export'], ['class' => 'btn btn-info']) ?>
 </p>
 <?= GridView::widget([
     'options' => ['class' => 'gridview', 'style' => 'overflow:auto', 'id' => 'grid'],
@@ -115,4 +116,5 @@ $(document).on('click', '.delete-all', function(){
     </div>
     <?= Html::a('New Directory', ['create'], ['class' => 'btn btn-success']) ?>
     <?= Html::a('Import Directories', ['import'], ['class' => 'btn btn-warning']) ?>
+    <?= Html::a('Export Directories', ['export'], ['class' => 'btn btn-info']) ?>
 </p>

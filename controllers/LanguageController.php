@@ -8,6 +8,8 @@ use yii\filters\VerbFilter;
 use app\models\LanguageSearch;
 use app\models\Language;
 use yii\web\HttpException;
+use yii\web\UploadedFile;
+use yii\helpers\ArrayHelper;
 
 class LanguageController extends Controller{
     /**
@@ -31,6 +33,8 @@ class LanguageController extends Controller{
                 'actions' => [
                     'index' => ['get'],
                     'delete-all' => ['get'],
+                    'import' => ['get', 'post'],
+                    'export' => ['get'],
                     'view' => ['get'],
                     'create' => ['get', 'post'],
                     'update' => ['get', 'post'],
@@ -91,6 +95,80 @@ class LanguageController extends Controller{
         Yii::info('delete selected ' . count($languageNames) . ' languages, they are ' . implode(',', $languageNames), 'administrator');
         return $this->redirect(['index']);
     }
+    
+/**
+     * import languages
+     */
+    public function actionImport(){
+        $model = new Language();
+        $state = [
+            'message' => 'Info:please import a xml file. Format as below:</br>'
+            . '&lt;?xml version="1.0" encoding="UTF-8"?&gt;</br>'
+            . '&lt;message&gt;</br>'
+            . '&nbsp;&nbsp;&lt;Language&gt;</br>'
+            . '&nbsp;&nbsp;&nbsp;&nbsp;&lt;languageName&gt;English&lt;/languageName&gt;</br>'
+            . '&nbsp;&nbsp;&lt;/Language&gt;</br>'
+            . '&nbsp;&nbsp;&lt;Language&gt;</br>'
+            . '&nbsp;&nbsp;&nbsp;&nbsp;······</br>'
+            . '&nbsp;&nbsp;&lt;/Language&gt;</br>'
+            . '&lt;/message&gt;</br>',
+            'class' => 'alert-info',
+            'percent' => 0,
+            'label' => '0%',
+        ];
+        if($model->load(Yii::$app->request->post())){
+            $model->importFile = UploadedFile::getInstance($model, 'importFile');
+            try {
+                $xmlArray = simplexml_load_file($model->importFile->tempName);
+                $languages = json_decode(json_encode($xmlArray), true);
+                $columns = ['languageName', 'createTime', 'updateTime'];
+                $rows = ArrayHelper::getColumn($languages['Language'], function($element){
+                    $now = date('Y-m-d H:i:s', time());
+                    return [$element['languageName'], $now, $now];
+                });
+                    $db = Yii::$app->db;
+                    $db->createCommand()->batchInsert('language', $columns, $rows)->execute();
+                    $languageStr = implode(',', ArrayHelper::getColumn($languages['Language'], 'languageName'));
+                    Yii::info("import " . count($rows) . " languages, they are $languageStr", 'administrator');
+                    $state['message'] = 'Success:import success, there are totally ' . count($rows) .' languages added to DB, they are ' . $languageStr;
+                    $state['class'] = 'alert-success';
+                    $state['percent'] = 100;
+                    $state['label'] = '100% completed';
+            }catch (\Exception $e){
+                $state['message'] = 'Error:' . $e->getMessage();
+                $state['class'] = 'alert-danger';
+            }
+        }
+        return $this->render('import', [
+            'model' => $model,
+            'state' => $state,
+        ]);
+    }
+    /**
+     * 导出所有的languages
+     */
+    public function actionExport(){
+        $model = new Language();
+        $productcards = $model->find()->all();
+        $response = Yii::createObject([
+            'class' => 'yii\web\Response',
+            'format' => \yii\web\Response::FORMAT_XML,
+            'formatters' => [
+                \yii\web\Response::FORMAT_XML => [
+                    'class' => 'yii\web\XmlResponseFormatter',
+                    'rootTag' => 'message', //根节点
+                    'itemTag' => 'language',
+                ],
+            ],
+            'data' => $productcards,
+        ]);
+        $formatter = new \yii\web\XmlResponseFormatter();
+        $formatter->rootTag = 'message';
+        $formatter->format($response);
+        Yii::$app->response->sendContentAsFile($response->content, 'languages.xml')->send();
+        Yii::info('export all languages', 'administrator');
+    }
+    
     /**
      * 查看language的详细信息
      * @param int $languageId

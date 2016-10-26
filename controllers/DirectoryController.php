@@ -11,6 +11,7 @@ use yii\helpers\ArrayHelper;
 use app\models\Channel;
 use yii\web\HttpException;
 use yii\db\Exception;
+use yii\web\UploadedFile;
 
 class DirectoryController extends Controller{
     /**
@@ -34,9 +35,12 @@ class DirectoryController extends Controller{
                 'actions' => [
                     'index' => ['get'],
                     'delete-all' => ['get'],
+                    'import' => ['get', 'post'],
+                    'export' => ['get'],
                     'view' => ['get'],
                     'create' => ['get', 'post'],
                     'update' => ['get', 'post'],
+                    'delete' => ['get'],
                 ],
             ],
         ];
@@ -92,6 +96,81 @@ class DirectoryController extends Controller{
         Yii::info('delete selected ' . count($directoryNames) . ' directories, they are ' . implode(',', $directoryNames), 'administrator');
         return $this->redirect(['index']);
     }
+    
+    /**
+     * import directories
+     */
+    public function actionImport(){
+        $model = new Directory();
+        $state = [
+            'message' => 'Info:please import a xml file. Format as below:</br>'
+            . '&lt;?xml version="1.0" encoding="UTF-8"?&gt;</br>'
+            . '&lt;message&gt;</br>'
+            . '&nbsp;&nbsp;&lt;Directory&gt;</br>'
+            . '&nbsp;&nbsp;&nbsp;&nbsp;&lt;directoryName&gt;MiddleEastVIP&lt;/directoryName&gt;</br>'
+            . '&nbsp;&nbsp;&nbsp;&nbsp;&lt;showOrder&gt;1&lt;/showOrder&gt;</br>'
+            . '&nbsp;&nbsp;&lt;/Directory&gt;</br>'
+            . '&nbsp;&nbsp;&lt;Directory&gt;</br>'
+            . '&nbsp;&nbsp;&nbsp;&nbsp;······</br>'
+            . '&nbsp;&nbsp;&lt;/Directory&gt;</br>'
+            . '&lt;/message&gt;</br>',
+            'class' => 'alert-info',
+            'percent' => 0,
+            'label' => '0%',
+        ];
+        if($model->load(Yii::$app->request->post())){
+            $model->importFile = UploadedFile::getInstance($model, 'importFile');
+            try {
+                $xmlArray = simplexml_load_file($model->importFile->tempName);
+                $directories = json_decode(json_encode($xmlArray), true);
+                $columns = ['directoryName', 'showOrder', 'createTime', 'updateTime'];
+                $rows = ArrayHelper::getColumn($directories['Directory'], function($element){
+                    $now = date('Y-m-d H:i:s', time());
+                    return [$element['directoryName'], $element['showOrder'], $now, $now];
+                });
+                    $db = Yii::$app->db;
+                    $db->createCommand()->batchInsert('directory', $columns, $rows)->execute();
+                    $directoryStr = implode(',', ArrayHelper::getColumn($directories['Directory'], 'directoryName'));
+                    Yii::info("import " . count($rows) . " directories, they are $directoryStr", 'administrator');
+                    $state['message'] = 'Success:import success, there are totally ' . count($rows) .' directories added to DB, they are ' . $directoryStr;
+                    $state['class'] = 'alert-success';
+                    $state['percent'] = 100;
+                    $state['label'] = '100% completed';
+            }catch (\Exception $e){
+                $state['message'] = 'Error:' . $e->getMessage();
+                $state['class'] = 'alert-danger';
+            }
+        }
+        return $this->render('import', [
+            'model' => $model,
+            'state' => $state,
+        ]);
+    }
+    /**
+     * 导出所有的directories
+     */
+    public function actionExport(){
+        $model = new Directory();
+        $directories = $model->find()->all();
+        $response = Yii::createObject([
+            'class' => 'yii\web\Response',
+            'format' => \yii\web\Response::FORMAT_XML,
+            'formatters' => [
+                \yii\web\Response::FORMAT_XML => [
+                    'class' => 'yii\web\XmlResponseFormatter',
+                    'rootTag' => 'message', //根节点
+                    'itemTag' => 'directory',
+                ],
+            ],
+            'data' => $directories,
+        ]);
+        $formatter = new \yii\web\XmlResponseFormatter();
+        $formatter->rootTag = 'message';
+        $formatter->format($response);
+        Yii::$app->response->sendContentAsFile($response->content, 'directories.xml')->send();
+        Yii::info('export all directories', 'administrator');
+    }
+    
     /**
      * 查看directory的详细信息
      * @param int $directoryId

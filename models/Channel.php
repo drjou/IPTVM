@@ -8,6 +8,8 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
 
 class Channel extends ActiveRecord{
+    //批量导入的文件
+    public $importFile;
     //语言名
     public $languageName;
     //channel对应的图片
@@ -15,6 +17,7 @@ class Channel extends ActiveRecord{
     
     const SCENARIO_ADD = 'add';
     const SCENARIO_UPDATE = 'update';
+    const SCENARIO_IMPORT = 'import';
     /**
      * 设置模型对应表名
      * @return string
@@ -47,6 +50,7 @@ class Channel extends ActiveRecord{
     public function rules(){
         return [
             [['channelName', 'channelIp', 'channelUrl', 'urlType', 'channelType', 'languageName'], 'required'],
+            ['importFile', 'file', 'skipOnEmpty' => false, 'mimeTypes' => ['application/xml', 'text/xml'],'extensions' => ['xml'], 'maxSize' => 50*1024*1024],
             ['channelPic', 'required', 'on' => self::SCENARIO_UPDATE],
             [['channelName', 'channelIp', 'channelUrl'], 'trim'],
             ['channelName', 'string', 'length' => [3, 10]],
@@ -65,6 +69,7 @@ class Channel extends ActiveRecord{
         return [
             self::SCENARIO_ADD => ['channelName', 'channelIp', 'thumbnail', 'channelUrl', 'urlType', 'channelType', 'languageName'],
             self::SCENARIO_UPDATE => ['channelName', 'channelIp', 'channelPic', 'thumbnail', 'channelUrl', 'urlType', 'channelType', 'languageName'],
+            self::SCENARIO_IMPORT => ['importFile'],
         ];
     }
     
