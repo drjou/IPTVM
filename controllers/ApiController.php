@@ -109,6 +109,7 @@ class ApiController extends Controller{
                     'endDate',
                 ],
             ]);
+            Yii::info('get products', 'stb');
             //返回xml响应（将itemTag置为Product）
             return Yii::createObject([
                 'class' => 'yii\web\Response',
@@ -162,6 +163,8 @@ class ApiController extends Controller{
                     },
                 ]
             ]);
+            $product = Product::findOne($productId);
+            Yii::info("get all channels of $product->productName", 'stb');
             //返回xml响应（将itemTag置为Product）
             return Yii::createObject([
                 'class' => 'yii\web\Response',
@@ -201,6 +204,7 @@ class ApiController extends Controller{
                     },
                 ],
             ]);
+            Yii::info('get directories', 'stb');
             //返回xml响应（将itemTag置为Product）
             return Yii::createObject([
                 'class' => 'yii\web\Response',
@@ -256,6 +260,7 @@ class ApiController extends Controller{
                 ];
                 array_push($channels, $tmp);
             }
+            Yii::info("get all channels of directory $model->directoryName", 'stb');
             /* $channels = ArrayHelper::toArray($model->channels, [
                 'app\models\Channel' => [
                     'channelId',
@@ -322,6 +327,7 @@ class ApiController extends Controller{
                 'languageName' => $model->language->languageName,
                 'purchased' => ArrayHelper::isIn($accountId, $accountIds) ? 'yes' : 'no',
             ];
+            Yii::info("get details of channel $model->channelName", 'stb');
             return $channel;
         }else {
             return $state;
@@ -381,6 +387,7 @@ class ApiController extends Controller{
                         }
                     }
                     $transaction->commit();
+                    Yii::info('activated itself', 'stb');
                     return [
                         'info' => API::INFO0008,
                     ];
@@ -455,6 +462,8 @@ class ApiController extends Controller{
                         $card->scenario = Productcard::SCENARIO_API;
                         if($card->save()){//修改充值卡状态成功
                             $transaction->commit();
+                            $product = Product::findOne($card->productId);
+                            Yii::info("buy product $product->productName by productcard $card->cardNumber", 'stb');
                             return [
                                 'info' => API::INFO0010,
                             ];
@@ -483,6 +492,8 @@ class ApiController extends Controller{
                         $card->scenario = Productcard::SCENARIO_API;
                         if($card->save()){//修改充值卡状态成功
                             $transaction->commit();
+                            $product = Product::findOne($card->productId);
+                            Yii::info("buy product $product->productName by productcard $card->cardNumber", 'stb');
                             return [
                                 'info' => API::INFO0010,
                             ];
@@ -515,6 +526,8 @@ class ApiController extends Controller{
                         $card->scenario = Productcard::SCENARIO_API;
                         if($card->save()){//修改充值卡状态成功
                             $transaction->commit();
+                            $product = Product::findOne($card->productId);
+                            Yii::info("buy product $product->productName by productcard $card->cardNumber", 'stb');
                             return [
                                 'info' => API::INFO0010,
                             ];
@@ -560,6 +573,8 @@ class ApiController extends Controller{
                     $card->scenario = Productcard::SCENARIO_API;
                     if($card->save()){//修改充值卡状态成功
                         $transaction->commit();
+                        $product = Product::findOne($card->productId);
+                        Yii::info("buy product $product->productName by productcard $card->cardNumber", 'stb');
                         return [
                             'info' => API::INFO0010,
                         ];

@@ -58,6 +58,21 @@ $config = [
                         return "$userName";
                     }
                 ],
+                [
+                    'class' => 'yii\log\DbTarget',
+                    'logTable' => 'stb_log',
+                    'levels' => ['info'],
+                    'categories' => [
+                        'stb',
+                    ],
+                    'except' => [
+                        'application',
+                    ],
+                    'prefix' => function ($message) {
+                        $accountId = Yii::$app->request->get('accountId');
+                        return "$accountId";
+                    }
+                ],
             ],
         ],
         'db' => require(__DIR__ . '/db.php'),
