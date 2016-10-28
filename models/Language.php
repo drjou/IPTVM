@@ -9,6 +9,8 @@ use yii\db\Expression;
 
 class Language extends ActiveRecord{
     public $importFile;
+    const SCENARIO_SAVE = 'save';
+    const SCENARIO_IMPORT = 'import';
     /**
      * 设置模型对应表名
      * @return string
@@ -45,6 +47,18 @@ class Language extends ActiveRecord{
             ['languageName', 'trim'],
             ['languageName', 'string', 'length' => [2, 20]],
             ['languageName', 'unique'],
+        ];
+    }
+    
+    /**
+     * 设置不同场景要验证的属性
+     * {@inheritDoc}
+     * @see \yii\base\Model::scenarios()
+     */
+    public function scenarios(){
+        return [
+            self::SCENARIO_SAVE => ['languageName'],
+            self::SCENARIO_IMPORT => ['importFile'],
         ];
     }
     

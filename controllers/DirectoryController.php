@@ -102,6 +102,7 @@ class DirectoryController extends Controller{
      */
     public function actionImport(){
         $model = new Directory();
+        $model->scenario = Directory::SCENARIO_IMPORT;
         $state = [
             'message' => 'Info:please import a xml file. Format as below:</br>'
             . '&lt;?xml version="1.0" encoding="UTF-8"?&gt;</br>'
@@ -128,14 +129,14 @@ class DirectoryController extends Controller{
                     $now = date('Y-m-d H:i:s', time());
                     return [$element['directoryName'], $element['showOrder'], $now, $now];
                 });
-                    $db = Yii::$app->db;
-                    $db->createCommand()->batchInsert('directory', $columns, $rows)->execute();
-                    $directoryStr = implode(',', ArrayHelper::getColumn($directories['Directory'], 'directoryName'));
-                    Yii::info("import " . count($rows) . " directories, they are $directoryStr", 'administrator');
-                    $state['message'] = 'Success:import success, there are totally ' . count($rows) .' directories added to DB, they are ' . $directoryStr;
-                    $state['class'] = 'alert-success';
-                    $state['percent'] = 100;
-                    $state['label'] = '100% completed';
+                $db = Yii::$app->db;
+                $db->createCommand()->batchInsert('directory', $columns, $rows)->execute();
+                $directoryStr = implode(',', ArrayHelper::getColumn($directories['Directory'], 'directoryName'));
+                Yii::info("import " . count($rows) . " directories, they are $directoryStr", 'administrator');
+                $state['message'] = 'Success:import success, there are totally ' . count($rows) .' directories added to DB, they are ' . $directoryStr;
+                $state['class'] = 'alert-success';
+                $state['percent'] = 100;
+                $state['label'] = '100% completed';
             }catch (\Exception $e){
                 $state['message'] = 'Error:' . $e->getMessage();
                 $state['class'] = 'alert-danger';
@@ -192,6 +193,7 @@ class DirectoryController extends Controller{
      */
     public function actionCreate(){
         $model = new Directory();
+        $model->scenario = Directory::SCENARIO_SAVE;
         if($model->load(Yii::$app->request->post())){
             if(!empty($model->channels)){//添加的channels不为空
                 //将channels信息添加到channel_directory表中
@@ -209,6 +211,9 @@ class DirectoryController extends Controller{
                         $transaction->commit();
                         Yii::info("create directory $model->directoryName", 'administrator');
                         return $this->redirect(['view', 'directoryId' => $model->directoryId]);
+                    }else{
+                        $transaction->rollBack();
+                        $model->addError('directoryName', "add directory $model->directoryName failed! please try again.");
                     }
                 }catch(Exception $e){
                     $transaction->rollBack();
@@ -236,6 +241,7 @@ class DirectoryController extends Controller{
      */
     public function actionUpdate($directoryId){
         $model = Directory::findDirectoryById($directoryId);
+        $model->scenario = Directory::SCENARIO_SAVE;
         $oldChannels = ArrayHelper::getColumn($model->channels, 'channelId');
         if($model->load(Yii::$app->request->post())){
             //计算channels的差别，然后进行差量同步到数据库
@@ -267,6 +273,9 @@ class DirectoryController extends Controller{
                         $transaction->commit();
                         Yii::info("update directory $model->directoryName", 'administrator');
                         return $this->redirect(['view', 'directoryId' => $model->directoryId]);
+                    }else{
+                        $transaction->rollBack();
+                        $model->addError('directoryName', "update directory $model->directoryName failed! please try again.");
                     }
                 }catch (Exception $e){
                     $transaction->rollBack();

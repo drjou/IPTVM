@@ -98,6 +98,14 @@ class Channel extends ActiveRecord{
     }
     
     /**
+     * 获取该channels对应的account（API实现getDirectoryChannel时用到）
+     */
+    public function getAccounts(){
+        return $this->hasMany(AccountProduct::className(), ['productId' => 'productId'])
+                ->via('products');
+    }
+    
+    /**
      * 获取Channel的语言
      * @return ActiveQuery
      */

@@ -101,6 +101,7 @@ class LanguageController extends Controller{
      */
     public function actionImport(){
         $model = new Language();
+        $model->scenario = Language::SCENARIO_IMPORT;
         $state = [
             'message' => 'Info:please import a xml file. Format as below:</br>'
             . '&lt;?xml version="1.0" encoding="UTF-8"?&gt;</br>'
@@ -188,6 +189,7 @@ class LanguageController extends Controller{
      */
     public function actionCreate(){
         $model = new Language();
+        $model->scenario = Language::SCENARIO_SAVE;
         if($model->load(Yii::$app->request->post()) && $model->save()){
             Yii::info("create language $model->languageName", 'administrator');
             return $this->redirect(['view', 'languageId' => $model->languageId]);
@@ -203,6 +205,7 @@ class LanguageController extends Controller{
      */
     public function actionUpdate($languageId){
         $model = Language::findLanguageById($languageId);
+        $model->scenario = Language::SCENARIO_SAVE;
         if($model->load(Yii::$app->request->post()) && $model->save()){
             Yii::info("update language $model->languageName", 'administrator');
             return $this->redirect(['view', 'languageId' => $model->languageId]);

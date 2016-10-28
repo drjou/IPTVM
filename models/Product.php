@@ -9,6 +9,8 @@ use yii\db\Expression;
 
 class Product extends ActiveRecord{
     public $importFile;
+    const SCENARIO_SAVE = 'save';
+    const SCENARIO_IMPORT = 'import';
     /**
      * 设置模型对应的表名
      * @return string
@@ -48,6 +50,18 @@ class Product extends ActiveRecord{
             ['channels', 'safe'],
         ];
     }
+    /**
+     * 设置不同场景要验证的属性
+     * {@inheritDoc}
+     * @see \yii\base\Model::scenarios()
+     */
+    public function scenarios(){
+        return [
+            self::SCENARIO_SAVE => ['productName', 'channels'],
+            self::SCENARIO_IMPORT => ['importFile'],
+        ];
+    }
+    
     /**
      * 根据productId获取product信息
      * @param int $productId

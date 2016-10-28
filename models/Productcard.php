@@ -9,6 +9,9 @@ use yii\db\Expression;
 class Productcard extends ActiveRecord{
     public $importFile;
     public $productName;
+    const SCENARIO_SAVE = 'save';
+    const SCENARIO_IMPORT = 'import';
+    const SCENARIO_API = 'api';
     /**
      * 设置模型对应的表名
      * @return string
@@ -48,6 +51,24 @@ class Productcard extends ActiveRecord{
         ];
     }
     
+    /**
+     * 设置不同场景要验证的属性
+     * {@inheritDoc}
+     * @see \yii\base\Model::scenarios()
+     */
+    public function scenarios(){
+        return [
+            self::SCENARIO_SAVE => ['cardNumber', 'cardValue', 'productName', 'cardState'],
+            self::SCENARIO_IMPORT => ['importFile'],
+            self::SCENARIO_API => ['cardNumber', 'cardValue', 'productId', 'cardState'],
+        ];
+    }
+    
+    /**
+     * 设置表单中显示对应的名称
+     * {@inheritDoc}
+     * @see \yii\base\Model::attributeLabels()
+     */
     public function attributeLabels(){
         return [
             'cardValue' => 'Days',
@@ -77,7 +98,9 @@ class Productcard extends ActiveRecord{
     }
     
     public function beforeSave($insert){
-        $this->productId = $this->productName;
+        if($this->scenario == self::SCENARIO_SAVE){
+            $this->productId = $this->productName;
+        }
         return parent::beforeSave($insert);
     }
 }

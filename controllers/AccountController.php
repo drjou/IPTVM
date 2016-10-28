@@ -96,6 +96,7 @@ class AccountController extends Controller{
     
     public function actionImport(){
         $model = new Account();
+        $model->scenario = Account::SCENARIO_IMPORT;
         $state = [
             'message' => 'Info:please import a xml file. Format as below:</br>'
                         . '&lt;?xml version="1.0" encoding="UTF-8"?&gt;</br>'
@@ -219,6 +220,7 @@ class AccountController extends Controller{
      */
     public function actionCreate(){
         $model = new Account();
+        $model->scenario = Account::SCENARIO_SAVE;
         if($model->load(Yii::$app->request->post())){
             if($model->state == '1003'){
                 if($model->save()){
@@ -241,6 +243,9 @@ class AccountController extends Controller{
                         $transaction->commit();
                         Yii::info("create stb account $model->accountId", 'administrator');
                         return $this->redirect(['view', 'accountId' => $model->accountId]);
+                    }else{
+                        $transaction->rollBack();
+                        $model->addError('accountId', "add account $model->accountId failed! please try again.");
                     }
                 }catch (Exception $e){
                     $transaction->rollBack();
@@ -262,6 +267,7 @@ class AccountController extends Controller{
      */
     public function actionUpdate($accountId){
         $model = Account::findAccountById($accountId);
+        $model->scenario = Account::SCENARIO_SAVE;
         if($model->state == '1001' || $model->state == '1004'){
             throw new HttpException(500, 'you can\'t update the account whose state is 1001 or 1004');
         }
@@ -297,6 +303,9 @@ class AccountController extends Controller{
                         $transaction->commit();
                         Yii::info("update stb account $model->accountId", 'administrator');
                         return $this->redirect(['view', 'accountId' => $model->accountId]);
+                    }else{
+                        $transaction->rollBack();
+                        $model->addError('accountId', "update account $model->accountId failed! please try again.");
                     }
                 }catch (Exception $e){
                     $transaction->rollBack();

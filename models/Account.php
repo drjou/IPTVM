@@ -9,6 +9,8 @@ use yii\db\Expression;
 
 class Account extends ActiveRecord{
     public $importFile;
+    const SCENARIO_SAVE = 'save';
+    const SCENARIO_IMPORT = 'import';
     /**
      * 设置模型对应表名
      * @return string
@@ -52,6 +54,18 @@ class Account extends ActiveRecord{
         ];
     }
     /**
+     * 设置不同场景下的验证属性
+     * {@inheritDoc}
+     * @see \yii\base\Model::scenarios()
+     */
+    public function scenarios(){
+        return [
+            self::SCENARIO_SAVE => ['accountId', 'state', 'enable', 'products'],
+            self::SCENARIO_IMPORT => ['importFile'],
+        ];
+    }
+    
+    /**
      * 设置表单里显示的名称
      * {@inheritDoc}
      * @see \yii\base\Model::attributeLabels()
@@ -69,11 +83,18 @@ class Account extends ActiveRecord{
         $this->products = $products;
     }
     /**
-     * 获取属性products
+     * 获取属性products（与stbbind表相关联）
      */
     public function getProducts(){
         return $this->hasMany(Product::className(), ['productId' => 'productId'])
         ->viaTable('stbbind', ['accountId' => 'accountId']);
+    }
+    /**
+     * Api获取account对应products（与account_product表相关联）
+     */
+    public function getApiProducts(){
+        return $this->hasMany(Product::className(), ['productId' => 'productId'])
+        ->viaTable('account_product', ['accountId' => 'accountId']);
     }
     
     /**

@@ -12,6 +12,8 @@ class Directory extends ActiveRecord{
     public $importFile;
     //父目录名称
     public $parentName;
+    const SCENARIO_SAVE = 'save';
+    const SCENARIO_IMPORT = 'import';
     /**
      * 设置模型对应的表名
      * @return string
@@ -52,6 +54,19 @@ class Directory extends ActiveRecord{
             [['parentName', 'channels'], 'safe'],
         ];
     }
+    
+    /**
+     * 设置不同场景要验证的属性
+     * {@inheritDoc}
+     * @see \yii\base\Model::scenarios()
+     */
+    public function scenarios(){
+        return [
+            self::SCENARIO_SAVE => ['directoryName', 'showOrder', 'parentName', 'channels'],
+            self::SCENARIO_IMPORT => ['importFile'],
+        ];
+    }
+    
     /**
      * 根据directoryId获取目录信息
      * @param int $directoryId

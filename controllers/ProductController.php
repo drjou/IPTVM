@@ -101,6 +101,7 @@ class ProductController extends Controller{
      */
     public function actionImport(){
         $model = new Product();
+        $model->scenario = Product::SCENARIO_IMPORT;
         $state = [
             'message' => 'Info:please import a xml file. Format as below:</br>'
             . '&lt;?xml version="1.0" encoding="UTF-8"?&gt;</br>'
@@ -194,6 +195,7 @@ class ProductController extends Controller{
      */
     public function actionCreate(){
         $model = new Product();
+        $model->scenario = Product::SCENARIO_SAVE;
         if($model->load(Yii::$app->request->post())){
             if(!empty($model->channels)){//添加的channels不为空
                 //将channels信息添加到product_channel表中
@@ -211,6 +213,9 @@ class ProductController extends Controller{
                         $transaction->commit();
                         Yii::info("create product $model->productName", 'administrator');
                         return $this->redirect(['view', 'productId' => $model->productId]);
+                    }else{
+                        $transaction->rollBack();
+                        $model->addError('productName', "add product $model->productName failed! please try again.");
                     }
                 }catch(Exception $e){
                     $transaction->rollBack();
@@ -236,6 +241,7 @@ class ProductController extends Controller{
      */
     public function actionUpdate($productId){
         $model = Product::findProductById($productId);
+        $model->scenario = Product::SCENARIO_SAVE;
         //修改前的channels列表
         $oldChannels = ArrayHelper::getColumn($model->channels, 'channelId');
         if($model->load(Yii::$app->request->post())){
@@ -268,6 +274,9 @@ class ProductController extends Controller{
                         $transaction->commit();
                         Yii::info("update product $model->productName", 'administrator');
                         return $this->redirect(['view', 'productId' => $productId]);
+                    }else{
+                        $transaction->rollBack();
+                        $model->addError('productName', "update product $model->productName failed! please try again.");
                     }
                 }catch (Exception $e){
                     $transaction->rollBack();

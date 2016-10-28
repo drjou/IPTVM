@@ -99,6 +99,7 @@ class ProductcardController extends Controller{
      */
     public function actionImport(){
         $model = new Productcard();
+        $model->scenario = Productcard::SCENARIO_IMPORT;
         $state = [
             'message' => 'Info:please import a xml file. Format as below:</br>'
             . '&lt;?xml version="1.0" encoding="UTF-8"?&gt;</br>'
@@ -187,6 +188,7 @@ class ProductcardController extends Controller{
      */
     public function actionCreate(){
         $model = new Productcard();
+        $model->scenario = Productcard::SCENARIO_SAVE;
         if($model->load(Yii::$app->request->post()) && $model->save()){
             Yii::info("create productcard $model->cardNumber", 'administrator');
             return $this->redirect(['view', 'cardNumber' => $model->cardNumber]);
@@ -204,6 +206,7 @@ class ProductcardController extends Controller{
      */
     public function actionUpdate($cardNumber){
         $model = Productcard::findProductcardById($cardNumber);
+        $model->scenario = Productcard::SCENARIO_SAVE;
         if($model->cardState == 1){
             throw new HttpException(500, "You can't update the productcard that has been used.");
         }
