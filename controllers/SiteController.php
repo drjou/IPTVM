@@ -78,7 +78,7 @@ class SiteController extends Controller
         $counts['directory'] = count(Directory::find()->all());
         $counts['productcard'] = count(Productcard::find()->all());
         $counts['language'] = count(Language::find()->all());
-        $counts['log'] = count(AdminLog::find()->all()) + count(StbLog::find()->all());
+        $counts['log'] = count(AdminLog::find()->where(['category' => 'administrator'])->all()) + count(StbLog::find()->where(['category' => 'stb'])->all());
         return $this->render('index', [
             'counts' => $counts,
         ]);

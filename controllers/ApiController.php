@@ -38,6 +38,11 @@ class ApiController extends Controller{
                 'actions' => [
                     'get-product' => ['get'],
                     'get-product-channel' => ['get'],
+                    'get-directory' => ['get'],
+                    'get-directory-channel' => ['get'],
+                    'get-epg' => ['get'],
+                    'active' => ['get', 'post'],
+                    'purchase' => ['get', 'post'],
                 ],
             ],
         ];
