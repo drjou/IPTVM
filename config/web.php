@@ -1,7 +1,5 @@
 <?php
 
-use yii\behaviors\AttributeBehavior;
-use yii\db\ActiveRecord;
 
 $params = require(__DIR__ . '/params.php');
 

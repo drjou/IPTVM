@@ -23,6 +23,10 @@ class ComposerStaticInite7bbc9e18f4d13c4675486b0c8f56260
             'yii\\bootstrap\\' => 14,
             'yii\\' => 4,
         ),
+        'm' => 
+        array (
+            'miloschuman\\highcharts\\' => 23,
+        ),
         'c' => 
         array (
             'cebe\\markdown\\' => 14,
@@ -65,6 +69,10 @@ class ComposerStaticInite7bbc9e18f4d13c4675486b0c8f56260
         'yii\\' => 
         array (
             0 => __DIR__ . '/..' . '/yiisoft/yii2',
+        ),
+        'miloschuman\\highcharts\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/miloschuman/yii2-highcharts-widget/src',
         ),
         'cebe\\markdown\\' => 
         array (
