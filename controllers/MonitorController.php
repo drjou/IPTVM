@@ -4,7 +4,6 @@ namespace app\controllers;
 use yii\web\Controller;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
-use app\models\Admin;
 
 class MonitorController extends Controller{
     /**
