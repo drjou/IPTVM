@@ -49,4 +49,10 @@ class MonitorController extends Controller{
         //$cpu = new Admin();
         return $this->render('index', []);
     }
+    /**
+     * 显示CPU折线图
+     */
+    public function actionCpuChart(){
+        return $this->render('cpu-chart', []);
+    }
 }
