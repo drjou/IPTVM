@@ -5,7 +5,6 @@ use Yii;
 use yii\web\Controller;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
-use app\models\Admin;
 use app\models\CPUSearch;
 use app\models\CPU;
 use app\models\Server;
