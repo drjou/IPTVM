@@ -20,7 +20,10 @@ $this->params['breadcrumbs'][] = $this->title;
         }
     </style>
 </head>
-
+<div style="float: left">
+<?= Html::a('Gauge', null, ['class' => 'btn btn-default']);?>
+<?= Html::a('Line', ['index-chart','serverName'=>$serverName], ['class' => 'btn btn-default']);?><br/>
+</div>
 <div style="float: right">
 <?php $form = ActiveForm::begin(); ?>
 
@@ -64,7 +67,7 @@ $this->registerJs("
         var gaugeChart4 = $('#w4').highcharts();
         var point4 = gaugeChart4.series[0].points[0];
         var server = $('#server-servername option:selected').text();
-        $.get('index.php?r=monitor/new-info&serverName='+server,function(data,status){
+        $.get('index.php?r=monitor/update-info&serverName='+server,function(data,status){
             point1.update(data.cpuInfo);
             point2.update(data.ramInfo);
             point3.update(data.diskInfo);

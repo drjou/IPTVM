@@ -161,9 +161,9 @@ class ChartDraw
                 'tooltip' => [
                     'dateTimeLabelFormats' => [
                         'millisecond' => '%H:%M:%S.%L',
-                        'second' => '%H:%M:%S',
-                        'minute' => '%H:%M',
-                        'hour' => '%H:%M',
+                        'second' => '%m-%d %H:%M:%S',
+                        'minute' => '%m-%d %H:%M',
+                        'hour' => '%m-%d %H:%M',
                         'day' => '%m-%d',
                         'week' => '%m-%d',
                         'month' => '%Y-%m',
