@@ -1,7 +1,7 @@
 <?php
 use yii\helpers\Html;
 use yii\grid\GridView;
-use yii\data\ArrayDataProvider;
+
 $this->title = 'CPU Grid';
 $this->params['breadcrumbs'][] = ['label' => 'Monitor Dashboard', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
@@ -29,7 +29,7 @@ $request = Yii::$app->request;
         'ncpu',
         [
             'attribute' => 'recordTime',
-            'headerOptions' => ['width' => '155'],
+            'headerOptions' => ['width' => '180'],
         ],
         'utilize',
         'user', 

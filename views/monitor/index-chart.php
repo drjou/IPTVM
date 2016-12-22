@@ -10,4 +10,4 @@ $request = Yii::$app->request;
 <?= Html::a('Line', null, ['class' => 'btn btn-default']);?><br/>
 </div>
 <?php
-echo ChartDraw::drawLineChart('General Utilization', $request->get('serverName'), 'Percentage(%)', '%', $data);
+echo ChartDraw::drawLineChart('General Utilization', 'Click and drag to zoom in', 'Percentage(%)', '%', $data);

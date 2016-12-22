@@ -1,18 +1,18 @@
 <?php
-
 use yii\helpers\Html;
 use yii\grid\GridView;
-$this->title = 'Streams Monitor';
+
+$this->title = 'Disk Grid';
+$this->params['breadcrumbs'][] = ['label' => 'Monitor Dashboard', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
-$enables = [
-    0 => 'off',
-    1 => 'on',
-]
+$request = Yii::$app->request;
 ?>
-
+<div style="float: left">
+<span>Server Name: <strong><?php echo $request->get('serverName')?></strong></span>
+</div>
 <div style="float: right">
-<?= Html::a('Chart', ['streams'], ['class' => 'btn btn-default']);?>
+<?= Html::a('Chart', ['disk-chart','serverName'=>$request->get('serverName')], ['class' => 'btn btn-default']);?>
 <?= Html::a('Grid', null, ['class' => 'btn btn-default']);?><br/>
 </div><br/><br/>
 <?php echo GridView::widget([
@@ -26,26 +26,15 @@ $enables = [
             'class' => 'yii\grid\SerialColumn',
             'headerOptions' => ['width' => '10'],
         ],
-        'server',
-        'processName', 
-        [
-            'attribute' => 'status',
-            'value' => function($model){
-                return $model->status == 1 ? 'on' : 'off';
-            },
-            'filter' => $enables,
-            'headerOptions' => ['width' => '85'],
-        ], 
         [
             'attribute' => 'recordTime',
             'headerOptions' => ['width' => '180'],
         ],
-        'total',
-        'user', 
-        'system', 
-        'memory', 
-        'rss', 
-        'readByte', 
-        'writeByte',
+        'freePercent', 
+        'free', 
+        'used', 
+        'total'
     ]
 ]);
+?>
+

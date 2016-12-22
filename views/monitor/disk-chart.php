@@ -10,7 +10,7 @@ $request = Yii::$app->request;
 
 <div style="float: right">
 <?= Html::a('Chart', null, ['class' => 'btn btn-default']);?>
-<?= Html::a('Grid', ['ram-grid','serverName' => $request->get('serverName')], ['class' => 'btn btn-default']);?><br/>
+<?= Html::a('Grid', ['disk-grid','serverName' => $request->get('serverName')], ['class' => 'btn btn-default']);?><br/>
 </div>
 <?php
-echo ChartDraw::drawLineChart('RAM Utilization', 'Click and drag to zoom in', 'RAM Utilization Percentage(%)', '%', $data);
+echo ChartDraw::drawLineChart('Disk Utilization', 'Click and drag to zoom in', 'Free Percentage Disk(%)', '%', $data);

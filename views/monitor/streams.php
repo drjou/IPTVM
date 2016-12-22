@@ -18,11 +18,11 @@ $this->params['breadcrumbs'][] = $this->title;
 <?= Html::a('Grid', ['streams-grid'], ['class' => 'btn btn-default']);?><br/>
 </div>
 <?php
-echo ChartDraw::drawLineChart('The Total Utilization of Process', 'Click and drag to zoom in', 'Percentage(%)', '%', $totalData);
+echo ChartDraw::drawLineChart('Total Utilization of Process', 'Click and drag to zoom in', 'Total Utilization Percentage of Process(%)', '%', $totalData);
 ?>
 <br/><br/>
 <?php
-echo ChartDraw::drawLineChart('The Memory Utilization of Process', 'Click and drag to zoom in', 'Percentage(%)', '%', $memoryData);
+echo ChartDraw::drawLineChart('Memory Utilization of Process', 'Click and drag to zoom in', 'Memory Utilization Percentage of Process(%)', '%', $memoryData);
 $this->registerJs("
     $('#server-servername').change(function(){
     var server = $('#server-servername option:selected').text();

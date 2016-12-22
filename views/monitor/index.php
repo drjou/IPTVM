@@ -39,15 +39,15 @@ $this->params['breadcrumbs'][] = $this->title;
 	</div>
 	<div class="left">
 		<?php echo ChartDraw::drawGauge('RAM', 0, 100, 0, '%');?>
-		<a href="<?= Url::to(['monitor/ram-chart']) ?>">View Details</a>
+		<a href="<?= Url::to(['monitor/ram-chart', 'serverName' =>  $serverName]) ?>">View Details</a>
 	</div>
 	<div class="left">
 		<?php echo ChartDraw::drawGauge('DISK', 0, 100, 0, '%');?>
-		<a>View Details</a>
+		<a href="<?= Url::to(['monitor/disk-chart', 'serverName' =>  $serverName])?>">View Details</a>
 	</div>
 	<div class="left">
 		<?php echo ChartDraw::drawGauge('LOAD', 0, 100, 0, '%');?>
-		<a>View Details</a>
+		<a href="<?= Url::to(['monitor/load-chart', 'serverName' =>  $serverName])?>">View Details</a>
 	</div>
 </div>
 <br style="clear: both"/>

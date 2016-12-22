@@ -14,6 +14,9 @@ use app\models\Disk;
 use app\models\Load;
 use app\models\Process;
 use app\models\ProcessInfoSearch;
+use app\models\RAMSearch;
+use app\models\DiskSearch;
+use app\models\LoadSearch;
 
 class MonitorController extends Controller
 {
@@ -83,7 +86,10 @@ class MonitorController extends Controller
             'data' => $data
         ]);
     }
-    
+    /**
+     * 传回各个总体信息
+     * @param string $serverName
+     */
     public function actionIndexChart($serverName)
     {
         $cpu = CPU::find()->asArray()->all();
@@ -204,12 +210,8 @@ class MonitorController extends Controller
     /**
      * 传回CPU表格数据
      */
-    public function actionCpuGrid($serverName=null)
+    public function actionCpuGrid($serverName)
     {
-        if($serverName==null){
-            $firstServer = Server::find()->one();
-            $serverName = $firstServer->serverName;
-        }
         $searchModel = new CPUSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $serverName);
         return $this->render('cpu-grid', [
@@ -221,9 +223,110 @@ class MonitorController extends Controller
     /**
      * 传回RAM折线图数据
      */
-    public function actionRamChart()
+    public function actionRamChart($serverName)
     {
-        return $this->render('ram-chart', []);
+        $ramData = RAM::find()->where([
+            'server' => $serverName
+        ])
+        ->asArray()
+        ->all();
+        $data = [
+            [
+                'name' => 'utilize',
+                'data' => $this->getChartDataByProperty($ramData, 'recordTime', 'utilize')
+            ]
+        ];
+        return $this->render('ram-chart', [
+            'data' => $data
+        ]);
+    }
+    /**
+     * 传回RAM表格数据
+     * @param string $serverName
+     */
+    public function actionRamGrid($serverName){
+        $searchModel = new RAMSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $serverName);
+        return $this->render('ram-grid', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider
+        ]);
+    }
+    
+    /**
+     * 传回Disk折线图数据
+     * @param string $serverName
+     */
+    public function actionDiskChart($serverName){
+        $diskData = Disk::find()->where([
+            'server' => $serverName
+        ])
+        ->asArray()
+        ->all();
+        $data = [
+            [
+                'name' => 'free',
+                'data' => $this->getChartDataByProperty($diskData, 'recordTime', 'freePercent')
+            ]
+        ];
+        return $this->render('disk-chart', [
+            'data' => $data
+        ]);
+    }
+    
+    /**
+     * 传回Disk表格数据
+     * @param string $serverName
+     */
+    public function actionDiskGrid($serverName){
+        $searchModel = new DiskSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $serverName);
+        return $this->render('disk-grid', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider
+        ]);
+    }
+    
+    /**
+     * 传回Load折线图数据
+     * @param string $serverName
+     */
+    public function actionLoadChart($serverName){
+        $loadData = Load::find()->where([
+            'server' => $serverName
+        ])
+        ->asArray()
+        ->all();
+        $data = [
+            [
+                'name' => 'load of 1 minute',
+                'data' => $this->getChartDataByProperty($loadData, 'recordTime', 'load1')
+            ],
+            [
+                'name' => 'load of 5 minute',
+                'data' => $this->getChartDataByProperty($loadData, 'recordTime', 'load5')
+            ],
+            [
+                'name' => 'load of 15 minute',
+                'data' => $this->getChartDataByProperty($loadData, 'recordTime', 'load15')
+            ]
+        ];
+        return $this->render('load-chart', [
+            'data' => $data
+        ]);
+    }
+    
+    /**
+     * 传回Disk表格数据
+     * @param string $serverName
+     */
+    public function actionLoadGrid($serverName){
+        $searchModel = new LoadSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $serverName);
+        return $this->render('load-grid', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider
+        ]);
     }
     
     /**
@@ -268,6 +371,9 @@ class MonitorController extends Controller
         ]);
     }
     
+    /**
+     * 传回表格中的数据
+     */
     public function actionStreamsGrid(){
         $searchModel = new ProcessInfoSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -277,6 +383,48 @@ class MonitorController extends Controller
         ]);
     }
     
+    /**
+     * 传回不同服务器的相关数据
+     */
+    public function actionServers(){
+        $servers = Server::find()->all();
+        $cpuData = array();
+        $ramData = array();
+        $diskData = array();
+        $loadData = array();
+        for($i=0;$i<count($servers);$i++){
+            $cpuInfo = $servers[$i]->getCpuInfo()->asArray()->all();
+            $cpu = [
+                'name' => $servers[$i]['serverName'],
+                'data' => $this->getChartDataByProperty($cpuInfo, 'recordTime', 'utilize')
+            ];
+            array_push($cpuData, $cpu);
+            $ramInfo = $servers[$i]->getRamInfo()->asArray()->all();
+            $ram = [
+                'name' => $servers[$i]['serverName'],
+                'data' => $this->getChartDataByProperty($ramInfo, 'recordTime', 'utilize')
+            ];
+            array_push($ramData, $ram);
+            $diskInfo = $servers[$i]->getDiskInfo()->asArray()->all();
+            $disk = [
+                'name' => $servers[$i]['serverName'],
+                'data' => $this->getChartDataByProperty($diskInfo, 'recordTime', 'freePercent')
+            ];
+            array_push($diskData, $disk);
+            $loadInfo = $servers[$i]->getLoadInfo()->asArray()->all();
+            $load = [
+                'name' => $servers[$i]['serverName'],
+                'data' => $this->getChartDataByProperty($loadInfo, 'recordTime', 'load1')
+            ];
+            array_push($loadData, $load);
+        }
+        return $this->render('servers', [
+            'cpuData' => $cpuData,
+            'ramData' => $ramData,
+            'diskData' => $diskData,
+            'loadData' => $loadData
+        ]);
+    }
     
     /**
      * 整理折线图横轴和纵轴的数据

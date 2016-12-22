@@ -156,7 +156,8 @@ class ChartDraw
                             'width' => 1,
                             'color' => '#808080'
                         ]
-                    ]
+                    ],
+                    'lineWidth' => 1,
                 ],
                 'tooltip' => [
                     'dateTimeLabelFormats' => [
