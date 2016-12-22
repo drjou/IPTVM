@@ -6,13 +6,15 @@ $this->title = 'CPU Grid';
 $this->params['breadcrumbs'][] = ['label' => 'Monitor Dashboard', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
-
+$request = Yii::$app->request;
 ?>
-
+<div style="float: left">
+<span>Server Name: <strong><?php echo $request->get('serverName')?></strong></span>
+</div>
 <div style="float: right">
-<?= Html::a('Chart', ['cpu-chart'], ['class' => 'btn btn-default']);?>
+<?= Html::a('Chart', ['cpu-chart','serverName'=>$request->get('serverName')], ['class' => 'btn btn-default']);?>
 <?= Html::a('Grid', null, ['class' => 'btn btn-default']);?><br/>
-</div><br/>
+</div><br/><br/>
 <?php echo GridView::widget([
     'dataProvider' => $dataProvider,
     'filterModel' => $searchModel,
@@ -37,19 +39,9 @@ $this->params['breadcrumbs'][] = $this->title;
         'softIrq', 
         'nice', 
         'steal', 
-        'guest'
+        'guest',
+        'idle'
     ]
 ]);
 ?>
-<p>
-	<strong>util(%):</strong>CPU总使用的时间百分比<br/>
-	<strong>hirq(%):</strong>系统处理硬中断所花费的时间百分比<br/>
-	<strong>sirq(%):</strong>系统处理软中断所花费的时间百分比<br/>
-	<strong>nice(%):</strong>系统调整进程优先级所花费的时间百分比<br/>
-	<strong>user(h):</strong>CPU执行用户进程的时间<br/>
-	<strong>sys(h):</strong>CPU在内核运行时间<br/>
-	<strong>wait(h):</strong>CPU在等待I/O操作完成所花费的时间<br/>
-	<strong>steal(h):</strong>被强制等待（involuntary wait）虚拟CPU的时间<br/>
-	<strong>ncpu:</strong>CPU的总个数<br/>
-</p>
 

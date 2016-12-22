@@ -109,10 +109,21 @@ class ChartDraw
             ]
         ]);
     }
-    
-    public static function drawLineChart($title, $subtitle, $xCategories, $yText, $ySuffix, $data){
+    /**
+     * 
+     * @param string $title 折线图标题
+     * @param string $subtitle 副标题
+     * @param date $xCategories 横轴数据
+     * @param string $yText y轴表示
+     * @param string $ySuffix y轴单位
+     * @param array $data 折线图数据
+     */
+    public static function drawLineChart($title, $subtitle, $yText, $ySuffix, $data){
         return Highcharts::widget([
             'options' => [
+                'chart' => [
+                    'zoomType' => 'x'
+                ],
                 'title' => [
                     'text' => $title,
                     'x' => - 20
@@ -123,7 +134,17 @@ class ChartDraw
                     'x' => - 20
                 ],
                 'xAxis' => [
-                    'categories' => $xCategories
+                    'type' => 'datetime',
+                    'dateTimeLabelFormats' => [
+                        'millisecond' => '%H:%M:%S.%L',
+                        'second' => '%H:%M:%S',
+                        'minute' => '%H:%M',
+                        'hour' => '%H:%M',
+                        'day' => '%m-%d',
+                        'week' => '%m-%d',
+                        'month' => '%Y-%m',
+                        'year' => '%Y'
+                    ]
                 ],
                 'yAxis' => [
                     'title' => [
@@ -138,6 +159,16 @@ class ChartDraw
                     ]
                 ],
                 'tooltip' => [
+                    'dateTimeLabelFormats' => [
+                        'millisecond' => '%H:%M:%S.%L',
+                        'second' => '%H:%M:%S',
+                        'minute' => '%H:%M',
+                        'hour' => '%H:%M',
+                        'day' => '%m-%d',
+                        'week' => '%m-%d',
+                        'month' => '%Y-%m',
+                        'year' => '%Y'
+                    ],
                     'valueSuffix' => $ySuffix
                 ],
                 'legend' => [
@@ -149,9 +180,14 @@ class ChartDraw
                 'plotOptions' => [
                     'line' => [
                         'dataLabels' => [
-                            'enabled' => true
+                            'enabled' => false
                         ],
                         'enableMouseTracking' => true
+                    ],
+                    'series' => [
+                        'marker' => [
+                            'enabled' => false
+                        ]
                     ]
                 ],
                 'credits' => [

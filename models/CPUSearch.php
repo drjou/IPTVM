@@ -5,19 +5,33 @@ use yii\base\Model;
 
 
 class CPUSearch extends CPU{
+    /**
+     * 表单验证规则
+     * {@inheritDoc}
+     * @see \yii\base\Model::rules()
+     */
     public function rules()
     {
         return [
-            [['recordTime', 'utilize', 'user', 'system', 'wait', 'hardIrq', 'softIrq', 'nice', 'steal', 'guest'], 'safe'],
+            [['recordTime', 'utilize', 'user', 'system', 'wait', 'hardIrq', 'softIrq', 'nice', 'steal', 'guest', 'idle'], 'safe'],
         ];
     }
-    
+    /**
+     * 每个场景要验证的属性
+     * {@inheritDoc}
+     * @see \yii\base\Model::scenarios()
+     */
     public function scenarios()
     {
         return Model::scenarios();
     }
-    public function search($params){
-        $query = CPU::find();
+    /**
+     * 检索过滤
+     * @param string $params
+     * @return \yii\data\ActiveDataProvider
+     */
+    public function search($params, $serverName){
+        $query = CPU::find()->where(['server'=>$serverName]);
         $dataProvider  = new ActiveDataProvider([
            'query' => $query,
            'pagination' => [
@@ -38,7 +52,8 @@ class CPUSearch extends CPU{
         ->andFilterWhere(['=', 'softIrq', $this->softIrq])
         ->andFilterWhere(['=', 'nice', $this->nice])
         ->andFilterWhere(['=', 'steal', $this->steal])
-        ->andFilterWhere(['=', 'guest', $this->guest]);
+        ->andFilterWhere(['=', 'guest', $this->guest])
+        ->andFilterWhere(['=', 'idle', $this->idle]);
         return $dataProvider;
     }
 }
