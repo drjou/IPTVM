@@ -31,19 +31,19 @@ $this->params['breadcrumbs'][] = $this->title;
 <br style="clear: both"/>
 <div class="text-center">
 	<div class="gauge left" >
-		<?php echo ChartDraw::drawGauge('CPU', 0, 100, 0, '%');?>
+		<?php echo ChartDraw::drawGauge('<span class="dashboard">CPU<span>', 0, 100, 0, '%');?>
 		<a href="<?= Url::to(['monitor/cpu-chart', 'serverName' =>  $serverName]) ?>">View Details</a>
 	</div>
 	<div class="gauge left">
-		<?php echo ChartDraw::drawGauge('RAM', 0, 100, 0, '%');?>
+		<?php echo ChartDraw::drawGauge('<span class="dashboard">RAM<span>', 0, 100, 0, '%');?>
 		<a href="<?= Url::to(['monitor/ram-chart', 'serverName' =>  $serverName]) ?>">View Details</a>
 	</div>
 	<div class="gauge left">
-		<?php echo ChartDraw::drawGauge('DISK', 0, 100, 0, '%');?>
+		<?php echo ChartDraw::drawGauge('<span class="dashboard">DISK<span>', 0, 100, 0, '%');?>
 		<a href="<?= Url::to(['monitor/disk-chart', 'serverName' =>  $serverName])?>">View Details</a>
 	</div>
 	<div class="gauge left">
-		<?php echo ChartDraw::drawGauge('LOAD', 0, 100, 0, '<br/>');?>
+		<?php echo ChartDraw::drawGauge('<span class="dashboard">LOAD<span>', 0, 100, 0, '<br/>');?>
 		<a href="<?= Url::to(['monitor/load-chart', 'serverName' =>  $serverName])?>">View Details</a>
 	</div>
 </div>
