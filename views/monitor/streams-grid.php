@@ -11,11 +11,13 @@ $enables = [
 ]
 ?>
 
-<div style="float: right">
-<?= Html::a('Chart', ['streams'], ['class' => 'btn btn-default']);?>
-<?= Html::a('Grid', null, ['class' => 'btn btn-default']);?><br/>
+<div class="btn-group right">
+	<?= Html::a('<i class="iconfont icon-linechart"></i>', ['streams'], ['class' => 'btn btn-default']);?>
+	<?= Html::a('<i class="iconfont icon-grid"></i>', null, ['class' => 'btn btn-default']);?>
 </div><br/><br/>
-<?php echo GridView::widget([
+
+<?php 
+echo GridView::widget([
     'dataProvider' => $dataProvider,
     'filterModel' => $searchModel,
     'rowOptions' => function($model, $key, $index, $grid){

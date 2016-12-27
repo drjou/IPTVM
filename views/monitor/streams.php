@@ -6,21 +6,23 @@ use app\models\ChartDraw;
 $this->title = 'Streams Monitor';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div style="float: left">
-<?php $form = ActiveForm::begin(); ?>
 
-<?= $form->field($server, 'serverName')->dropDownList(ArrayHelper::map($allServer,'serverName','serverName'), ['options'=>[$serverName=>['Selected'=>true]]])->label(false) ?>
+<div class="left">
+    <?php $form = ActiveForm::begin(); ?>
+    	<?= $form->field($server, 'serverName')->dropDownList(ArrayHelper::map($allServer,'serverName','serverName'), ['options'=>[$serverName=>['Selected'=>true]]])->label(false) ?>
+    <?php ActiveForm::end() ?>
+</div>
 
-<?php ActiveForm::end() ?>
+<div class="btn-group right">
+    <?= Html::a('<i class="iconfont icon-linechart"></i>', null, ['class' => 'btn btn-default']);?>
+    <?= Html::a('<i class="iconfont icon-grid"></i>', ['streams-grid'], ['class' => 'btn btn-default']);?>
 </div>
-<div style="float: right">
-<?= Html::a('Chart', null, ['class' => 'btn btn-default']);?>
-<?= Html::a('Grid', ['streams-grid'], ['class' => 'btn btn-default']);?><br/>
-</div>
+
 <?php
 echo ChartDraw::drawLineChart('Total Utilization of Process', 'Click and drag to zoom in', 'Total Utilization Percentage of Process(%)', '%', $totalData);
 ?>
 <br/><br/>
+
 <?php
 echo ChartDraw::drawLineChart('Memory Utilization of Process', 'Click and drag to zoom in', 'Memory Utilization Percentage of Process(%)', '%', $memoryData);
 $this->registerJs("

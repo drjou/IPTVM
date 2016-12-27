@@ -7,14 +7,17 @@ $this->params['breadcrumbs'][] = $this->title;
 
 $request = Yii::$app->request;
 ?>
-<div style="float: left">
-<span>Server Name: <strong><?php echo $request->get('serverName')?></strong></span>
+<div class="left">
+	<span>Server Name: <strong><?php echo $request->get('serverName')?></strong></span>
 </div>
-<div style="float: right">
-<?= Html::a('Chart', ['ram-chart','serverName'=>$request->get('serverName')], ['class' => 'btn btn-default']);?>
-<?= Html::a('Grid', null, ['class' => 'btn btn-default']);?><br/>
+
+<div class="btn-group right">
+	<?= Html::a('<i class="iconfont icon-linechart"></i>', ['ram-chart','serverName'=>$request->get('serverName')], ['class' => 'btn btn-default']);?>
+	<?= Html::a('<i class="iconfont icon-grid"></i>', null, ['class' => 'btn btn-default']);?>
 </div><br/><br/>
-<?php echo GridView::widget([
+
+<?php 
+echo GridView::widget([
     'dataProvider' => $dataProvider,
     'filterModel' => $searchModel,
     'rowOptions' => function($model, $key, $index, $grid){

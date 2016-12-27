@@ -7,9 +7,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
 $request = Yii::$app->request;
 ?>
-<div style="float: right">
-<?= Html::a('Chart', null, ['class' => 'btn btn-default']);?>
-<?= Html::a('Grid', ['load-grid','serverName'=>$request->get('serverName')], ['class' => 'btn btn-default']);?><br/>
+
+<div class="btn-group right">
+	<?= Html::a('<i class="iconfont icon-linechart"></i>', null, ['class' => 'btn btn-default']);?>
+	<?= Html::a('<i class="iconfont icon-grid"></i>', ['load-grid','serverName'=>$request->get('serverName')], ['class' => 'btn btn-default']);?>
 </div>
+<br/><br/>
+
 <?php
-echo ChartDraw::drawLineChart('Load Utilization', 'Click and drag to zoom in', 'Load Utilization Percentage(%)', '%', $data);
+echo ChartDraw::drawLineChart('Load Utilization', 'Click and drag to zoom in', 'Load Utilization', '', $data);

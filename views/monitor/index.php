@@ -9,44 +9,41 @@ $this->params['breadcrumbs'][] = $this->title;
 
 ?>
 
-<head>
-	<style type="text/css">
-        .center{
-        	text-align: center;
-        }
-        .center .left{
-        	float:left;
-        	width: 250px;       
-        }
-    </style>
-</head>
-<div style="float: left">
-<?= Html::a('Gauge', null, ['class' => 'btn btn-default']);?>
-<?= Html::a('Line', ['index-chart','serverName'=>$serverName], ['class' => 'btn btn-default']);?><br/>
+<div style="vertical-align: middle">
+    <div class="btn-group">
+    	<?= Html::a('<i class="iconfont icon-dashboard"></i>', null, ['class' => 'btn btn-default']);?>
+    	<?= Html::a('<i class="iconfont icon-linechart"></i>', ['index-chart','serverName'=>$serverName], ['class' => 'btn btn-default']);?>
+    </div>
+    
+    <div class="right">
+        <?php $form = ActiveForm::begin(); ?>
+        	<?= $form->field($server, 'serverName')
+        	    ->dropDownList(ArrayHelper::map($data,'serverName','serverName'), ['options'=>[$serverName=>['Selected'=>true]]])
+        	    ->label(false) ?>
+        <?php ActiveForm::end() ?>
+    </div>
+    
+    <div class="right server-icon">
+    	<i class="iconfont icon-server"></i>
+    </div>
 </div>
-<div style="float: right">
-<?php $form = ActiveForm::begin(); ?>
 
-<?= $form->field($server, 'serverName')->dropDownList(ArrayHelper::map($data,'serverName','serverName'), ['options'=>[$serverName=>['Selected'=>true]]])->label(false) ?>
-
-<?php ActiveForm::end() ?>
-</div>
 <br style="clear: both"/>
-<div class="center">
-	<div class="left" >
+<div class="text-center">
+	<div class="gauge left" >
 		<?php echo ChartDraw::drawGauge('CPU', 0, 100, 0, '%');?>
 		<a href="<?= Url::to(['monitor/cpu-chart', 'serverName' =>  $serverName]) ?>">View Details</a>
 	</div>
-	<div class="left">
+	<div class="gauge left">
 		<?php echo ChartDraw::drawGauge('RAM', 0, 100, 0, '%');?>
 		<a href="<?= Url::to(['monitor/ram-chart', 'serverName' =>  $serverName]) ?>">View Details</a>
 	</div>
-	<div class="left">
+	<div class="gauge left">
 		<?php echo ChartDraw::drawGauge('DISK', 0, 100, 0, '%');?>
 		<a href="<?= Url::to(['monitor/disk-chart', 'serverName' =>  $serverName])?>">View Details</a>
 	</div>
-	<div class="left">
-		<?php echo ChartDraw::drawGauge('LOAD', 0, 100, 0, '%');?>
+	<div class="gauge left">
+		<?php echo ChartDraw::drawGauge('LOAD', 0, 100, 0, '<br/>');?>
 		<a href="<?= Url::to(['monitor/load-chart', 'serverName' =>  $serverName])?>">View Details</a>
 	</div>
 </div>
@@ -76,6 +73,6 @@ $this->registerJs("
         
     }
     window.onload = update;
-    setInterval(update,30000);
+    setInterval(update,1000);
     ");
 ?>

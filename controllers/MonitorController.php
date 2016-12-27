@@ -17,6 +17,7 @@ use app\models\ProcessInfoSearch;
 use app\models\RAMSearch;
 use app\models\DiskSearch;
 use app\models\LoadSearch;
+use app\models\RealTime;
 
 class MonitorController extends Controller
 {
@@ -125,9 +126,7 @@ class MonitorController extends Controller
      */
     public function actionCpuChart($serverName)
     {
-        $cpuData = CPU::find()->where([
-            'server' => $serverName
-        ])
+        $cpuData = CPU::find()->where('server="'.$serverName.'"')
             ->asArray()
             ->all();
         $data = [
@@ -181,29 +180,14 @@ class MonitorController extends Controller
      * @param string $serverName 服务器名
      */
     public function actionUpdateInfo($serverName){
-        $cpuInfo = CPU::find()
-        ->where(['server' => $serverName])
-        ->orderBy(['recordTime' => SORT_DESC])
-        ->one();
-        $ramInfo = RAM::find()
-        ->where(['server' => $serverName])
-        ->orderBy(['recordTime' => SORT_DESC])
-        ->one();
-        $diskInfo = Disk::find()
-        ->where(['server' => $serverName])
-        ->orderBy(['recordTime' => SORT_DESC])
-        ->one();
-        $loadInfo = Load::find()
-        ->where(['server' => $serverName])
-        ->orderBy(['recordTime' => SORT_DESC])
-        ->one();
+        $updatedInfo = RealTime::findOne(['server' => $serverName]);
         $response = Yii::$app->response;
         $response->format = \yii\web\Response::FORMAT_JSON;
         $response->data = [
-            'cpuInfo' => $cpuInfo['utilize']+0,
-            'ramInfo' => $ramInfo['utilize']+0,
-            'diskInfo' => 100 - $diskInfo['freePercent'],
-            'loadInfo' => $loadInfo['load1']+0
+            'cpuInfo' => $updatedInfo['cpuUtilize']+0,
+            'ramInfo' => $updatedInfo['memoryUtilize']+0,
+            'diskInfo' => $updatedInfo['diskUtilize']+0,
+            'loadInfo' => $updatedInfo['load1']+0
         ];
     }
 
@@ -441,9 +425,13 @@ class MonitorController extends Controller
         $column = ArrayHelper::getColumn($allData, function ($element) use($property){
                     return $element[$property] + 0;
         });
+        
         for($i=0;$i<count($xCatagories);$i++){
-            $d = array($xCatagories[$i],$column[$i]);
-            array_push($data, $d);
+            $time = (time()-(24-8)*3600)*1000;
+            if($xCatagories[$i] >= $time){
+                $d = array($xCatagories[$i],$column[$i]);
+                array_push($data, $d);
+            }
         }
         return $data;
     }
