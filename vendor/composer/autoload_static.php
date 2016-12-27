@@ -27,6 +27,11 @@ class ComposerStaticInite7bbc9e18f4d13c4675486b0c8f56260
         array (
             'miloschuman\\highcharts\\' => 23,
         ),
+        'k' => 
+        array (
+            'kartik\\daterange\\' => 17,
+            'kartik\\base\\' => 12,
+        ),
         'c' => 
         array (
             'cebe\\markdown\\' => 14,
@@ -73,6 +78,14 @@ class ComposerStaticInite7bbc9e18f4d13c4675486b0c8f56260
         'miloschuman\\highcharts\\' => 
         array (
             0 => __DIR__ . '/..' . '/miloschuman/yii2-highcharts-widget/src',
+        ),
+        'kartik\\daterange\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/kartik-v/yii2-date-range',
+        ),
+        'kartik\\base\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/kartik-v/yii2-krajee-base',
         ),
         'cebe\\markdown\\' => 
         array (

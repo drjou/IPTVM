@@ -4,6 +4,7 @@ use app\models\ChartDraw;
 use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
+use kartik\daterange\DateRangePicker;
 $this->title = 'IPTV Monitor';
 $this->params['breadcrumbs'][] = $this->title;
 
@@ -26,6 +27,16 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="right server-icon">
     	<i class="iconfont icon-server"></i>
     </div>
+    <?php 
+        echo '<label class="control-label">Date Range</label>';
+        echo '<div class="drp-container">';
+        echo DateRangePicker::widget([
+            'name'=>'date_range_2',
+            'presetDropdown'=>true,
+            'hideInput'=>true
+        ]);
+        echo '</div>';
+    ?>
 </div>
 
 <br style="clear: both"/>
