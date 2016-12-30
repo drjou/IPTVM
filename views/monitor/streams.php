@@ -5,6 +5,26 @@ use yii\helpers\ArrayHelper;
 use app\models\ChartDraw;
 $this->title = 'Streams Monitor';
 $this->params['breadcrumbs'][] = $this->title;
+
+$this->registerJs("
+    Highcharts.setOptions({
+    global:{
+    useUTC:false
+}});");
+
+$operation = 
+    'var obj = eval(data);
+     for(var i=0;i<obj.length;i++){
+        var id;
+        switch(i){
+            case 0: id="#w2"; break;
+            case 1: id="#w3"; break;
+        }
+        for(var j=0;j<obj[i].length;j++){
+            var series=$(id).highcharts().series[j];
+            series.setData(obj[i][j].data);
+        }
+     }';
 ?>
 
 <div class="left">
@@ -13,9 +33,13 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php ActiveForm::end() ?>
 </div>
 
+<?php 
+    ChartDraw::drawDateRange($serverName, 'Streams', $range, $minDate, $operation, '#w1');
+?>
+
 <div class="btn-group right">
-    <?= Html::a('<i class="iconfont icon-linechart"></i>', null, ['class' => 'btn btn-default']);?>
-    <?= Html::a('<i class="iconfont icon-grid"></i>', ['streams-grid'], ['class' => 'btn btn-default']);?>
+    <?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', null, ['class' => 'btn btn-default']);?>
+    <?= Html::a('<i class="iconfont iconfont-blue icon-grid"></i>', ['streams-grid'], ['class' => 'btn btn-default']);?>
 </div>
 
 <?php

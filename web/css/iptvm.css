@@ -527,7 +527,7 @@ div.left {
 }
 
 .gauge {
-    width: 270px;
+    width: 250px;
 }
 
 .icon-index {
@@ -539,5 +539,11 @@ div.right {
 }
 
 div.server-icon {
-	margin: 6px
+	margin: 6px;
+}
+
+.calendar {
+	width: 360px;
+	margin-top: 1px;
+	margin-left: 3px;
 }

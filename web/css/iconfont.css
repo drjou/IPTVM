@@ -19,6 +19,9 @@
 .iconfont-fw {
 	margin:0px 4px 0px 2px;
 }
+.iconfont-blue {
+	color:#337ab7
+}
 .icon-home:before { content: "\e602"; }
 .icon-language:before { content: "\e609"; }
 .icon-channel:before { content: "\e603"; }

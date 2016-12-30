@@ -3,6 +3,7 @@ namespace app\models;
 
 use miloschuman\highcharts\Highcharts;
 use yii\web\JsExpression;
+use kartik\daterange\DateRangePicker;
 class ChartDraw
 {
 
@@ -53,7 +54,9 @@ class ChartDraw
                         'text' => $title,
                         'y' => - 70,
                         'style' => [
-                            'font-size' => '20px'
+                            'font-size' => '20px',
+                            'color' => '#337ab7',
+                            'font-family' => 'Racing Sans One, cursive'
                         ]
                     ],
                     'stops' => [
@@ -121,6 +124,10 @@ class ChartDraw
     public static function drawLineChart($title, $subtitle, $yText, $ySuffix, $data){
         return Highcharts::widget([
             'options' => [
+                'global' => [
+                    'useUTC' => false,
+                    'timezoneOffset' => 8*60
+                ],
                 'chart' => [
                     'zoomType' => 'x'
                 ],
@@ -197,5 +204,56 @@ class ChartDraw
                 'series' => $data
             ]
         ]);
+    }
+    
+    public static function drawDateRange($serverName, $type, $defaultValue, $minDate, $opration=
+                            'var obj = eval(data);
+                            for(var i=0;i<obj.length;i++){
+                                var series=$("#w1").highcharts().series[i];
+                                series.setData(obj[i].data);
+                            }',$inputId='#w0')
+    {
+        $range = explode(' - ', $defaultValue);
+        $start = $range[0];
+        $end = $range[1];
+        echo '<div class="drp-container left calendar">';
+        echo DateRangePicker::widget([
+            'name'=>'date_range',
+            'value'=>$defaultValue,
+            'presetDropdown'=>true,
+            'hideInput'=>true,
+            'containerTemplate'=>
+            '<span class="input-group-addon">
+                    <i class="glyphicon glyphicon-calendar iconfont-blue"></i>
+                </span>
+                <span class="form-control text-right">
+                    <span class="pull-left">
+                        <span class="range-value">{value}</span>
+                    </span>
+                    <b class="caret"></b>
+                    {input}
+                </span>',
+            'pluginEvents' => [
+                'apply.daterangepicker' => 'function() {
+                var time = $("'.$inputId.'").val().split(" - ");
+                var startTime = Date.parse(new Date(time[0]));
+                var endTime = Date.parse(new Date(time[1]));
+                $.get("index.php?r=monitor/update-line-info&serverName='.$serverName.'&type='.$type.'&startTime="+startTime+"&endTime="+endTime,
+                        function(data,status){
+                            '.$opration.'
+                        });}'
+            ],
+            'convertFormat'=>true,
+            'pluginOptions'=>[
+                'timePicker'=>true,
+                'timePickerIncrement'=>5,
+                'locale'=>['format'=>'Y-m-d H:i:s'],
+                'startDate' => $start,
+                'endDate' => $end,
+                'minDate' => $minDate,
+                'maxDate' => new JsExpression('moment()')
+            ],
+        ]);
+        echo '</div>';
     }
 }

@@ -1,21 +1,16 @@
 <?php
 use yii\helpers\Url;
 use app\models\ChartDraw;
-use yii\helpers\Html;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
-use kartik\daterange\DateRangePicker;
+use miloschuman\highcharts\Highcharts;
+use yii\base\Widget;
+use yii\web\JsExpression;
 $this->title = 'IPTV Monitor';
 $this->params['breadcrumbs'][] = $this->title;
-
 ?>
 
-<div style="vertical-align: middle">
-    <div class="btn-group">
-    	<?= Html::a('<i class="iconfont icon-dashboard"></i>', null, ['class' => 'btn btn-default']);?>
-    	<?= Html::a('<i class="iconfont icon-linechart"></i>', ['index-chart','serverName'=>$serverName], ['class' => 'btn btn-default']);?>
-    </div>
-    
+<div>
     <div class="right">
         <?php $form = ActiveForm::begin(); ?>
         	<?= $form->field($server, 'serverName')
@@ -25,40 +20,91 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
     
     <div class="right server-icon">
-    	<i class="iconfont icon-server"></i>
+    	<i class="iconfont iconfont-blue icon-server"></i>
     </div>
-    <?php 
-        echo '<label class="control-label">Date Range</label>';
-        echo '<div class="drp-container">';
-        echo DateRangePicker::widget([
-            'name'=>'date_range_2',
-            'presetDropdown'=>true,
-            'hideInput'=>true
-        ]);
-        echo '</div>';
-    ?>
 </div>
 
 <br style="clear: both"/>
 <div class="text-center">
 	<div class="gauge left" >
-		<?php echo ChartDraw::drawGauge('<span class="dashboard">CPU<span>', 0, 100, 0, '%');?>
+		<?php echo ChartDraw::drawGauge('CPU', 0, 100, 0, '%');?>
 		<a href="<?= Url::to(['monitor/cpu-chart', 'serverName' =>  $serverName]) ?>">View Details</a>
 	</div>
 	<div class="gauge left">
-		<?php echo ChartDraw::drawGauge('<span class="dashboard">RAM<span>', 0, 100, 0, '%');?>
+		<?php echo ChartDraw::drawGauge('RAM', 0, 100, 0, '%');?>
 		<a href="<?= Url::to(['monitor/ram-chart', 'serverName' =>  $serverName]) ?>">View Details</a>
 	</div>
 	<div class="gauge left">
-		<?php echo ChartDraw::drawGauge('<span class="dashboard">DISK<span>', 0, 100, 0, '%');?>
+		<?php echo ChartDraw::drawGauge('DISK', 0, 100, 0, '%');?>
 		<a href="<?= Url::to(['monitor/disk-chart', 'serverName' =>  $serverName])?>">View Details</a>
 	</div>
 	<div class="gauge left">
-		<?php echo ChartDraw::drawGauge('<span class="dashboard">LOAD<span>', 0, 100, 0, '<br/>');?>
+		<?php echo ChartDraw::drawGauge('LOAD', 0, 100, 0, '<br/>');?>
 		<a href="<?= Url::to(['monitor/load-chart', 'serverName' =>  $serverName])?>">View Details</a>
 	</div>
 </div>
 <br style="clear: both"/>
+<br/>
+<?php 
+    echo Highcharts::widget([
+        'scripts' => [
+            'highcharts-more',
+            'modules/heatmap'
+        ],
+
+        'options' => [
+        'chart' => [
+            'type' => 'heatmap',
+            'marginTop' => 40,
+            'marginBottom' => 80
+        ],
+        'title' => [
+            'text' => 'Utilization of Servers'
+        ],
+        'credits' => [
+            'enabled' => false
+        ],
+        'xAxis' => [
+            'categories' => $xCatagories
+        ],
+        'yAxis' => [
+            'categories' => ['CPU', 'RAM', 'DISK', 'LOAD'],
+            'title' => null
+        ],
+        'colorAxis' => [
+            'min' => 0,
+            'max' => 100,
+            'stops' => [
+                'minColor' => 'FFFFFF',
+                'maxColor' => '#DF5353' // red
+            ],
+        ],
+        'legend' => [
+            'align' => 'right',
+            'layout' => 'vertical',
+            'margin' => 0,
+            'verticalAlign' => 'top',
+            'y' => 25,
+            'symbolHeight' => 280
+        ],
+        'tooltip' => [
+            'formatter' => new JsExpression('function () {
+                return "<b>" + this.series.yAxis.categories[this.point.y] + "</b> of <b>" +
+                 this.series.xAxis.categories[this.point.x]+ "</b><br> is <b>" + this.point.value + "</b>";
+            }')
+        ],
+        'series' => [[
+            'name' => 'Utiliztion of Servers',
+            'borderWidth' => 1,
+            'data' => $heatData,
+            'dataLabels' => [
+                'enabled' => true,
+                'color' => '#000000'
+            ]]
+        ]
+     ]]);
+?>
+
 <?php 
 $this->registerJs("
     $('#server-servername').change(function(){
@@ -75,7 +121,7 @@ $this->registerJs("
         var gaugeChart4 = $('#w4').highcharts();
         var point4 = gaugeChart4.series[0].points[0];
         var server = $('#server-servername option:selected').text();
-        $.get('index.php?r=monitor/update-info&serverName='+server,function(data,status){
+        $.get('index.php?r=monitor/update-gauge-info&serverName='+server,function(data,status){
             point1.update(data.cpuInfo);
             point2.update(data.ramInfo);
             point3.update(data.diskInfo);

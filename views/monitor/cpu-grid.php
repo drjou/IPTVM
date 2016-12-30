@@ -14,8 +14,8 @@ $request = Yii::$app->request;
 </div>
 
 <div class="btn-group right">
-	<?= Html::a('<i class="iconfont icon-linechart"></i>', ['cpu-chart','serverName'=>$request->get('serverName')], ['class' => 'btn btn-default']);?>
-	<?= Html::a('<i class="iconfont icon-grid"></i>', null, ['class' => 'btn btn-default']);?>
+	<?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', ['cpu-chart','serverName'=>$request->get('serverName')], ['class' => 'btn btn-default']);?>
+	<?= Html::a('<i class="iconfont iconfont-blue icon-grid"></i>', null, ['class' => 'btn btn-default']);?>
 </div><br/><br/>
 
 <?php 
