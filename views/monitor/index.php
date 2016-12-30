@@ -48,7 +48,6 @@ $this->params['breadcrumbs'][] = $this->title;
 <?php 
     echo Highcharts::widget([
         'scripts' => [
-            'highcharts-more',
             'modules/heatmap'
         ],
 
@@ -75,9 +74,19 @@ $this->params['breadcrumbs'][] = $this->title;
             'min' => 0,
             'max' => 100,
             'stops' => [
-                'minColor' => 'FFFFFF',
-                'maxColor' => '#DF5353' // red
-            ],
+                        [
+                            0.1,
+                            '#55BF3B'
+                        ], // green
+                        [
+                            0.5,
+                            '#DDDF0D'
+                        ], // yellow
+                        [
+                            0.9,
+                            '#DF5353'
+                        ]
+                    ],
         ],
         'legend' => [
             'align' => 'right',
@@ -111,7 +120,7 @@ $this->registerJs("
         var server = $('#server-servername option:selected').text();
         location.href='index.php?r=monitor/index&serverName='+server;
     });
-    var update = function updateChart() {
+    var updateGuage = function updateGuageChart() {
         var gaugeChart1 = $('#w1').highcharts();
         var point1 = gaugeChart1.series[0].points[0];
         var gaugeChart2 = $('#w2').highcharts();
@@ -127,9 +136,17 @@ $this->registerJs("
             point3.update(data.diskInfo);
             point4.update(data.loadInfo);
         });
-        
     }
-    window.onload = update;
-    setInterval(update,1000);
+    window.onload = updateGuage;
+    setInterval(updateGuage,1000);
+    var updateHeat = function updateHeatMap(){
+        $.get('index.php?r=monitor/update-heat-map',function(data,status){
+            var heatMap = $('#w5').highcharts();
+            var series = heatMap.series[0];
+            var obj = eval(data);
+            series.setData(obj);
+        })
+    }
+    setInterval(updateHeat,1000);
     ");
 ?>

@@ -329,6 +329,12 @@ class MonitorController extends Controller
         }
     }
     
+    public function actionUpdateHeatMap(){
+        $response = Yii::$app->response;
+        $response->format = \yii\web\Response::FORMAT_JSON;
+        $response->data = $this->getHeatMapData();
+    }
+    
     /**
      * 整理折线图横轴和纵轴的数据
      * @param array $allData 相应表中的所用数据
