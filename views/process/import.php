@@ -5,8 +5,8 @@ use yii\widgets\ActiveForm;
 use yii\helpers\Html;
 use yii\bootstrap\Progress;
 
-$this->title = 'Import Servers';
-$this->params['breadcrumbs'][] = ['label' => 'Monitored Servers', 'url' => ['index']];
+$this->title = 'Import Streams';
+$this->params['breadcrumbs'][] = ['label' => 'Monitored Streams', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 FileInputAsset::register($this);
 ?>
@@ -39,7 +39,6 @@ FileInputAsset::register($this);
 <?php ActiveForm::end(); ?>
 
 <?php 
-
 $this->registerJs("
     $('#file-input').fileinput({
             showUpload: false,

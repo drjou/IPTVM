@@ -13,7 +13,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div>
 	<div class="right">
         <?php $form = ActiveForm::begin(); ?>
-        	<?=$form->field($server, 'serverName')->dropDownList(ArrayHelper::map($data, 'serverName', 'serverName'), ['options' => [$serverName => ['Selected' => true]]])->label(false)?>
+        	<?=$form->field($server, 'serverName')->dropDownList($servers, ['options' => [$serverName => ['Selected' => true]]])->label(false)?>
         <?php ActiveForm::end()?>
     </div>
 

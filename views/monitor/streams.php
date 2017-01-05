@@ -35,7 +35,7 @@ $operation = 'function() {
 
 <div class="left">
     <?php $form = ActiveForm::begin(); ?>
-    	<?= $form->field($server, 'serverName')->dropDownList(ArrayHelper::map($allServer,'serverName','serverName'), ['options'=>[$serverName=>['Selected'=>true]]])->label(false) ?>
+    	<?= $form->field($server, 'serverName')->dropDownList($servers, ['options'=>[$serverName=>['Selected'=>true]]])->label(false) ?>
     <?php ActiveForm::end() ?>
 </div>
 

@@ -47,9 +47,21 @@ class MonitorController extends Controller
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'index' => [
-                        'get'
-                    ]
+                    'index' => ['get'],
+                    'cpu-chart' => ['get'],
+                    'cpu-grid' => ['get'],
+                    'ram-chart' => ['get'],
+                    'ram-grid' => ['get'],
+                    'disk-chart' => ['get'],
+                    'disk-grid' => ['get'],
+                    'load-chart' => ['get'],
+                    'load-grid' => ['get'],
+                    'streams' => ['get'],
+                    'streams-grid' => ['get'],
+                    'servers' => ['get'],
+                    'update-gauge-info' => ['get'],
+                    'update-line-info' => ['get'],
+                    'update-heat-map' => ['get'],
                 ]
             ]
         ];
@@ -81,14 +93,13 @@ class MonitorController extends Controller
             $serverName = $firstServer->serverName;
         }
         $server = new Server();
-        $data = Server::find()->all();
         $heatData = $this->getHeatMapData();
         $realTimes = RealTime::find()->asArray()->all();
         $xCategories = ArrayHelper::getColumn($realTimes, 'server');
         return $this->render('index', [
             'serverName' => $serverName,
             'server' => $server,
-            'data' => $data,
+            'servers' => $this->getServersForDrop(),
             'xCategories' => $xCategories,
             'heatData' => $heatData
         ]);
@@ -226,7 +237,6 @@ class MonitorController extends Controller
             $serverName = $firstServer->serverName;
         }
         $server = new Server();
-        $allServer = Server::find()->all();
         $startTime = date('Y-m-d H:i:s',time()-24*3600);
         $endTime = date('Y-m-d H:i:s',time());
         $data = $this->getStreamsData($serverName, $startTime, $endTime);
@@ -234,7 +244,7 @@ class MonitorController extends Controller
         $minDate = ProcessInfo::find()->where(['server'=>$serverName])->min('recordTime');
         return $this->render('streams', [
             'server' => $server,
-            'allServer' => $allServer,
+            'servers' => $this->getServersForDrop(),
             'serverName' => $serverName,
             'totalData' => $data[0],
             'memoryData' => $data[1],
@@ -275,7 +285,7 @@ class MonitorController extends Controller
     }
     
     /**
-     * 将最新的数据传回
+     * 将最新的仪表盘数据传回
      * @param string $serverName 服务器名
      */
     public function actionUpdateGaugeInfo($serverName){
@@ -289,7 +299,13 @@ class MonitorController extends Controller
             'loadInfo' => $updatedInfo['load1']+0
         ];
     }
-    
+    /**
+     * 返回相应折线图数据
+     * @param string $serverName
+     * @param string $type
+     * @param string $startTime
+     * @param string $endTime
+     */
     public function actionUpdateLineInfo($serverName, $type, $startTime, $endTime){
         $updatedInfo = RealTime::findOne(['server' => $serverName]);
         $startTime = date('Y-m-d H:i:s',$startTime/1000);
@@ -317,7 +333,9 @@ class MonitorController extends Controller
                 break;
         }
     }
-    
+    /**
+     * 传回最新的热力图数据
+     */
     public function actionUpdateHeatMap(){
         $response = Yii::$app->response;
         $response->format = \yii\web\Response::FORMAT_JSON;
@@ -346,6 +364,13 @@ class MonitorController extends Controller
         }
         return $data;
     }
+    
+    /**
+     * 获取应用于CPU折线图的数据
+     * @param string $serverName
+     * @param string $startTime
+     * @param string $endTime
+     */
     private function getCpuData($serverName, $startTime, $endTime){
         $cpuData = CPU::find()
             ->where('server="'.$serverName.'" and recordTime between "'.$startTime.'" and "'.$endTime.'"')
@@ -394,6 +419,12 @@ class MonitorController extends Controller
             ]
         ];
     }
+    /**
+     * 获取应用于RAM折线图的数据
+     * @param string $serverName
+     * @param string $startTime
+     * @param string $endTime
+     */
     private function getRamData($serverName, $startTime, $endTime){
         $ramData = RAM::find()
         ->where('server="'.$serverName.'" and recordTime between "'.$startTime.'" and "'.$endTime.'"')
@@ -406,6 +437,12 @@ class MonitorController extends Controller
             ]
         ];
     }
+    /**
+     * 获取应用于DISK折线图的数据
+     * @param string $serverName
+     * @param string $startTime
+     * @param string $endTime
+     */
     private function getDiskData($serverName, $startTime, $endTime){
         $diskData = Disk::find()
         ->where('server="'.$serverName.'" and recordTime between "'.$startTime.'" and "'.$endTime.'"')
@@ -418,6 +455,12 @@ class MonitorController extends Controller
             ]
         ];
     }
+    /**
+     * 获取应用于LOAD折线图的数据
+     * @param string $serverName
+     * @param string $startTime
+     * @param string $endTime
+     */
     private function getLoadData($serverName, $startTime, $endTime){
         $loadData = Load::find()
         ->where('server="'.$serverName.'" and recordTime between "'.$startTime.'" and "'.$endTime.'"')
@@ -439,6 +482,11 @@ class MonitorController extends Controller
             ]
         ];
     }
+    /**
+     * 获取应用于Server Monitor折线图的数据
+     * @param string $startTime
+     * @param string $endTime
+     */
     private function getServersData($startTime, $endTime){
         $servers = Server::find()->all();
         $cpuData = array();
@@ -473,6 +521,12 @@ class MonitorController extends Controller
         }
         return array($cpuData, $ramData, $diskData, $loadData);
     }
+    /**
+     * 获取应用于Streams Monitor折线图的数据
+     * @param string $serverName
+     * @param string $startTime
+     * @param string $endTime
+     */
     private function getStreamsData($serverName, $startTime, $endTime){
         $processName = Process::find()
             ->where(['server'=>$serverName])
@@ -497,6 +551,10 @@ class MonitorController extends Controller
         }
         return array($totalData, $memoryData);
     }
+    
+    /**
+     * 获取热力图数据
+     */
     private function getHeatMapData(){
          $data = RealTime::find()->asArray()->all();
          $heatData = array();
@@ -508,5 +566,12 @@ class MonitorController extends Controller
              array_push($heatData, $cpuData, $ramData, $diskData, $loadData);
          }
          return $heatData;
+    }
+    /**
+     * 获取应用于下拉框的server数据
+     */
+    private function getServersForDrop(){
+        $allServers = Server::find()->asArray()->all();
+        return ArrayHelper::map($allServers, 'serverName', 'serverName');
     }
 }

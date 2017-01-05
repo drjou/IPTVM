@@ -90,7 +90,7 @@ class ServerController extends Controller{
         $model->scenario = Server::SCENARIO_SAVE;
         if($model->load(Yii::$app->request->post()) && $model->save()){
             Yii::info("create a server named $model->serverName", 'server');
-            $this->redirect(['index']);
+            $this->redirect(['view', 'serverName' => $model->serverName]);
         }
         return $this->render('create',[
             'model' => $model
@@ -201,12 +201,16 @@ class ServerController extends Controller{
         $model->scenario = Server::SCENARIO_SAVE;
         if($model->load(Yii::$app->request->post()) && $model->save()){
             Yii::info("Update the server named $serverName", 'server');
-            return $this->redirect(['index']);
+            return $this->redirect(['view', 'serverName' => $model->serverName]);
         }
         return $this->render('update', [
             'model' => $model
         ]);
     }
+    /**
+     * 查看server详情
+     * @param string $serverName
+     */
     public function actionView($serverName){
         $model = Server::findServerByName($serverName);
         return $this->render('view', [
