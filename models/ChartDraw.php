@@ -16,9 +16,10 @@ class ChartDraw
      * @param 单位 $suffix
      * @return 仪表图的配置数组
      */
-    public static function drawGauge($title, $min, $max, $data, $suffix)
+    public static function drawGauge($id, $title, $min, $max, $data, $suffix)
     {
         return Highcharts::widget([
+            'id' => $id,
             'scripts' => [
                 'highcharts-more',
                 'modules/solid-gauge'
@@ -121,15 +122,24 @@ class ChartDraw
      * @param string $ySuffix y轴单位
      * @param array $data 折线图数据
      */
-    public static function drawLineChart($title, $subtitle, $yText, $ySuffix, $data){
+    public static function drawLineChart($id, $file, $title, $yText, $ySuffix, $data, $subtitle='Click and drag to zoom in.Hold down shift key to pan.'){
+        $file->registerJs("
+            Highcharts.setOptions({
+            global:{
+                useUTC:false
+            }
+        });");
         return Highcharts::widget([
+            'id' => $id,
+            'scripts' => [
+                'highcharts-more',
+                'modules/boost'
+            ],
             'options' => [
-                'global' => [
-                    'useUTC' => false,
-                    'timezoneOffset' => 8*60
-                ],
                 'chart' => [
-                    'zoomType' => 'x'
+                    'zoomType' => 'x',
+                    'panning' => true,
+                    'panKey' => 'shift'
                 ],
                 'title' => [
                     'text' => $title,
@@ -206,12 +216,7 @@ class ChartDraw
         ]);
     }
     
-    public static function drawDateRange($serverName, $type, $defaultValue, $minDate, $opration=
-                            'var obj = eval(data);
-                            for(var i=0;i<obj.length;i++){
-                                var series=$("#w1").highcharts().series[i];
-                                series.setData(obj[i].data);
-                            }',$inputId='#w0')
+    public static function drawDateRange($defaultValue, $minDate, $operation)
     {
         $range = explode(' - ', $defaultValue);
         $start = $range[0];
@@ -234,14 +239,7 @@ class ChartDraw
                     {input}
                 </span>',
             'pluginEvents' => [
-                'apply.daterangepicker' => 'function() {
-                var time = $("'.$inputId.'").val().split(" - ");
-                var startTime = Date.parse(new Date(time[0]));
-                var endTime = Date.parse(new Date(time[1]));
-                $.get("index.php?r=monitor/update-line-info&serverName='.$serverName.'&type='.$type.'&startTime="+startTime+"&endTime="+endTime,
-                        function(data,status){
-                            '.$opration.'
-                        });}'
+                'apply.daterangepicker' => $operation
             ],
             'convertFormat'=>true,
             'pluginOptions'=>[

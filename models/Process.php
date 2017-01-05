@@ -15,7 +15,8 @@ class Process extends ActiveRecord{
     /**
      * 返回所有服务器的所有进程信息
      */
-    public function getProcesses(){
-        return $this->hasMany(ProcessInfo::className(), ['processName' => 'processName','server' => 'server']);
+    public function getProcesses($startTime, $endTime){
+        return $this->hasMany(ProcessInfo::className(), ['processName' => 'processName','server' => 'server'])
+        ->where('recordTime between "'.$startTime.'" and "'.$endTime.'"');
     }
 }

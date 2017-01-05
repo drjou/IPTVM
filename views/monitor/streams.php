@@ -6,25 +6,31 @@ use app\models\ChartDraw;
 $this->title = 'Streams Monitor';
 $this->params['breadcrumbs'][] = $this->title;
 
-$this->registerJs("
-    Highcharts.setOptions({
-    global:{
-    useUTC:false
-}});");
+$operation = 'function() {
+                var time = $("#w1").val().split(" - ");
+                var startTime = Date.parse(new Date(time[0]));
+                var endTime = Date.parse(new Date(time[1]));
+                $("#total-chart").highcharts().showLoading();
+                $("#memory-chart").highcharts().showLoading();
+                $.get("index.php?r=monitor/update-line-info&serverName='.$serverName.'&type=Streams&startTime="+startTime+"&endTime="+endTime,
+                        function(data,status){
+                             var obj = eval(data);
+                             for(var i=0;i<obj.length;i++){
+                                var id;
+                                switch(i){
+                                    case 0: id="#total-chart"; break;
+                                    case 1: id="#memory-chart"; break;
+                                }
+                                for(var j=0;j<obj[i].length;j++){
+                                    var series=$(id).highcharts().series[j];
+                                    series.setData(obj[i][j].data);
+                                }
+                             }
+                            $("#total-chart").highcharts().hideLoading();
+                            $("#memory-chart").highcharts().hideLoading();
+                        });
+             }';
 
-$operation = 
-    'var obj = eval(data);
-     for(var i=0;i<obj.length;i++){
-        var id;
-        switch(i){
-            case 0: id="#w2"; break;
-            case 1: id="#w3"; break;
-        }
-        for(var j=0;j<obj[i].length;j++){
-            var series=$(id).highcharts().series[j];
-            series.setData(obj[i][j].data);
-        }
-     }';
 ?>
 
 <div class="left">
@@ -34,7 +40,7 @@ $operation =
 </div>
 
 <?php 
-    ChartDraw::drawDateRange($serverName, 'Streams', $range, $minDate, $operation, '#w1');
+    ChartDraw::drawDateRange($range, $minDate, $operation);
 ?>
 
 <div class="btn-group right">
@@ -43,12 +49,12 @@ $operation =
 </div>
 
 <?php
-echo ChartDraw::drawLineChart('Total Utilization of Process', 'Click and drag to zoom in', 'Total Utilization Percentage of Process(%)', '%', $totalData);
+echo ChartDraw::drawLineChart('total-chart', $this, 'Total Utilization of Process', 'Total Utilization Percentage of Process(%)', '%', $totalData);
 ?>
 <br/><br/>
 
 <?php
-echo ChartDraw::drawLineChart('Memory Utilization of Process', 'Click and drag to zoom in', 'Memory Utilization Percentage of Process(%)', '%', $memoryData);
+echo ChartDraw::drawLineChart('memory-chart', $this, 'Memory Utilization of Process', 'Memory Utilization Percentage of Process(%)', '%', $memoryData);
 $this->registerJs("
     $('#server-servername').change(function(){
     var server = $('#server-servername option:selected').text();

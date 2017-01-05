@@ -6,15 +6,25 @@ $this->params['breadcrumbs'][] = ['label' => 'Monitor Dashboard','url' => ['inde
 $this->params['breadcrumbs'][] = $this->title;
 
 $request = Yii::$app->request;
-$this->registerJs("
-    Highcharts.setOptions({
-    global:{
-    useUTC:false
-}});");
+$operation = 'function() {
+                var time = $("#w0").val().split(" - ");
+                var startTime = Date.parse(new Date(time[0]));
+                var endTime = Date.parse(new Date(time[1]));
+                $("#linechart").highcharts().showLoading();
+                $.get("index.php?r=monitor/update-line-info&serverName='.$request->get('serverName').'&type=RAM&startTime="+startTime+"&endTime="+endTime,
+                        function(data,status){
+                            var obj = eval(data);
+                            for(var i=0;i<obj.length;i++){
+                                var series=$("#linechart").highcharts().series[i];
+                                series.setData(obj[i].data);
+                            }
+                            $("#linechart").highcharts().hideLoading();
+                        });
+             }';
 ?>
 
 <?php 
-    ChartDraw::drawDateRange($request->get('serverName'), 'RAM', $range, $minDate);
+    ChartDraw::drawDateRange($range, $minDate, $operation);
 ?>
 
 <div class="btn-group right">
@@ -24,5 +34,5 @@ $this->registerJs("
 <br/><br/>
 
 <?php
-echo ChartDraw::drawLineChart('RAM Utilization', 'Click and drag to zoom in', 'RAM Utilization Percentage(%)', '%', $data);
+echo ChartDraw::drawLineChart('linechart', $this, 'RAM Utilization', 'RAM Utilization Percentage(%)', '%', $data);
 

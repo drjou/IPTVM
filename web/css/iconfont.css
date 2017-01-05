@@ -38,5 +38,8 @@
 .icon-admin-log:before { content: "\e60f"; }
 .icon-dashboard:before { content: "\e663";}
 .icon-linechart:before { content: "\e64a"}
-.icon-grid:before { content: "\e612"}
-.icon-server:before { content: "\e78c"}
+.icon-grid:before { content: "\e64c"}
+.icon-server:before { content: "\e610"}
+.icon-fullscreen:before { content: "\e63a"}
+.icon-monitor:before { content: "\e76a"}
+.icon-stream:before { content: "\e644"}

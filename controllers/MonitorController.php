@@ -84,12 +84,12 @@ class MonitorController extends Controller
         $data = Server::find()->all();
         $heatData = $this->getHeatMapData();
         $realTimes = RealTime::find()->asArray()->all();
-        $xCatagories = ArrayHelper::getColumn($realTimes, 'server');
+        $xCategories = ArrayHelper::getColumn($realTimes, 'server');
         return $this->render('index', [
             'serverName' => $serverName,
             'server' => $server,
             'data' => $data,
-            'xCatagories' => $xCatagories,
+            'xCategories' => $xCategories,
             'heatData' => $heatData
         ]);
     }
@@ -100,12 +100,10 @@ class MonitorController extends Controller
      */
     public function actionCpuChart($serverName)
     {
-        $startTime = (time()-24*3600)*1000;
-        $endTime = time()*1000;
+        $startTime = date('Y-m-d H:i:s',time()-24*3600);
+        $endTime = date('Y-m-d H:i:s',time());
         $data = $this->getCpuData($serverName, $startTime, $endTime);
-        $start = date('Y-m-d H:i:s',$startTime/1000);
-        $end = date('Y-m-d H:i:s',$endTime/1000);
-        $range = $start.' - '.$end;
+        $range = $startTime.' - '.$endTime;
         $minDate = CPU::find()->where(['server'=>$serverName])->min('recordTime');
         return $this->render('cpu-chart', [
             'data' => $data,
@@ -133,13 +131,10 @@ class MonitorController extends Controller
      */
     public function actionRamChart($serverName)
     {
-        
-        $startTime = (time()-24*3600)*1000;
-        $endTime = time()*1000;
+        $startTime = date('Y-m-d H:i:s',time()-24*3600);
+        $endTime = date('Y-m-d H:i:s',time());
         $data = $this->getRamData($serverName, $startTime, $endTime);
-        $start = date('Y-m-d H:i:s',$startTime/1000);
-        $end = date('Y-m-d H:i:s',$endTime/1000);
-        $range = $start.' - '.$end;
+        $range = $startTime.' - '.$endTime;
         $minDate = RAM::find()->where(['server'=>$serverName])->min('recordTime');
         return $this->render('ram-chart', [
             'data' => $data,
@@ -165,12 +160,10 @@ class MonitorController extends Controller
      * @param string $serverName
      */
     public function actionDiskChart($serverName){
-        $startTime = (time()-24*3600)*1000;
-        $endTime = time()*1000;
+        $startTime = date('Y-m-d H:i:s',time()-24*3600);
+        $endTime = date('Y-m-d H:i:s',time());
         $data = $this->getDiskData($serverName, $startTime, $endTime);
-        $start = date('Y-m-d H:i:s',$startTime/1000);
-        $end = date('Y-m-d H:i:s',$endTime/1000);
-        $range = $start.' - '.$end;
+        $range = $startTime.' - '.$endTime;
         $minDate = Disk::find()->where(['server'=>$serverName])->min('recordTime');
         return $this->render('disk-chart', [
             'data' => $data,
@@ -197,12 +190,10 @@ class MonitorController extends Controller
      * @param string $serverName
      */
     public function actionLoadChart($serverName){
-        $startTime = (time()-24*3600)*1000;
-        $endTime = time()*1000;
+        $startTime = date('Y-m-d H:i:s',time()-24*3600);
+        $endTime = date('Y-m-d H:i:s',time());
         $data = $this->getLoadData($serverName, $startTime, $endTime);
-        $start = date('Y-m-d H:i:s',$startTime/1000);
-        $end = date('Y-m-d H:i:s',$endTime/1000);
-        $range = $start.' - '.$end;
+        $range = $startTime.' - '.$endTime;
         $minDate = Load::find()->where(['server'=>$serverName])->min('recordTime');
         return $this->render('load-chart', [
             'data' => $data,
@@ -236,12 +227,10 @@ class MonitorController extends Controller
         }
         $server = new Server();
         $allServer = Server::find()->all();
-        $startTime = (time()-24*3600)*1000;
-        $endTime = time()*1000;
+        $startTime = date('Y-m-d H:i:s',time()-24*3600);
+        $endTime = date('Y-m-d H:i:s',time());
         $data = $this->getStreamsData($serverName, $startTime, $endTime);
-        $start = date('Y-m-d H:i:s',$startTime/1000);
-        $end = date('Y-m-d H:i:s',$endTime/1000);
-        $range = $start.' - '.$end;
+        $range = $startTime.' - '.$endTime;
         $minDate = ProcessInfo::find()->where(['server'=>$serverName])->min('recordTime');
         return $this->render('streams', [
             'server' => $server,
@@ -270,12 +259,10 @@ class MonitorController extends Controller
      * 传回不同服务器的相关数据
      */
     public function actionServers(){
-        $startTime = (time()-24*3600)*1000;
-        $endTime = time()*1000;
+        $startTime = date('Y-m-d H:i:s',time()-24*3600);
+        $endTime = date('Y-m-d H:i:s',time());
         $data = $this->getServersData($startTime, $endTime);
-        $start = date('Y-m-d H:i:s',$startTime/1000);
-        $end = date('Y-m-d H:i:s',$endTime/1000);
-        $range = $start.' - '.$end;
+        $range = $startTime.' - '.$endTime;
         $minDate = CPU::find()->min('recordTime');
         return $this->render('servers', [
             'cpuData' => $data[0],
@@ -305,6 +292,8 @@ class MonitorController extends Controller
     
     public function actionUpdateLineInfo($serverName, $type, $startTime, $endTime){
         $updatedInfo = RealTime::findOne(['server' => $serverName]);
+        $startTime = date('Y-m-d H:i:s',$startTime/1000);
+        $endTime = date('Y-m-d H:i:s',$endTime/1000);
         $response = Yii::$app->response;
         $response->format = \yii\web\Response::FORMAT_JSON;
         switch ($type){
@@ -341,116 +330,112 @@ class MonitorController extends Controller
      * @param string $time 时间属性
      * @param string $property 与时间对应的数值属性
      */
-    private function getChartDataByProperty($allData, $time, $property, $startTime, $endTime){
-        $xCatagories = ArrayHelper::getColumn($allData, $time);
-        for ($i=0;$i<count($xCatagories);$i++){
-            $xCatagories[$i] = strtotime($xCatagories[$i])*1000;
+    private function getChartDataByProperty($allData, $time, $property){
+        $xCategories = ArrayHelper::getColumn($allData, $time);
+        for ($i=0;$i<count($xCategories);$i++){
+            $xCategories[$i] = strtotime($xCategories[$i])*1000;
         }
         $data = array();
         $column = ArrayHelper::getColumn($allData, function ($element) use($property){
                     return $element[$property] + 0;
         });
         
-        for($i=0;$i<count($xCatagories);$i++){
-            if($xCatagories[$i] >= $startTime && $xCatagories[$i] <= $endTime){
-                $d = array($xCatagories[$i],$column[$i]);
-                array_push($data, $d);
-            }
+        for($i=0;$i<count($xCategories);$i++){
+            $d = array($xCategories[$i],$column[$i]);
+            array_push($data, $d);
         }
         return $data;
     }
     private function getCpuData($serverName, $startTime, $endTime){
-        $cpuData = CPU::find()->where('server="'.$serverName.'"')
+        $cpuData = CPU::find()
+            ->where('server="'.$serverName.'" and recordTime between "'.$startTime.'" and "'.$endTime.'"')
             ->asArray()
             ->all();
         return [
             [
                 'name' => 'utilize',
-                'data' => $this->getChartDataByProperty($cpuData, 'recordTime', 'utilize', $startTime, $endTime)
+                'data' => $this->getChartDataByProperty($cpuData, 'recordTime', 'utilize')
             ],
             [
                 'name' => 'user',
-                'data' => $this->getChartDataByProperty($cpuData, 'recordTime', 'user', $startTime, $endTime)
+                'data' => $this->getChartDataByProperty($cpuData, 'recordTime', 'user')
             ],
             [
                 'name' => 'system',
-                'data' => $this->getChartDataByProperty($cpuData, 'recordTime', 'system', $startTime, $endTime)
+                'data' => $this->getChartDataByProperty($cpuData, 'recordTime', 'system')
             ],
             [
                 'name' => 'wait',
-                'data' => $this->getChartDataByProperty($cpuData, 'recordTime', 'wait', $startTime, $endTime)
+                'data' => $this->getChartDataByProperty($cpuData, 'recordTime', 'wait')
             ],
             [
                 'name' => 'hardIrq',
-                'data' => $this->getChartDataByProperty($cpuData, 'recordTime', 'hardIrq', $startTime, $endTime)
+                'data' => $this->getChartDataByProperty($cpuData, 'recordTime', 'hardIrq')
             ],
             [
                 'name' => 'softIrq',
-                'data' => $this->getChartDataByProperty($cpuData, 'recordTime', 'softIrq', $startTime, $endTime)
+                'data' => $this->getChartDataByProperty($cpuData, 'recordTime', 'softIrq')
             ],
             [
                 'name' => 'nice',
-                'data' => $this->getChartDataByProperty($cpuData, 'recordTime', 'nice', $startTime, $endTime)
+                'data' => $this->getChartDataByProperty($cpuData, 'recordTime', 'nice')
             ],
             [
                 'name' => 'steal',
-                'data' => $this->getChartDataByProperty($cpuData, 'recordTime', 'steal', $startTime, $endTime)
+                'data' => $this->getChartDataByProperty($cpuData, 'recordTime', 'steal')
             ],
             [
                 'name' => 'guest',
-                'data' => $this->getChartDataByProperty($cpuData, 'recordTime', 'guest', $startTime, $endTime)
+                'data' => $this->getChartDataByProperty($cpuData, 'recordTime', 'guest')
             ],
             [
                 'name' => 'idle',
-                'data' => $this->getChartDataByProperty($cpuData, 'recordTime', 'idle', $startTime, $endTime)
+                'data' => $this->getChartDataByProperty($cpuData, 'recordTime', 'idle')
             ]
         ];
     }
     private function getRamData($serverName, $startTime, $endTime){
-        $ramData = RAM::find()->where([
-            'server' => $serverName
-        ])
+        $ramData = RAM::find()
+        ->where('server="'.$serverName.'" and recordTime between "'.$startTime.'" and "'.$endTime.'"')
         ->asArray()
         ->all();
         return [
             [
                 'name' => 'utilize',
-                'data' => $this->getChartDataByProperty($ramData, 'recordTime', 'utilize', $startTime, $endTime)
+                'data' => $this->getChartDataByProperty($ramData, 'recordTime', 'utilize')
             ]
         ];
     }
     private function getDiskData($serverName, $startTime, $endTime){
-        $diskData = Disk::find()->where([
-            'server' => $serverName
-        ])
+        $diskData = Disk::find()
+        ->where('server="'.$serverName.'" and recordTime between "'.$startTime.'" and "'.$endTime.'"')
         ->asArray()
         ->all();
         return [
             [
                 'name' => 'free',
-                'data' => $this->getChartDataByProperty($diskData, 'recordTime', 'freePercent', $startTime, $endTime)
+                'data' => $this->getChartDataByProperty($diskData, 'recordTime', 'freePercent')
             ]
         ];
     }
     private function getLoadData($serverName, $startTime, $endTime){
-        $loadData = Load::find()->where([
-            'server' => $serverName
-        ])
+        $loadData = Load::find()
+        ->where('server="'.$serverName.'" and recordTime between "'.$startTime.'" and "'.$endTime.'"')
         ->asArray()
         ->all();
         
         return [
             [
                 'name' => 'load of 1 minute',
-                'data' => $this->getChartDataByProperty($loadData, 'recordTime', 'load1', $startTime, $endTime)
+                'data' => $this->getChartDataByProperty($loadData, 'recordTime', 'load1')
             ],
             [
                 'name' => 'load of 5 minute',
-                'data' => $this->getChartDataByProperty($loadData, 'recordTime', 'load5', $startTime, $endTime)
+                'data' => $this->getChartDataByProperty($loadData, 'recordTime', 'load5')
             ],
             [
                 'name' => 'load of 15 minute',
-                'data' => $this->getChartDataByProperty($loadData, 'recordTime', 'load15', $startTime, $endTime)
+                'data' => $this->getChartDataByProperty($loadData, 'recordTime', 'load15')
             ]
         ];
     }
@@ -461,28 +446,28 @@ class MonitorController extends Controller
         $diskData = array();
         $loadData = array();
         for($i=0;$i<count($servers);$i++){
-            $cpuInfo = $servers[$i]->getCpuInfo()->asArray()->all();
+            $cpuInfo = $servers[$i]->getCpuInfo($startTime, $endTime)->asArray()->all();
             $cpu = [
                 'name' => $servers[$i]['serverName'],
-                'data' => $this->getChartDataByProperty($cpuInfo, 'recordTime', 'utilize', $startTime, $endTime)
+                'data' => $this->getChartDataByProperty($cpuInfo, 'recordTime', 'utilize')
             ];
             array_push($cpuData, $cpu);
-            $ramInfo = $servers[$i]->getRamInfo()->asArray()->all();
+            $ramInfo = $servers[$i]->getRamInfo($startTime, $endTime)->asArray()->all();
             $ram = [
                 'name' => $servers[$i]['serverName'],
-                'data' => $this->getChartDataByProperty($ramInfo, 'recordTime', 'utilize', $startTime, $endTime)
+                'data' => $this->getChartDataByProperty($ramInfo, 'recordTime', 'utilize')
             ];
             array_push($ramData, $ram);
-            $diskInfo = $servers[$i]->getDiskInfo()->asArray()->all();
+            $diskInfo = $servers[$i]->getDiskInfo($startTime, $endTime)->asArray()->all();
             $disk = [
                 'name' => $servers[$i]['serverName'],
-                'data' => $this->getChartDataByProperty($diskInfo, 'recordTime', 'freePercent', $startTime, $endTime)
+                'data' => $this->getChartDataByProperty($diskInfo, 'recordTime', 'freePercent')
             ];
             array_push($diskData, $disk);
-            $loadInfo = $servers[$i]->getLoadInfo()->asArray()->all();
+            $loadInfo = $servers[$i]->getLoadInfo($startTime, $endTime)->asArray()->all();
             $load = [
                 'name' => $servers[$i]['serverName'],
-                'data' => $this->getChartDataByProperty($loadInfo, 'recordTime', 'load1', $startTime, $endTime)
+                'data' => $this->getChartDataByProperty($loadInfo, 'recordTime', 'load1')
             ];
             array_push($loadData, $load);
         }
@@ -496,17 +481,17 @@ class MonitorController extends Controller
         $memoryData = array();
         for($i=0;$i<count($processName);$i++){
             $process = $processName[$i]
-            ->getProcesses()
+            ->getProcesses($startTime, $endTime)
             ->asArray()
             ->all();
             $processTotal = [
                 'name' => $processName[$i]['processName'],
-                'data' => $this -> getChartDataByProperty($process, 'recordTime', 'total', $startTime, $endTime)
+                'data' => $this -> getChartDataByProperty($process, 'recordTime', 'total')
             ];
             array_push($totalData, $processTotal);
             $processMemory = [
                 'name' => $processName[$i]['processName'],
-                'data' => $this -> getChartDataByProperty($process, 'recordTime', 'memory', $startTime, $endTime)
+                'data' => $this -> getChartDataByProperty($process, 'recordTime', 'memory')
             ];
             array_push($memoryData, $processMemory);
         }

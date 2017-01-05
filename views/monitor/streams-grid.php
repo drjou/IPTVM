@@ -20,6 +20,10 @@ $enables = [
 echo GridView::widget([
     'dataProvider' => $dataProvider,
     'filterModel' => $searchModel,
+    'pager' => [
+        'firstPageLabel' => 'First Page',
+        'lastPageLabel' => 'Last Page',
+    ],
     'rowOptions' => function($model, $key, $index, $grid){
         return ['class' => $index % 2 == 0 ? 'label-white' : 'label-grey' ];
     },

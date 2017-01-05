@@ -6,15 +6,25 @@ $this->params['breadcrumbs'][] = ['label' => 'Monitor Dashboard', 'url' => ['ind
 $this->params['breadcrumbs'][] = $this->title;
 
 $request = Yii::$app->request;
-$this->registerJs("
-    Highcharts.setOptions({
-    global:{
-    useUTC:false
-}});");
+$operation = 'function() {
+                var time = $("#w0").val().split(" - ");
+                var startTime = Date.parse(new Date(time[0]));
+                var endTime = Date.parse(new Date(time[1]));
+                $("#linechart").highcharts().showLoading();
+                $.get("index.php?r=monitor/update-line-info&serverName='.$request->get('serverName').'&type=CPU&startTime="+startTime+"&endTime="+endTime,
+                        function(data,status){
+                            var obj = eval(data);
+                            for(var i=0;i<obj.length;i++){
+                                var series=$("#linechart").highcharts().series[i];
+                                series.setData(obj[i].data);
+                            }
+                            $("#linechart").highcharts().hideLoading();
+                        });
+             }';
 ?>
 
 <?php 
-    ChartDraw::drawDateRange($request->get('serverName'), 'CPU', $range, $minDate);
+    ChartDraw::drawDateRange($range, $minDate, $operation);
 ?>
     
 <div class="btn-group right">
@@ -24,4 +34,4 @@ $this->registerJs("
 <br/><br/>
 
 <?php
-echo ChartDraw::drawLineChart('CPU Utilization', 'Click and drag to zoom in', 'CPU Utilization Percentage(%)', '%', $data);
+echo ChartDraw::drawLineChart('linechart', $this, 'CPU Utilization', 'CPU Utilization Percentage(%)', '%', $data);
