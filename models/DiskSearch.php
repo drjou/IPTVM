@@ -13,7 +13,7 @@ class DiskSearch extends Disk{
     public function rules()
     {
         return [
-            [['recordTime', 'freePercent', 'free', 'used', 'total'], 'safe'],
+            [['server', 'recordTime', 'freePercent', 'free', 'used', 'total'], 'safe'],
         ];
     }
     /**
@@ -26,12 +26,33 @@ class DiskSearch extends Disk{
         return Model::scenarios();
     }
     /**
-     * 检索过滤
+     * 所有数据
      * @param string $params
      * @return \yii\data\ActiveDataProvider
      */
-    public function search($params, $serverName){
-        $query = Disk::find()->where(['server'=>$serverName]);
+    public function search($params){
+        $query = Disk::find()
+        ->orderBy(['recordTime'=>SORT_DESC]);
+        return $this->searchProvider($query, $params);
+    }
+    /**
+     * 所有低于阈值的数据
+     * @param string $params
+     * @return \yii\data\ActiveDataProvider
+     */
+    public function searchWarning($params){
+        $threshold = Threshold::find()->one();
+        $query = Disk::find()->join('INNER JOIN', 'server', 'server=serverName')
+        ->where('freePercent<='.$threshold->disk)
+        ->orderBy(['recordTime'=>SORT_DESC]);
+        return $this->searchProvider($query, $params);
+    }
+    /**
+     * 检索过滤
+     * @param ActiveQuery $query
+     * @param string $params
+     */
+    private function searchProvider($query, $params){
         $dataProvider  = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [

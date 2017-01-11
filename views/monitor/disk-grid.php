@@ -2,19 +2,24 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 
+$request = Yii::$app->request;
+
 $this->title = 'Disk Grid';
-$this->params['breadcrumbs'][] = ['label' => 'Monitor Dashboard', 'url' => ['index']];
+if($request->get('type') == 1){
+    $this->params['breadcrumbs'][] = ['label' => 'Server Monitor', 'url' => ['servers']];
+    $this->params['breadcrumbs'][] = ['label' => 'Server Details', 'url' => ['detail','serverName'=>$request->get('serverName')]];
+}else{
+    $this->params['breadcrumbs'][] = ['label' => 'IPTV Monitor', 'url' => ['index']];
+}
 $this->params['breadcrumbs'][] = $this->title;
 
-$request = Yii::$app->request;
+
+$url = $request->get('serverName') == ''? ['index']:['disk-chart','serverName'=>$request->get('serverName')];
 ?>
 
-<div class="left">
-	<span>Server Name: <strong><?php echo $request->get('serverName')?></strong></span>
-</div>
 
 <div class="btn-group right">
-	<?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', ['disk-chart','serverName'=>$request->get('serverName')], ['class' => 'btn btn-default']);?>
+	<?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', $url, ['class' => 'btn btn-default']);?>
 	<?= Html::a('<i class="iconfont iconfont-blue icon-grid"></i>', null, ['class' => 'btn btn-default']);?>
 </div><br/><br/>
 
@@ -33,6 +38,11 @@ echo GridView::widget([
         [
             'class' => 'yii\grid\SerialColumn',
             'headerOptions' => ['width' => '10'],
+        ],
+        [
+            'attribute' => 'server',
+            'headerOptions' => ['width' => '100'],
+            'filter' => $servers
         ],
         [
             'attribute' => 'recordTime',

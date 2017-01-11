@@ -13,7 +13,7 @@ class CPUSearch extends CPU{
     public function rules()
     {
         return [
-            [['recordTime', 'utilize', 'user', 'system', 'wait', 'hardIrq', 'softIrq', 'nice', 'steal', 'guest', 'idle'], 'safe'],
+            [['server', 'recordTime', 'utilize', 'user', 'system', 'wait', 'hardIrq', 'softIrq', 'nice', 'steal', 'guest', 'idle'], 'safe'],
         ];
     }
     /**
@@ -26,23 +26,45 @@ class CPUSearch extends CPU{
         return Model::scenarios();
     }
     /**
-     * 检索过滤
+     * 所有数据
      * @param string $params
      * @return \yii\data\ActiveDataProvider
      */
-    public function search($params, $serverName){
-        $query = CPU::find()->where(['server'=>$serverName]);
+    public function search($params){
+        $query = CPU::find()
+        ->orderBy(['recordTime'=>SORT_DESC]);
+        return $this->searchProvider($query, $params);
+    }
+    /**
+     * 所有高于阈值的数据
+     * @param string $params
+     * @return \yii\data\ActiveDataProvider
+     */
+    public function searchWarning($params){
+        $threshold = Threshold::find()->one();
+        $query = CPU::find()->join('INNER JOIN', 'server', 'server=serverName')
+        ->where('utilize>='.$threshold->cpu)
+        ->orderBy(['recordTime'=>SORT_DESC]);
+        return $this->searchProvider($query, $params);
+    }
+    /**
+     * 检索过滤
+     * @param ActiveQuery $query
+     * @param string $params
+     */
+    private function searchProvider($query, $params){
         $dataProvider  = new ActiveDataProvider([
-           'query' => $query,
-           'pagination' => [
-               'pageSize' => 10
-           ]
+            'query' => $query,
+            'pagination' => [
+                'pageSize' => 10
+            ]
         ]);
         $this->load($params);
         if(!$this->validate()){
             return $dataProvider;
         }
-        $query->andFilterWhere(['like', 'recordTime', $this->recordTime])
+        $query->andFilterWhere(['=', 'server', $this->server])
+        ->andFilterWhere(['like', 'recordTime', $this->recordTime])
         ->andFilterWhere(['=', 'ncpu', $this->ncpu])
         ->andFilterWhere(['=', 'utilize', $this->utilize])
         ->andFilterWhere(['=', 'user', $this->user])

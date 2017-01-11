@@ -19,6 +19,10 @@ use app\models\DiskSearch;
 use app\models\LoadSearch;
 use app\models\RealTime;
 use app\models\ProcessInfo;
+use app\models\Threshold;
+use yii\db\Query;
+use app\models\MySqlSearch;
+use app\models\NginxSearch;
 
 class MonitorController extends Controller
 {
@@ -56,12 +60,15 @@ class MonitorController extends Controller
                     'disk-grid' => ['get'],
                     'load-chart' => ['get'],
                     'load-grid' => ['get'],
+                    'mysql-grid' => ['get'],
                     'streams' => ['get'],
                     'streams-grid' => ['get'],
                     'servers' => ['get'],
+                    'detail' => ['get'],
                     'update-gauge-info' => ['get'],
                     'update-line-info' => ['get'],
                     'update-heat-map' => ['get'],
+                    'update-warning-line' => ['get'],
                 ]
             ]
         ];
@@ -86,22 +93,40 @@ class MonitorController extends Controller
     /**
      * Dashboard action
      */
-    public function actionIndex($serverName=null)
+    public function actionIndex()
     {
-        if($serverName==null){
-            $firstServer = Server::find()->one();
-            $serverName = $firstServer->serverName;
-        }
-        $server = new Server();
-        $heatData = $this->getHeatMapData();
-        $realTimes = RealTime::find()->asArray()->all();
-        $xCategories = ArrayHelper::getColumn($realTimes, 'server');
+        $startTime = date('Y-m-d H:i:s',time()-24*3600);
+        $endTime = date('Y-m-d H:i:s',time());
+        $range = $startTime.' - '.$endTime;
+        $minDate = CPU::find()->min('recordTime');
+        $threshold = Threshold::find()->one();
+        $cpuData = $this->getCpuWarningData($startTime, $endTime, $threshold->cpu);
+        $ramData = $this->getRamWarningData($startTime, $endTime, $threshold->memory);
+        $diskData = $this->getDiskWarningData($startTime, $endTime, $threshold->disk);
+        $loadData = $this->getLoadWarningData($startTime, $endTime, $threshold->loads);
+        $processData = $this->getProcessWarningData($startTime, $endTime);
+        $processData2 = $this->getProcessNames($startTime, $endTime);
+        $mySqlData = $this->getMySqlWarningData($startTime, $endTime);
+        $mySqlData2 = $this->getMySqlServers($startTime, $endTime);
+        $nginxData = $this->getNginxWarningData($startTime, $endTime);
+        $nginxData2 = $this->getNginxServers($startTime, $endTime);
         return $this->render('index', [
-            'serverName' => $serverName,
-            'server' => $server,
-            'servers' => $this->getServersForDrop(),
-            'xCategories' => $xCategories,
-            'heatData' => $heatData
+            'cpuData' => $cpuData,
+            'ramData' => $ramData,
+            'diskData' => $diskData,
+            'loadData' => $loadData,
+            'processData' => $processData,
+            'processData2' => json_encode($processData2),
+            'mySqlData' => $mySqlData,
+            'mySqlData2' => json_encode($mySqlData2),
+            'nginxData' => $nginxData,
+            'nginxData2' => json_encode($nginxData2),
+            'range' =>  $range,
+            'minDate' => $minDate,
+            'cpuThreshold' => $threshold->cpu+0,
+            'memoryThreshold' => $threshold->memory+0,
+            'diskThreshold' => $threshold->disk+0,
+            'loadsThreshold' => $threshold->loads+0
         ]);
     }
 
@@ -127,13 +152,19 @@ class MonitorController extends Controller
     /**
      * 传回CPU表格数据
      */
-    public function actionCpuGrid($serverName)
+    public function actionCpuGrid($serverName, $type)
     {
         $searchModel = new CPUSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $serverName);
+        $dataProvider = null;
+        if($type==1){
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        }else{
+            $dataProvider = $searchModel->searchWarning(Yii::$app->request->queryParams);
+        }
         return $this->render('cpu-grid', [
             'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider
+            'dataProvider' => $dataProvider,
+            'servers' => $this->getServersForDrop()
         ]);
     }
 
@@ -157,12 +188,18 @@ class MonitorController extends Controller
      * 传回RAM表格数据
      * @param string $serverName
      */
-    public function actionRamGrid($serverName){
+    public function actionRamGrid($serverName, $type){
         $searchModel = new RAMSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $serverName);
+        $dataProvider = null;
+        if($type==1){
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        }else{
+            $dataProvider = $searchModel->searchWarning(Yii::$app->request->queryParams);
+        }
         return $this->render('ram-grid', [
             'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider
+            'dataProvider' => $dataProvider,
+            'servers' => $this->getServersForDrop()
         ]);
     }
     
@@ -187,12 +224,18 @@ class MonitorController extends Controller
      * 传回Disk表格数据
      * @param string $serverName
      */
-    public function actionDiskGrid($serverName){
+    public function actionDiskGrid($serverName, $type){
         $searchModel = new DiskSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $serverName);
+        $dataProvider = null;
+        if($type==1){
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        }else{
+            $dataProvider = $searchModel->searchWarning(Yii::$app->request->queryParams);
+        }
         return $this->render('disk-grid', [
             'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider
+            'dataProvider' => $dataProvider,
+            'servers' => $this->getServersForDrop()
         ]);
     }
     
@@ -217,12 +260,42 @@ class MonitorController extends Controller
      * 传回Disk表格数据
      * @param string $serverName
      */
-    public function actionLoadGrid($serverName){
+    public function actionLoadGrid($serverName, $type){
         $searchModel = new LoadSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, $serverName);
+        $dataProvider = null;
+        if($type==1){
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        }else{
+            $dataProvider = $searchModel->searchWarning(Yii::$app->request->queryParams);
+        }
         return $this->render('load-grid', [
             'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider
+            'dataProvider' => $dataProvider,
+            'servers' => $this->getServersForDrop()
+        ]);
+    }
+    /**
+     * MySql数据
+     */
+    public function actionMysqlGrid(){
+        $filterModel = new MySqlSearch();
+        $dataProvider = $filterModel->search(Yii::$app->request->queryParams);
+        return $this->render('mysql-grid',[
+            'filterModel' => $filterModel,
+            'dataProvider' => $dataProvider,
+            'servers' => $this->getServersForDrop()
+        ]);
+    }
+    /**
+     * Nginx数据
+     */
+    public function actionNginxGrid(){
+        $filterModel = new NginxSearch();
+        $dataProvider = $filterModel->search(Yii::$app->request->queryParams);
+        return $this->render('nginx-grid',[
+            'filterModel' => $filterModel,
+            'dataProvider' => $dataProvider,
+            'servers' => $this->getServersForDrop()
         ]);
     }
     
@@ -256,12 +329,13 @@ class MonitorController extends Controller
     /**
      * 传回表格中的数据
      */
-    public function actionStreamsGrid(){
+    public function actionStreamsGrid($type){
         $searchModel = new ProcessInfoSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         return $this->render('streams-grid',[
             'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider
+            'dataProvider' => $dataProvider,
+            'servers' => $this->getServersForDrop()
         ]);
     }
     
@@ -274,14 +348,26 @@ class MonitorController extends Controller
         $data = $this->getServersData($startTime, $endTime);
         $range = $startTime.' - '.$endTime;
         $minDate = CPU::find()->min('recordTime');
+        $heatData = $this->getHeatMapData();
+        $realTimes = RealTime::find()->asArray()->all();
+        $xCategories = ArrayHelper::getColumn($realTimes, 'server');
         return $this->render('servers', [
             'cpuData' => $data[0],
             'ramData' => $data[1],
             'diskData' => $data[2],
             'loadData' => $data[3],
             'range' => $range,
-            'minDate' => $minDate
+            'minDate' => $minDate,
+            'xCategories' => $xCategories,
+            'heatData' => $heatData
         ]);
+    }
+    /**
+     * 获取服务器详细信息
+     * @param string $serverName
+     */
+    public function actionDetail($serverName){
+        return $this->render('detail',[]);
     }
     
     /**
@@ -307,7 +393,6 @@ class MonitorController extends Controller
      * @param string $endTime
      */
     public function actionUpdateLineInfo($serverName, $type, $startTime, $endTime){
-        $updatedInfo = RealTime::findOne(['server' => $serverName]);
         $startTime = date('Y-m-d H:i:s',$startTime/1000);
         $endTime = date('Y-m-d H:i:s',$endTime/1000);
         $response = Yii::$app->response;
@@ -333,6 +418,29 @@ class MonitorController extends Controller
                 break;
         }
     }
+    
+    public function actionUpdateWarningLine($type, $startTime, $endTime){
+        $startTime = date('Y-m-d H:i:s',$startTime/1000);
+        $endTime = date('Y-m-d H:i:s',$endTime/1000);
+        $threshold = Threshold::find()->one();
+        $response = Yii::$app->response;
+        $response->format = \yii\web\Response::FORMAT_JSON;
+        switch ($type){
+            case 'CPU':$response->data = $this->getCpuWarningData($startTime, $endTime, $threshold->cpu);break;
+            case 'RAM':$response->data = $this->getRamWarningData($startTime, $endTime, $threshold->memory);break;
+            case 'DISK':$response->data = $this->getDiskWarningData($startTime, $endTime, $threshold->disk);break;
+            case 'LOAD':$response->data = $this->getLoadWarningData($startTime, $endTime, $threshold->loads);break;
+            case 'Process':
+                $response->data = [$this->getProcessWarningData($startTime, $endTime), $this->getProcessNames($startTime, $endTime)];
+                break;
+            case 'MySql':
+                $response->data = [$this->getMySqlWarningData($startTime, $endTime), $this->getMySqlServers($startTime, $endTime)];
+                break;
+            case 'Nginx':
+                $response->data = [$this->getNginxWarningData($startTime, $endTime), $this->getNginxServers($startTime, $endTime)];
+                break;
+        }
+    }
     /**
      * 传回最新的热力图数据
      */
@@ -341,6 +449,7 @@ class MonitorController extends Controller
         $response->format = \yii\web\Response::FORMAT_JSON;
         $response->data = $this->getHeatMapData();
     }
+    
     
     /**
      * 整理折线图横轴和纵轴的数据
@@ -573,5 +682,250 @@ class MonitorController extends Controller
     private function getServersForDrop(){
         $allServers = Server::find()->asArray()->all();
         return ArrayHelper::map($allServers, 'serverName', 'serverName');
+    }
+    /**
+     * 得到阈值以上的cpu值
+     * @param string $startTime
+     * @param string $endTime
+     * @param string $threshold
+     */
+    private function getCpuWarningData($startTime, $endTime, $threshold){
+        $servers = Server::find()->all();
+        $cpuData = [];
+        for($i=0;$i<count($servers);$i++){
+            $cpuInfo = $servers[$i]->getCpuInfo($startTime, $endTime)
+            ->andWhere("utilize>=$threshold")
+            ->asArray()
+            ->all();
+            $cpu = [
+                'name' => $servers[$i]['serverName'],
+                'data' => $this->getChartDataByProperty($cpuInfo, 'recordTime', 'utilize')
+            ];
+            array_push($cpuData, $cpu);
+        }
+        return $cpuData;
+    }
+    /**
+     * 得到阈值以上的ram值
+     * @param string $startTime
+     * @param string $endTime
+     * @param string $threshold
+     */
+    private function getRamWarningData($startTime, $endTime, $threshold){
+        $servers = Server::find()->all();
+        $ramData = [];
+        for($i=0;$i<count($servers);$i++){
+            $ramInfo = $servers[$i]->getRamInfo($startTime, $endTime)
+            ->andWhere("utilize>=$threshold")
+            ->asArray()
+            ->all();
+            $ram = [
+                'name' => $servers[$i]['serverName'],
+                'data' => $this->getChartDataByProperty($ramInfo, 'recordTime', 'utilize')
+            ];
+            array_push($ramData, $ram);
+        }
+        return $ramData;
+    }
+    /**
+     * 得到阈值以下的disk值
+     * @param string $startTime
+     * @param string $endTime
+     * @param string $threshold
+     */
+    private function getDiskWarningData($startTime, $endTime, $threshold){
+        $servers = Server::find()->all();
+        $diskData = [];
+        for($i=0;$i<count($servers);$i++){
+            $diskInfo = $servers[$i]->getDiskInfo($startTime, $endTime)
+            ->andWhere("freePercent<=$threshold")
+            ->asArray()
+            ->all();
+            $disk = [
+                'name' => $servers[$i]['serverName'],
+                'data' => $this->getChartDataByProperty($diskInfo, 'recordTime', 'freePercent')
+            ];
+            array_push($diskData, $disk);
+        }
+        return $diskData;
+    }
+    /**
+     * 得到阈值以上的load值
+     * @param string $startTime
+     * @param string $endTime
+     * @param string $threshold
+     */
+    private function getLoadWarningData($startTime, $endTime, $threshold){
+        $servers = Server::find()->all();
+        $loadData = [];
+        for($i=0;$i<count($servers);$i++){
+            $loadInfo = $servers[$i]->getLoadInfo($startTime, $endTime)
+            ->andWhere("load1>=$threshold")
+            ->orderBy('recordTime')
+            ->asArray()
+            ->all();
+            $load = [
+                'name' => $servers[$i]['serverName'],
+                'data' => $this->getChartDataByProperty($loadInfo, 'recordTime', 'load1')
+            ];
+            array_push($loadData, $load);
+        }
+        return $loadData;
+    }
+    /**
+     * 各个时间点进程断的个数
+     * @param string $startTime
+     * @param string $endTime
+     */
+    private function getProcessWarningData($startTime, $endTime){
+        $servers = Server::find()->asArray()->all();
+        $processData=[];
+        for($i=0;$i<count($servers);$i++){
+            $rows = (new Query())
+            ->select(['DATE_FORMAT(DATE_FORMAT(recordTime,"%Y-%m-%d %H:%i"),"%Y-%m-%d %H:%i:%s") as time', 'count(if(status=0,true,null )) as count'])
+            ->from('process as p, process_info as pi')
+            ->where('p.server=pi.server and p.processName=pi.processName and p.server="'.$servers[$i]['serverName'].'" and recordTime between "'.$startTime.'" and "'.$endTime.'"')
+            ->groupBy('time,p.server')
+            ->all();
+            $data = [];
+            for($j=0;$j<count($rows);$j++){
+                $time = strtotime($rows[$j]['time'])*1000;
+                array_push($data, [$time, $rows[$j]['count']+0]);
+            }
+            $processes = [
+                'name' => $servers[$i]['serverName'],
+                'data' => $data
+            ];
+            array_push($processData, $processes);
+        }
+        return $processData;
+    }
+    /**
+     * 某一时间点断开的进程
+     * @param string $startTime
+     * @param string $endTime
+     */
+    private function getProcessNames($startTime, $endTime){
+        $deadProcess = (new Query())
+        ->select(['DATE_FORMAT(DATE_FORMAT(recordTime,"%Y-%m-%d %H:%i"),"%Y-%m-%d %H:%i:%s") as time', 'p.server','p.processName as pName'])
+        ->from('process as p, process_info as pi')
+        ->where("status=0 and p.server=pi.server and p.processName=pi.processName and recordTime between '$startTime' and '$endTime'")
+        ->orderBy(['recordTime' => SORT_ASC, 'server' => SORT_ASC, 'pName'=> SORT_ASC])
+        ->all();
+        $processes = [];
+        $time = null;
+        $server = null;
+        for($i=0;$i<count($deadProcess);$i++){
+            $recordTime = ''.strtotime($deadProcess[$i]['time'])*1000;
+            $newServer = $deadProcess[$i]['server'];
+            $processName = $deadProcess[$i]['pName'];
+            if($newServer==$server && $recordTime==$time){
+                array_push($processes[$newServer][$recordTime], $processName);
+            }else{
+                $processes[$newServer][$recordTime] = [$processName];
+                $time = $recordTime;
+                $server = $newServer;
+            }
+        }
+        return $processes;
+    }
+    /**
+     * 某一时间点断开的mysql数
+     * @param string $startTime
+     * @param string $endTime
+     */
+    private function getMySqlWarningData($startTime, $endTime){
+        $rows = (new Query())
+        ->select(['DATE_FORMAT(DATE_FORMAT(recordTime,"%Y-%m-%d %H:%i"),"%Y-%m-%d %H:%i:%s") as time', 'count(if(status=0,true,null )) as count'])
+        ->from(['mysql_info'])
+        ->where('recordTime BETWEEN "'.$startTime.'" and "'.$endTime.'"')
+        ->groupBy('time')
+        ->all();
+        $data = [];
+        for($j=0;$j<count($rows);$j++){
+            $time = strtotime($rows[$j]['time'])*1000;
+            array_push($data, [$time, $rows[$j]['count']+0]);
+        }
+        $mysql = [[
+            'name' => 'count',
+            'data' => $data
+        ]];
+        return $mysql;
+    }
+    /**
+     * 某一时间点断开的mysql所属的服务器
+     * @param string $startTime
+     * @param string $endTime
+     */
+    private function getMySqlServers($startTime, $endTime){
+        $rows = (new Query())
+        ->select(['DATE_FORMAT(DATE_FORMAT(recordTime,"%Y-%m-%d %H:%i"),"%Y-%m-%d %H:%i:%s") as time', 'server'])
+        ->from(['mysql_info'])
+        ->where('status=0 and recordTime BETWEEN "'.$startTime.'" and "'.$endTime.'"')
+        ->orderBy('time')
+        ->all();
+        $servers=[];
+        $time=null;
+        for($i=0;$i<count($rows);$i++){
+            $recordTime = ''.strtotime($rows[$i]['time'])*1000;
+            $serverName = $rows[$i]['server'];
+            if($recordTime==$time){
+                array_push($servers[$recordTime], $serverName);
+            }else{
+                $servers[$recordTime]=[$serverName];
+                $time=$recordTime;
+            }
+        }
+        return $servers;
+    }
+    
+    /**
+     * 某一时间点断开的nginx数
+     * @param string $startTime
+     * @param string $endTime
+     */
+    private function getNginxWarningData($startTime, $endTime){
+        $rows = (new Query())
+        ->select(['DATE_FORMAT(DATE_FORMAT(recordTime,"%Y-%m-%d %H:%i"),"%Y-%m-%d %H:%i:%s") as time', 'count(if(status=0,true,null )) as count'])
+        ->from(['nginx'])
+        ->where('recordTime BETWEEN "'.$startTime.'" and "'.$endTime.'"')
+        ->groupBy('time')
+        ->all();
+        $data = [];
+        for($j=0;$j<count($rows);$j++){
+            $time = strtotime($rows[$j]['time'])*1000;
+            array_push($data, [$time, $rows[$j]['count']+0]);
+        }
+        $nginx = [[
+            'name' => 'count',
+            'data' => $data
+        ]];
+        return $nginx;
+    }
+    /**
+     * 某一时间点断开的nginx所属的服务器
+     * @param string $startTime
+     * @param string $endTime
+     */
+    private function getNginxServers($startTime, $endTime){
+        $rows = (new Query())
+        ->select(['DATE_FORMAT(DATE_FORMAT(recordTime,"%Y-%m-%d %H:%i"),"%Y-%m-%d %H:%i:%s") as time', 'server'])
+        ->from(['nginx'])
+        ->where('status=0 and recordTime BETWEEN "'.$startTime.'" and "'.$endTime.'"')
+        ->orderBy('time')
+        ->all();
+        $servers=[];
+        $time=null;
+        for($i=0;$i<count($rows);$i++){
+            $recordTime = ''.strtotime($rows[$i]['time'])*1000;
+            $serverName = $rows[$i]['server'];
+            if($recordTime==$time){
+                array_push($servers[$recordTime], $serverName);
+            }else{
+                $servers[$recordTime]=[$serverName];
+                $time=$recordTime;
+            }
+        }
+        return $servers;
     }
 }

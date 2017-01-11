@@ -32,7 +32,8 @@ class ProcessInfoSearch extends ProcessInfo{
      */
     public function search($params){
         $query = ProcessInfo::find()
-        ->innerJoin('process','process.processName=process_info.processName and process.server=process_info.server');
+        ->innerJoin('process','process.processName=process_info.processName and process.server=process_info.server')
+        ->orderBy(['recordTime'=>SORT_DESC]);
         $dataProvider  = new ActiveDataProvider([
            'query' => $query,
            'pagination' => [

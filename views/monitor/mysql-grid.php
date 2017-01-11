@@ -1,31 +1,27 @@
 <?php
-use yii\helpers\Html;
+
 use yii\grid\GridView;
+use yii\helpers\Html;
 
-$request = Yii::$app->request;
-$this->title = 'Load Grid';
-if($request->get('type') == 1){
-    $this->params['breadcrumbs'][] = ['label' => 'Server Monitor', 'url' => ['servers']];
-    $this->params['breadcrumbs'][] = ['label' => 'Server Details', 'url' => ['detail','serverName'=>$request->get('serverName')]];
-}else{
-    $this->params['breadcrumbs'][] = ['label' => 'IPTV Monitor', 'url' => ['index']];
-}
-$this->params['breadcrumbs'][] = $this->title;
+$this->title='MySql Grid';
+$this->params['breadcrumbs'][]=['label'=>'IPTV Monitor', 'url'=>['index']];
+$this->params['breadcrumbs'][]=$this->title;
 
-
-$url = $request->get('serverName') == ''? ['index']:['load-chart','serverName'=>$request->get('serverName')];
+$status=[
+    1=>'on',
+    0=>'off'
+];
 ?>
 
-
 <div class="btn-group right">
-	<?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', $url, ['class' => 'btn btn-default']);?>
+	<?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', ['index'], ['class' => 'btn btn-default']);?>
 	<?= Html::a('<i class="iconfont iconfont-blue icon-grid"></i>', null, ['class' => 'btn btn-default']);?>
 </div><br/><br/>
 
 <?php 
 echo GridView::widget([
     'dataProvider' => $dataProvider,
-    'filterModel' => $searchModel,
+    'filterModel' => $filterModel,
     'pager' => [
         'firstPageLabel' => 'First Page',
         'lastPageLabel' => 'Last Page',
@@ -44,15 +40,17 @@ echo GridView::widget([
             'filter' => $servers
         ],
         [
+            'attribute' => 'status',
+            'value' => function($model){
+                return $model->status == 1 ? 'on' : 'off';
+            },
+            'filter' => $status,
+            'headerOptions' => ['width' => '85'],
+        ],
+        [
             'attribute' => 'recordTime',
             'headerOptions' => ['width' => '180'],
-        ],
-         'load1', 
-        'load5', 
-        'load15', 
-        'processRun', 
-        'processTotal'
+        ]
     ]
 ]);
 ?>
-

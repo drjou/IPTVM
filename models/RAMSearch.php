@@ -3,6 +3,7 @@ namespace app\models;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use yii\db\ActiveQuery;
 class RAMSearch extends RAM{
     /**
      * 表单验证规则
@@ -12,7 +13,7 @@ class RAMSearch extends RAM{
     public function rules()
     {
         return [
-            [['recordTime', 'utilize', 'free', 'used', 'total', 'buffer', 'cache'], 'safe'],
+            [['server' ,'recordTime', 'utilize', 'free', 'used', 'total', 'buffer', 'cache'], 'safe'],
         ];
     }
     /**
@@ -25,12 +26,32 @@ class RAMSearch extends RAM{
         return Model::scenarios();
     }
     /**
-     * 检索过滤
+     * 所有数据
      * @param string $params
      * @return \yii\data\ActiveDataProvider
      */
-    public function search($params, $serverName){
-        $query = RAM::find()->where(['server'=>$serverName]);
+    public function search($params){
+        $query = RAM::find()
+        ->orderBy(['recordTime'=>SORT_DESC]);
+        return $this->searchProvider($query, $params);
+    }
+    /**
+     * 超过阈值的数据
+     * @param string $params
+     */
+    public function searchWarning($params){
+        $threshold = Threshold::find()->one();
+        $query = RAM::find()->join('INNER JOIN', 'server', 'server=serverName')
+        ->where('utilize>='.$threshold->memory)
+        ->orderBy(['recordTime'=>SORT_DESC]);
+        return $this->searchProvider($query, $params);
+    }
+    /**
+     * 检索过滤
+     * @param ActiveQuery $query
+     * @param string $params
+     */
+    private function searchProvider($query, $params){
         $dataProvider  = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
@@ -41,7 +62,8 @@ class RAMSearch extends RAM{
         if(!$this->validate()){
             return $dataProvider;
         }
-        $query->andFilterWhere(['like', 'recordTime', $this->recordTime])
+        $query->andFilterWhere(['=', 'server', $this->server])
+        ->andFilterWhere(['like', 'recordTime', $this->recordTime])
         ->andFilterWhere(['=', 'utilize', $this->utilize])
         ->andFilterWhere(['=', 'free', $this->free])
         ->andFilterWhere(['=', 'used', $this->used])

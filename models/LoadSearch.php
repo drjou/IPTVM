@@ -13,7 +13,7 @@ class LoadSearch extends Load{
     public function rules()
     {
         return [
-            [['recordTime', 'load1', 'load5', 'load15', 'processRun', 'processTotal'], 'safe'],
+            [[ 'server', 'recordTime', 'load1', 'load5', 'load15', 'processRun', 'processTotal'], 'safe'],
         ];
     }
     /**
@@ -30,20 +30,33 @@ class LoadSearch extends Load{
      * @param string $params
      * @return \yii\data\ActiveDataProvider
      */
-    public function search($params, $serverName){
-        $query = Load::find()->where(['server'=>$serverName]);
+    public function search($params){
+        $query = Load::find()
+        ->orderBy(['recordTime'=>SORT_DESC]);
+        return $this->searchProvider($query, $params);
+    }
+    
+    public function searchWarning($params){
+        $threshold = Threshold::find()->one();
+        $query = Load::find()->join('INNER JOIN', 'server', 'server=serverName')
+        ->where('load1>='.$threshold->loads)
+        ->orderBy(['recordTime'=>SORT_DESC]);
+        return $this->searchProvider($query, $params);
+    }
+    
+    private function searchProvider($query, $params){
         $dataProvider  = new ActiveDataProvider([
-           'query' => $query,
-           'pagination' => [
-               'pageSize' => 10
-           ]
+            'query' => $query,
+            'pagination' => [
+                'pageSize' => 10
+            ]
         ]);
         $this->load($params);
         if(!$this->validate()){
             return $dataProvider;
         }
-        //'load1', 'load5', 'load15', 'processRun', 'processTotal'
-        $query->andFilterWhere(['like', 'recordTime', $this->recordTime])
+        $query->andFilterWhere(['=', 'server', $this->server])
+        ->andFilterWhere(['like', 'recordTime', $this->recordTime])
         ->andFilterWhere(['=', 'load1', $this->load1])
         ->andFilterWhere(['=', 'load5', $this->load5])
         ->andFilterWhere(['=', 'load15', $this->load15])

@@ -47,4 +47,5 @@ class ServerSearch extends Server{
         
         return $dataProvider;
     }
+    
 }

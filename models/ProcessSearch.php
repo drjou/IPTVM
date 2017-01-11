@@ -29,7 +29,8 @@ class ProcessSearch extends Process{
      * @param string $params
      */
     public function search($params){
-        $query = Process::find();
+        $query = Process::find()
+        ->orderBy('server');
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [

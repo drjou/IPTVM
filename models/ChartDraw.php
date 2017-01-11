@@ -137,6 +137,7 @@ class ChartDraw
             ],
             'options' => [
                 'chart' => [
+                    'type' => 'spline',
                     'zoomType' => 'x',
                     'panning' => true,
                     'panKey' => 'shift'
@@ -178,16 +179,17 @@ class ChartDraw
                 ],
                 'tooltip' => [
                     'dateTimeLabelFormats' => [
-                        'millisecond' => '%H:%M:%S.%L',
-                        'second' => '%m-%d %H:%M:%S',
-                        'minute' => '%m-%d %H:%M',
-                        'hour' => '%m-%d %H:%M',
-                        'day' => '%m-%d',
-                        'week' => '%m-%d',
-                        'month' => '%Y-%m',
-                        'year' => '%Y'
+                        'millisecond' => '<b>%H:%M:%S.%L</b>',
+                        'second' => '<b>%m-%d %H:%M:%S</b>',
+                        'minute' => '<b>%m-%d %H:%M</b>',
+                        'hour' => '<b>%m-%d %H:%M</b>',
+                        'day' => '<b>%m-%d</b>',
+                        'week' => '<b>%m-%d</b>',
+                        'month' => '<b>%Y-%m</b>',
+                        'year' => '<b>%Y</b>'
                     ],
-                    'valueSuffix' => $ySuffix
+                    'valueSuffix' => $ySuffix,
+                    'shared' => true
                 ],
                 'legend' => [
                     'layout' => 'vertical',
@@ -216,13 +218,14 @@ class ChartDraw
         ]);
     }
     
-    public static function drawDateRange($defaultValue, $minDate, $operation)
+    public static function drawDateRange($defaultValue, $minDate, $operation, $id='date-range')
     {
         $range = explode(' - ', $defaultValue);
         $start = $range[0];
         $end = $range[1];
         echo '<div class="drp-container left calendar">';
         echo DateRangePicker::widget([
+            'id' => $id,
             'name'=>'date_range',
             'value'=>$defaultValue,
             'presetDropdown'=>true,
@@ -239,7 +242,7 @@ class ChartDraw
                     {input}
                 </span>',
             'pluginEvents' => [
-                'apply.daterangepicker' => $operation
+                'apply.daterangepicker' => "function(){ $operation }"
             ],
             'convertFormat'=>true,
             'pluginOptions'=>[
@@ -253,5 +256,25 @@ class ChartDraw
             ],
         ]);
         echo '</div>';
+    }
+    
+    public static function operation($type, $dateRangId, $chartId){
+        return 
+        '
+                var time = $("#'.$dateRangId.'").val().split(" - ");
+                var startTime = Date.parse(new Date(time[0]));
+                var endTime = Date.parse(new Date(time[1]));
+                $("#'.$chartId.'").highcharts().showLoading();
+                $.get("index.php?r=monitor/update-warning-line&type='.$type.'&startTime="+startTime+"&endTime="+endTime,
+                        function(data,status){
+                             var obj = eval(data);
+                             for(var i=0;i<obj.length;i++){
+                                var series=$("#'.$chartId.'").highcharts().series[i];
+                                series.setData(obj[i].data,false);
+                             }
+                            $("#'.$chartId.'").highcharts().redraw();
+                            $("#'.$chartId.'").highcharts().hideLoading();
+                        });
+            ';
     }
 }

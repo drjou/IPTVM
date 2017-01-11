@@ -1,13 +1,15 @@
 <?php
 use app\models\ChartDraw;
 use yii\helpers\Html;
-$this->title = 'CPU Chart';
-$this->params['breadcrumbs'][] = ['label' => 'Monitor Dashboard', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
 
 $request = Yii::$app->request;
-$operation = 'function() {
-                var time = $("#w0").val().split(" - ");
+$this->title = 'CPU Chart';
+$this->params['breadcrumbs'][] = ['label' => 'Server Monitor', 'url' => ['servers']];
+$this->params['breadcrumbs'][] = ['label' => 'Server Details', 'url' => ['detail','serverName'=>$request->get('serverName')]];
+$this->params['breadcrumbs'][] = $this->title;
+
+
+$operation = 'var time = $("#date-range").val().split(" - ");
                 var startTime = Date.parse(new Date(time[0]));
                 var endTime = Date.parse(new Date(time[1]));
                 $("#linechart").highcharts().showLoading();
@@ -16,11 +18,11 @@ $operation = 'function() {
                             var obj = eval(data);
                             for(var i=0;i<obj.length;i++){
                                 var series=$("#linechart").highcharts().series[i];
-                                series.setData(obj[i].data);
+                                series.setData(obj[i].data,false);
                             }
+                            $("#linechart").highcharts().redraw();
                             $("#linechart").highcharts().hideLoading();
-                        });
-             }';
+                        });';
 ?>
 
 <?php 
@@ -29,7 +31,7 @@ $operation = 'function() {
     
 <div class="btn-group right">
 	<?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', null, ['class' => 'btn btn-default']);?>
-	<?= Html::a('<i class="iconfont iconfont-blue icon-grid"></i>', ['cpu-grid','serverName'=>$request->get('serverName')], ['class' => 'btn btn-default']);?>
+	<?= Html::a('<i class="iconfont iconfont-blue icon-grid"></i>', ['cpu-grid','serverName'=>$request->get('serverName'),'type'=>1], ['class' => 'btn btn-default']);?>
 </div>
 <br/><br/>
 
