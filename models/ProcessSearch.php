@@ -12,7 +12,7 @@ class ProcessSearch extends Process{
      */
     public function rules(){
         return [
-            [['processName', 'server'], 'safe']
+            [['processName', 'source', 'server'], 'safe']
         ];
     }
     /**
@@ -42,7 +42,8 @@ class ProcessSearch extends Process{
             return $dataProvider;
         }
         
-        $query->andFilterWhere(['like', 'processName', $this->processName])
+        $query->andFilterWhere(['like', 'processName', $this->processName])->
+        andFilterWhere(['like', 'source', $this->source])
         ->andFilterWhere(['=', 'server', $this->server]);
         
         return $dataProvider;

@@ -296,7 +296,11 @@ $this->registerJs("
                             if(obj[this.series.name].hasOwnProperty(this.x+'')){
                                 var process = '<br/>They are:<br/>';
                                 for(var i=0;i<obj[this.series.name][this.x+''].length;i++){
-                                    process = process + '<b>' + obj[this.series.name][this.x+''][i] + '<b/><br/>';
+                                    if(i%2==0){
+                                        process = process + '<b>' + obj[this.series.name][this.x+''][i] + '<b/>  ';
+                                    }else{
+                                        process = process + '<b>' + obj[this.series.name][this.x+''][i] + '<b/><br/>';
+                                    }
                                 }
                             }
                         }

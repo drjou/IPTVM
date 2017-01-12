@@ -13,7 +13,7 @@ class CPUSearch extends CPU{
     public function rules()
     {
         return [
-            [['server', 'recordTime', 'utilize', 'user', 'system', 'wait', 'hardIrq', 'softIrq', 'nice', 'steal', 'guest', 'idle'], 'safe'],
+            [['server','ncpu', 'recordTime', 'utilize', 'user', 'system', 'wait', 'hardIrq', 'softIrq', 'nice', 'steal', 'guest', 'idle'], 'safe'],
         ];
     }
     /**

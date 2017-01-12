@@ -8,9 +8,11 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <?php $form = ActiveForm::begin()?>
 
+<?= $form->field($model, 'server')->dropDownList($servers) ?>
+
 <?= $form->field($model, 'processName')->textInput()?>
 
-<?= $form->field($model, 'server')->dropDownList($servers) ?>
+<?= $form->field($model, 'source')->textInput()?>
 
 <div class="form-group">
 	<?= Html::submitButton('Update', ['class' => 'btn btn-success'])?>

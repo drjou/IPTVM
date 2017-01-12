@@ -310,7 +310,7 @@ class MonitorController extends Controller
             $serverName = $firstServer->serverName;
         }
         $server = new Server();
-        $startTime = date('Y-m-d H:i:s',time()-24*3600);
+        $startTime = date('Y-m-d H:i:s',time()-3600);
         $endTime = date('Y-m-d H:i:s',time());
         $data = $this->getStreamsData($serverName, $startTime, $endTime);
         $range = $startTime.' - '.$endTime;
@@ -460,6 +460,8 @@ class MonitorController extends Controller
     private function getChartDataByProperty($allData, $time, $property){
         $xCategories = ArrayHelper::getColumn($allData, $time);
         for ($i=0;$i<count($xCategories);$i++){
+            $xCategories[$i] = strtotime($xCategories[$i]);
+            $xCategories[$i] = date('Y-m-d H:i:00', $xCategories[$i]);
             $xCategories[$i] = strtotime($xCategories[$i])*1000;
         }
         $data = array();

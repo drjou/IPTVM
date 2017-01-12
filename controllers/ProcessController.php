@@ -137,6 +137,7 @@ class ProcessController extends Controller{
                         . '&lt;message&gt;</br>'
                         . '&nbsp;&nbsp;&lt;Process&gt;</br>'
                         . '&nbsp;&nbsp;&nbsp;&nbsp;&lt;processName&gt;nirvana6&lt;/processName&gt;</br>'
+                        . '&nbsp;&nbsp;&nbsp;&nbsp;&lt;source&gt;source&lt;/source&gt;</br>'
                         . '&nbsp;&nbsp;&nbsp;&nbsp;&lt;server&gt;server1&lt;/server&gt;</br>'
                         . '&nbsp;&nbsp;&lt;/Process&gt;</br>'
                         . '&nbsp;&nbsp;&lt;Process&gt;</br>'
@@ -152,7 +153,7 @@ class ProcessController extends Controller{
             try {
                 $xmlArray = simplexml_load_file($model->importFile->tempName);
                 $processes = json_decode(json_encode($xmlArray), true);
-                $columns = ['processName', 'server'];
+                $columns = ['processName', 'source', 'server', 'createTime', 'updateTime'];
                 $allStreams = null;
                 if(ArrayHelper::isIndexed($processes['Process'])){
                     $allStreams = $processes['Process'];
@@ -160,7 +161,8 @@ class ProcessController extends Controller{
                     $allStreams = [$processes['Process']];
                 }
                 $rows = ArrayHelper::getColumn($allStreams, function($element){
-                    return [$element['processName'], $element['server']];
+                    $now = date('Y-m-d H:i:s', time());
+                    return [$element['processName'], $element['source'], $element['server'], $now, $now];
                 });
                     $db = Yii::$app->db;
                     $db->createCommand()->batchInsert('process', $columns, $rows)->execute();

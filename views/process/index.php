@@ -42,6 +42,7 @@ echo GridView::widget([
             'headerOptions' => ['width' => '10'],
         ],
         'processName',
+        'source',
         [
             'attribute' => 'server',
             'filter' => $servers
