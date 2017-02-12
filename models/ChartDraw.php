@@ -197,6 +197,21 @@ class ChartDraw
                     'verticalAlign' => 'middle',
                     'borderWidth' => 0
                 ],
+                'loading' => [
+                    'labelStyle' => [
+                        'display' => 'inline-block',
+                        'width' => '100px',
+                        'height' => '100px',
+                        'backgroundImage' => 'url("images/loading/facebook.gif")',
+                        'backgroundRepeat' => 'no-repeat',
+                        'backgroundPosition' => 'center',
+           	            'fontSize' => '0px',
+                        'top' => '30%'
+                    ],
+                    'style' => [
+                        'opacity' => '0.8'
+                    ]
+                ],
                 'plotOptions' => [
                     'line' => [
                         'dataLabels' => [
