@@ -140,7 +140,12 @@ class ChartDraw
                     'type' => 'spline',
                     'zoomType' => 'x',
                     'panning' => true,
-                    'panKey' => 'shift'
+                    'panKey' => 'shift',
+                    'resetZoomButton' => [
+                        'position' => [
+                            'y' => -50
+                        ]
+                    ]
                 ],
                 'title' => [
                     'text' => $title,
