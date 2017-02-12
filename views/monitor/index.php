@@ -254,6 +254,9 @@ $operationNginx = '
 	</div>
 	<!-- /.col-lg-12 -->
 </div>
+<div class="gototop">
+	<a href="javascript:;" title="返回顶部"></a>
+</div>
 <?php 
 $this->registerJs("
     function addLine(chart, threshold){

@@ -567,3 +567,26 @@ div.server-icon {
     width: 100%;
 	background: black;
 }
+.gototop{
+	position:fixed;
+	_position:absolute;
+	bottom:0px;
+	right:0px;
+	width:150px;
+	height:195px;
+	display:none;
+}
+
+.gototop a,.gototop a:link{
+	width:150px;
+	height:195px;
+	display:inline-block;
+	background:url(../images/gototop.png) no-repeat;
+	_background:url(../images/gototop.gif) no-repeat;
+	outline:none;
+}
+
+.gototop a:hover{
+	background:url(../images/gototop.gif) no-repeat;
+	outline:none;
+}
