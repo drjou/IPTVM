@@ -67,7 +67,7 @@ $(function() {
         }
     }
 });
-
+//go to top function
 $(function(){	
 
 	$(window).scroll(function() {		
@@ -91,3 +91,4 @@ $(function(){
 	});	
 
 });
+

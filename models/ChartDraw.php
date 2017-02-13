@@ -125,15 +125,17 @@ class ChartDraw
     public static function drawLineChart($id, $file, $title, $yText, $ySuffix, $data, $subtitle='Click and drag to zoom in.Hold down shift key to pan.'){
         $file->registerJs("
             Highcharts.setOptions({
-            global:{
-                useUTC:false
-            }
-        });");
-        return Highcharts::widget([
+                global:{
+                    useUTC:false
+                },
+            });
+        ");
+        $chart = Highcharts::widget([
             'id' => $id,
             'scripts' => [
                 'highcharts-more',
-                'modules/boost'
+                'modules/boost',
+                'modules/no-data-to-display'
             ],
             'options' => [
                 'chart' => [
@@ -217,6 +219,12 @@ class ChartDraw
                         'opacity' => '0.8'
                     ]
                 ],
+                'noData' => [
+                    'style' => [
+                        'fontSize' => '15px',
+                        'color' => '#303030'
+                    ],
+                ],
                 'plotOptions' => [
                     'line' => [
                         'dataLabels' => [
@@ -236,6 +244,7 @@ class ChartDraw
                 'series' => $data
             ]
         ]);
+        return $chart;
     }
     
     public static function drawDateRange($defaultValue, $minDate, $operation, $id='date-range')

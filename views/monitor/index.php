@@ -70,7 +70,7 @@ $operationNginx = '
                     <br/><br/>
                     
                     <?php
-                        echo ChartDraw::drawLineChart('cpu-chart', $this, 'CPU Utilization', 'CPU Utilization Percentage(%)', '%', $cpuData);
+                        echo ChartDraw::drawLineChart('cpu-chart', $this, 'CPU Utilization Beyond Threshold', 'CPU Utilization Percentage(%)', '%', $cpuData);
                     ?>
 				</div>
 			</div>
@@ -99,7 +99,7 @@ $operationNginx = '
                     <br/><br/>
                     
                     <?php
-                        echo ChartDraw::drawLineChart('ram-chart', $this, 'RAM Utilization', 'RAM Utilization Percentage(%)', '%', $ramData);
+                        echo ChartDraw::drawLineChart('ram-chart', $this, 'RAM Utilization Beyond Threshold', 'RAM Utilization Percentage(%)', '%', $ramData);
                     ?>
 				</div>
 			</div>
@@ -128,7 +128,7 @@ $operationNginx = '
                     <br/><br/>
                     
                     <?php
-                        echo ChartDraw::drawLineChart('disk-chart', $this, 'Disk Utilization', 'Free Percentage of Disk(%)', '%', $diskData);
+                        echo ChartDraw::drawLineChart('disk-chart', $this, 'Disk Utilization Beyond Threshold', 'Free Percentage of Disk(%)', '%', $diskData);
                     ?>
 				</div>
 			</div>
@@ -157,7 +157,7 @@ $operationNginx = '
                     <br/><br/>
                     
                     <?php
-                        echo ChartDraw::drawLineChart('load-chart', $this, 'Load Utilization', 'Load Utilization Percentage(%)', '%', $loadData);
+                        echo ChartDraw::drawLineChart('load-chart', $this, 'Load Utilization Beyond Threshold', 'Load Utilization Percentage(%)', '%', $loadData);
                     ?>
 				</div>
 			</div>
@@ -186,7 +186,7 @@ $operationNginx = '
                     <br/><br/>
                     
                     <?php
-                        echo ChartDraw::drawLineChart('process-chart', $this, 'Process Status', 'The Numeber of Dead Processes', '', $processData);
+                        echo ChartDraw::drawLineChart('process-chart', $this, 'Disconnected Streams', 'The Numeber of Dead Processes', '', $processData);
                     ?>
 				</div>
 			</div>
@@ -215,7 +215,7 @@ $operationNginx = '
                     <br/><br/>
                     
                     <?php
-                        echo ChartDraw::drawLineChart('mysql-chart', $this, 'MySQL Status', 'Disconnected Number of MySQL', '', $mySqlData);
+                        echo ChartDraw::drawLineChart('mysql-chart', $this, 'MySQL Fault', 'Disconnected Number of MySQL', '', $mySqlData);
                     ?>
 				</div>
 			</div>
@@ -244,7 +244,7 @@ $operationNginx = '
                     <br/><br/>
                     
                     <?php
-                        echo ChartDraw::drawLineChart('nginx-chart', $this, 'Nginx Status', 'Disconnected Number of Nginx', '', $nginxData);
+                        echo ChartDraw::drawLineChart('nginx-chart', $this, 'Nginx Fault', 'Disconnected Number of Nginx', '', $nginxData);
                     ?>
 				</div>
 			</div>
@@ -358,4 +358,7 @@ $this->registerJs("
         updateTooltip(obj3, chart2);
     }
 ");
+
+
 ?>
+
