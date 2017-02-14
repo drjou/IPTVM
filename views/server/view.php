@@ -22,7 +22,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'serverIp',
                             [
                                 'attribute' => 'state',
-                                'value' => $model->state ? 'Enabled' : 'Disabled',
+                                'value' => $model->state ? 'up' : 'down',
                             ],
                             'operatingSystem',
                             'createTime',

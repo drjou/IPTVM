@@ -6,7 +6,7 @@ use yii\web\NotFoundHttpException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
 
-class Process extends ActiveRecord{
+class Stream extends ActiveRecord{
     public $importFile;
     const SCENARIO_SAVE = 'save';
     const SCENARIO_IMPORT = 'import';
@@ -15,7 +15,7 @@ class Process extends ActiveRecord{
      * @return string
      */
     public static function tableName(){
-        return 'process';
+        return 'stream';
     }
     /**
      * 自动更新创建时间和修改时间
@@ -39,11 +39,12 @@ class Process extends ActiveRecord{
      */
     public function rules(){
         return [
-            [['processName', 'source', 'server'], 'required'],
+            [['streamName', 'source', 'server'], 'required'],
             ['importFile', 'file', 'skipOnEmpty' => false, 'mimeTypes' => ['application/xml', 'text/xml'], 'extensions' => ['xml'], 'maxSize' => 50*1024*1024],
-            [['processName', 'source', 'server'], 'trim'],
-            [['processName', 'source', 'server'], 'string', 'length' => [1, 20]],
-            ['processName', 'validateProcessName']
+            [['streamName', 'source', 'server'], 'trim'],
+            [['streamName', 'server'], 'string', 'length' => [1, 20]],
+            ['source', 'string', 'length' => [1, 100]],
+            ['streamName', 'validateStreamName']
         ];
     }
     
@@ -54,7 +55,7 @@ class Process extends ActiveRecord{
      */
     public function scenarios(){
         return [
-            self::SCENARIO_SAVE => ['processName', 'source', 'server'],
+            self::SCENARIO_SAVE => ['streamName', 'source', 'server'],
             self::SCENARIO_IMPORT => ['importFile'],
         ];
     }
@@ -62,34 +63,34 @@ class Process extends ActiveRecord{
     /**
      * 返回所有服务器的所有进程信息
      */
-    public function getProcesses($startTime, $endTime){
-        return $this->hasMany(ProcessInfo::className(), ['processName' => 'processName','server' => 'server'])
+    public function getStreams($startTime, $endTime){
+        return $this->hasMany(StreamInfo::className(), ['streamName' => 'streamName','server' => 'server'])
         ->where('recordTime between "'.$startTime.'" and "'.$endTime.'"');
     }
     /**
-     * 通过主键寻找process
-     * @param string $processName
+     * 通过主键寻找stream
+     * @param string $streamName
      * @param string $server
      * @throws NotFoundHttpException
      */
-    public static function findProcessByKey($processName, $server){
-        if(($model = self::findOne(['processName' => $processName, 'server' => $server])) !== null){
+    public static function findStreamByKey($streamName, $server){
+        if(($model = self::findOne(['streamName' => $streamName, 'server' => $server])) !== null){
             return $model;
         }else{
-            throw new NotFoundHttpException("The stream $processName on $server doesn't exist, please try the right way to access stream.");
+            throw new NotFoundHttpException("The stream $streamName on $server doesn't exist, please try the right way to access stream.");
         }
     }
     
     /**
-     * 验证服务器上是否有该进程
+     * 验证服务器上是否有该流名
      * @param string $attribute
      * @param string $params
      */
-    public function validateProcessName($attribute, $params)
+    public function validateStreamName($attribute, $params)
     {
-        $processes = $this->find()->asArray()->all();
-        for($i=0;$i<count($processes);$i++){
-            if($this->$attribute==$processes[$i][$attribute] && $this->server==$processes[$i]['server']){
+        $streams = $this->find()->asArray()->all();
+        for($i=0;$i<count($streams);$i++){
+            if($this->$attribute==$streams[$i][$attribute] && $this->server==$streams[$i]['server']){
                 $this->addError($attribute, "The process name has already existed on $this->server");
             }
         }

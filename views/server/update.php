@@ -6,8 +6,8 @@ $this->title = 'Update Server';
 $this->params['breadcrumbs'][] = ['label' => 'Monitored Servers', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 $states = [
-    1 => 'enabled',
-    0 => 'disabled',
+    1 => 'up',
+    0 => 'down',
 ];
 ?>
 <?php $form = ActiveForm::begin()?>

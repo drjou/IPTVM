@@ -49,12 +49,12 @@ $operation = 'var time = $("#date-range").val().split(" - ");
 </div>
 
 <?php
-echo ChartDraw::drawLineChart('total-chart', $this, 'Total Utilization of Process', 'Total Utilization Percentage of Process(%)', '%', $totalData);
+echo ChartDraw::drawLineChart('total-chart', $this, 'Total Utilization of Stream Process', 'Total Utilization Percentage of Process(%)', '%', $totalData);
 ?>
 <br/><br/>
 
 <?php
-echo ChartDraw::drawLineChart('memory-chart', $this, 'Memory Utilization of Process', 'Memory Utilization Percentage of Process(%)', '%', $memoryData);
+echo ChartDraw::drawLineChart('memory-chart', $this, 'Memory Utilization of Stream Process', 'Memory Utilization Percentage of Stream Process(%)', '%', $memoryData);
 $this->registerJs("
     $('#server-servername').change(function(){
     var server = $('#server-servername option:selected').text();

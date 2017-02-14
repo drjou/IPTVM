@@ -4,7 +4,7 @@ use yii\data\ActiveDataProvider;
 use yii\base\Model;
 
 
-class ProcessInfoSearch extends ProcessInfo{
+class StreamInfoSearch extends StreamInfo{
     /**
      * 表单验证规则
      * {@inheritDoc}
@@ -13,7 +13,7 @@ class ProcessInfoSearch extends ProcessInfo{
     public function rules()
     {
         return [
-            [['server', 'processName', 'status', 'total','user', 'system', 'memory', 'rss', 'readByte', 'writeByte', 'recordTime'], 'safe'],
+            [['server', 'streamName', 'status', 'total','user', 'system', 'memory', 'rss', 'readByte', 'writeByte', 'recordTime'], 'safe'],
         ];
     }
     /**
@@ -31,8 +31,8 @@ class ProcessInfoSearch extends ProcessInfo{
      * @return \yii\data\ActiveDataProvider
      */
     public function search($params){
-        $query = ProcessInfo::find()
-        ->innerJoin('process','process.processName=process_info.processName and process.server=process_info.server')
+        $query = StreamInfo::find()
+        ->innerJoin('stream','stream.streamName=stream_info.streamName and stream.server=stream_info.server')
         ->orderBy(['recordTime'=>SORT_DESC]);
         $dataProvider  = new ActiveDataProvider([
            'query' => $query,
@@ -44,8 +44,8 @@ class ProcessInfoSearch extends ProcessInfo{
         if(!$this->validate()){
             return $dataProvider;
         }
-        $query->andFilterWhere(['like', 'process_info.server', $this->server])
-        ->andFilterWhere(['like', 'process_info.processName', $this->processName])
+        $query->andFilterWhere(['like', 'stream_info.server', $this->server])
+        ->andFilterWhere(['like', 'stream_info.streamName', $this->streamName])
         ->andFilterWhere(['=', 'status', $this->status])
         ->andFilterWhere(['=', 'total', $this->total])
         ->andFilterWhere(['=', 'user', $this->user])

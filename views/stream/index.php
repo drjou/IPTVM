@@ -41,7 +41,7 @@ echo GridView::widget([
             'class' => 'yii\grid\SerialColumn',
             'headerOptions' => ['width' => '10'],
         ],
-        'processName',
+        'streamName',
         'source',
         [
             'attribute' => 'server',
@@ -55,18 +55,18 @@ echo GridView::widget([
             'buttons' => [
                 'view' => function($url, $model, $key){
                     return Html::a('<i class="glyphicon glyphicon-eye-open"></i>',
-                        ['view', 'processName' => $model->processName, 'server' => $model->server],
+                        ['view', 'streamName' => $model->streamName, 'server' => $model->server],
                         ['title' => 'View']);
                 },
                 'update' => function($url, $model, $key){
                     return Html::a('<i class="glyphicon glyphicon-pencil"></i>',
-                        ['update', 'processName' => $model->processName, 'server' => $model->server],
+                        ['update', 'streamName' => $model->streamName, 'server' => $model->server],
                         ['title' => 'Update']);
                 },
                 'delete' => function($url, $model, $key){
                     return Html::a('<span class="glyphicon glyphicon-trash"></span>',
-                        ['delete', 'processName' => $model->processName, 'server' => $model->server],
-                        ['title' => 'Delete', 'data' => ['confirm' => "Are you sure to delete the stream $model->processName on $model->server?"]]);
+                        ['delete', 'streamName' => $model->streamName, 'server' => $model->server],
+                        ['title' => 'Delete', 'data' => ['confirm' => "Are you sure to delete the stream $model->streamName on $model->server?"]]);
                 }
             ],
         ]
@@ -80,7 +80,7 @@ $(document).on('click', '.gridview', function(){
     if(rows.length>0){
         $('.delete-all').attr('disabled', false);
         $('.delete-num').html(rows.length);
-        $('.delete-all').attr('href', 'index.php?r=process/delete-all&keys='+keys);
+        $('.delete-all').attr('href', 'index.php?r=stream/delete-all&keys='+keys);
     }
     else{
         $('.delete-all').attr('disabled', 'disabled');
@@ -106,6 +106,6 @@ $(document).on('click', '.delete-all', function(){
     	<?= Html::a('Delete Selected', [''], ['class' => 'btn btn-danger delete-all', 'disabled' => 'disabled']) ?>
     	<span class="btn btn-default delete-num">0</span>
     </div>
-    <?= Html::a('New Server', ['create'], ['class' => 'btn btn-success']) ?>
-    <?= Html::a('Import Servers', ['import'], ['class' => 'btn btn-warning']) ?>
+    <?= Html::a('New Stream', ['create'], ['class' => 'btn btn-success']) ?>
+    <?= Html::a('Import Streams', ['import'], ['class' => 'btn btn-warning']) ?>
 </p>

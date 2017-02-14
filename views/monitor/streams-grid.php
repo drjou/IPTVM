@@ -13,8 +13,8 @@ if($request->get('type')==1){
 $this->params['breadcrumbs'][] = $this->title;
 
 $enables = [
-    0 => 'off',
-    1 => 'on',
+    0 => 'down',
+    1 => 'up',
 ];
 
 $columns = [
@@ -26,11 +26,11 @@ $columns = [
         'attribute' => 'server',
         'filter' => $servers
     ],
-    'processName',
+    'streamName',
     [
         'attribute' => 'status',
         'value' => function($model){
-        return $model->status == 1 ? 'on' : 'off';
+        return $model->status == 1 ? 'up' : 'down';
         },
         'filter' => $enables,
         'headerOptions' => ['width' => '85'],

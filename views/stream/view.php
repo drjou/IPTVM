@@ -2,7 +2,7 @@
 
 use yii\widgets\DetailView;
 use yii\helpers\Html;
-$this->title = "Stream $model->processName on $model->server";
+$this->title = "Stream $model->streamName on $model->server";
 $this->params['breadcrumbs'][] = ['label' => 'Monitored Streams', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -18,7 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     <?= DetailView::widget([
                         'model' => $model,
                         'attributes' => [
-                            'processName',
+                            'streamName',
                             'server',
                         ],
                     ]) ?>
@@ -33,9 +33,9 @@ $this->params['breadcrumbs'][] = $this->title;
 <p>
 	<?= Html::a('Back to Monitored Streams', ['index'], ['class' => 'btn btn-primary']) ?>
     <?php
-        echo Html::a('Update', ['update', 'processName' => $model->processName, 'server' => $model->server], ['class' => 'btn btn-warning']);
+        echo Html::a('Update', ['update', 'streamName' => $model->streamName, 'server' => $model->server], ['class' => 'btn btn-warning']);
         echo '&nbsp;';
-        echo Html::a('Delete', ['delete', 'processName' => $model->processName, 'server' => $model->server], ['class' => 'btn btn-danger']);
+        echo Html::a('Delete', ['delete', 'streamName' => $model->streamName, 'server' => $model->server], ['class' => 'btn btn-danger']);
         $this->registerJs("
             $(document).on('click', '.btn-danger', function(){
                 if(!confirm('Are you sure to delete this stream?')){

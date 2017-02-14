@@ -6,8 +6,8 @@ use yii\base\Widget;
 $this->title = 'Monitored Servers';
 $this->params['breadcrumbs'][] = $this->title;
 $states = [
-    1 => 'enabled',
-    0 => 'disabled'
+    1 => 'up',
+    0 => 'down'
 ]
 ?>
 <p>
@@ -51,10 +51,10 @@ echo GridView::widget([
             'attribute' => 'state',
             'value' => function($model){
                 if($model->state==1){
-                    return 'enabled';
+                    return 'up';
                 }
                 else{
-                    return 'disabled';
+                    return 'down';
                 }
             },
             'filter' => $states

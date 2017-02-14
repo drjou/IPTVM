@@ -2,16 +2,16 @@
 namespace app\controllers;
 
 use yii\web\Controller;
-use app\models\ProcessSearch;
 use app\models\Server;
 use yii\helpers\ArrayHelper;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
-use app\models\Process;
 use yii\web\UploadedFile;
+use app\models\StreamSearch;
+use app\models\Stream;
 
-class ProcessController extends Controller{
+class StreamController extends Controller{
     /**
      * 访问权限设置
      * {@inheritDoc}
@@ -54,10 +54,10 @@ class ProcessController extends Controller{
         ];
     }
     /**
-     * 显示所有process信息
+     * 显示所有stream信息
      */
     public function actionIndex(){
-        $filterModel = new ProcessSearch();
+        $filterModel = new StreamSearch();
         $dataProvider = $filterModel->search(Yii::$app->request->queryParams);
         $allServers = Server::find()->asArray()->all();
         $servers = ArrayHelper::map($allServers, 'serverName', 'serverName');
@@ -68,25 +68,25 @@ class ProcessController extends Controller{
         ]);
     }
     /**
-     * 查看process详情
-     * @param string $processName
+     * 查看stream详情
+     * @param string $streamName
      * @param string $server
      */
-    public function actionView($processName, $server){
-        $model = Process::findProcessByKey($processName, $server);
+    public function actionView($streamName, $server){
+        $model = Stream::findStreamByKey($streamName, $server);
         return $this->render('view',[
             'model' => $model
         ]);
     }
     /**
-     * 创建新的process
+     * 创建新的stream
      */
     public function actionCreate(){
-        $model = new Process();
-        $model->scenario = Process::SCENARIO_SAVE;
+        $model = new Stream();
+        $model->scenario = Stream::SCENARIO_SAVE;
         if($model->load(Yii::$app->request->post()) && $model->save()){
-            Yii::info("create a stream named $model->processName on the server $model->server", 'stream');
-            $this->redirect(['view', 'processName' => $model->processName, 'server' => $model->server]);
+            Yii::info("create a stream named $model->streamName on the server $model->server", 'stream');
+            $this->redirect(['view', 'streamName' => $model->streamName, 'server' => $model->server]);
         }
         $allServers = Server::find()->asArray()->all();
         $servers = ArrayHelper::map($allServers, 'serverName', 'serverName');
@@ -97,31 +97,31 @@ class ProcessController extends Controller{
     }
     /**
      * 删除指定的stream
-     * @param string $processName
+     * @param string $streamName
      * @param string $server
      * @return \yii\web\Response
      */
-    public function actionDelete($processName, $server){
-        $model = Process::findProcessByKey($processName, $server);
+    public function actionDelete($streamName, $server){
+        $model = Stream::findStreamByKey($streamName, $server);
         $model->delete();
-        Yii::info("delete $model->processName on $model->server", 'Process');
+        Yii::info("delete $model->streamName on $model->server", 'Stream');
         return $this->redirect(['index']);
     }
     /**
-     * 批量删除process
+     * 批量删除stream
      * @param string $keys
      */
     public function actionDeleteAll($keys){
-        $process = json_decode($keys);
-        $processes = [];
-        for($i=0;$i<count($process);$i++){
-            $p = '("' . $process[$i]->processName . '","' . $process[$i]->server . '")';
-            array_push($processes, $p);
+        $stream = json_decode($keys);
+        $streams = [];
+        for($i=0;$i<count($stream);$i++){
+            $p = '("' . $stream[$i]->streamName . '","' . $stream[$i]->server . '")';
+            array_push($streams, $p);
         }
-        $pr = implode(',', $processes);
-        $model = new Process();
-        $model->deleteAll("(processName,server) in ($pr)");
-        Yii::info("delete selected " . count($process) . " streams", 'Process');
+        $pr = implode(',', $streams);
+        $model = new Stream();
+        $model->deleteAll("(streamName,server) in ($pr)");
+        Yii::info("delete selected " . count($stream) . " streams", 'Stream');
         return $this->redirect(['index']);
     }
     /**
@@ -129,20 +129,20 @@ class ProcessController extends Controller{
      * @return string
      */
     public function actionImport(){
-        $model = new Process();
-        $model->scenario = Process::SCENARIO_IMPORT;
+        $model = new Stream();
+        $model->scenario = Stream::SCENARIO_IMPORT;
         $state = [
             'message' => 'Info:please import a xml file. Format as below:</br>'
                         . '&lt;?xml version="1.0" encoding="UTF-8"?&gt;</br>'
                         . '&lt;message&gt;</br>'
-                        . '&nbsp;&nbsp;&lt;Process&gt;</br>'
-                        . '&nbsp;&nbsp;&nbsp;&nbsp;&lt;processName&gt;nirvana6&lt;/processName&gt;</br>'
+                        . '&nbsp;&nbsp;&lt;Stream&gt;</br>'
+                        . '&nbsp;&nbsp;&nbsp;&nbsp;&lt;streamName&gt;nirvana6&lt;/streamName&gt;</br>'
                         . '&nbsp;&nbsp;&nbsp;&nbsp;&lt;source&gt;source&lt;/source&gt;</br>'
                         . '&nbsp;&nbsp;&nbsp;&nbsp;&lt;server&gt;server1&lt;/server&gt;</br>'
-                        . '&nbsp;&nbsp;&lt;/Process&gt;</br>'
-                        . '&nbsp;&nbsp;&lt;Process&gt;</br>'
+                        . '&nbsp;&nbsp;&lt;/Stream&gt;</br>'
+                        . '&nbsp;&nbsp;&lt;Stream&gt;</br>'
                         . '&nbsp;&nbsp;&nbsp;&nbsp;······</br>'
-                        . '&nbsp;&nbsp;&lt;/Process&gt;</br>'
+                        . '&nbsp;&nbsp;&lt;/Stream&gt;</br>'
                         . '&lt;/message&gt;</br>',
             'class' => 'alert-info',
             'percent' => 0,
@@ -152,23 +152,23 @@ class ProcessController extends Controller{
             $model->importFile = UploadedFile::getInstance($model, 'importFile');
             try {
                 $xmlArray = simplexml_load_file($model->importFile->tempName);
-                $processes = json_decode(json_encode($xmlArray), true);
-                $columns = ['processName', 'source', 'server', 'createTime', 'updateTime'];
+                $streams = json_decode(json_encode($xmlArray), true);
+                $columns = ['streamName', 'source', 'server', 'createTime', 'updateTime'];
                 $allStreams = null;
-                if(ArrayHelper::isIndexed($processes['Process'])){
-                    $allStreams = $processes['Process'];
+                if(ArrayHelper::isIndexed($streams['Stream'])){
+                    $allStreams = $streams['Stream'];
                 }else{
-                    $allStreams = [$processes['Process']];
+                    $allStreams = [$streams['Stream']];
                 }
                 $rows = ArrayHelper::getColumn($allStreams, function($element){
                     $now = date('Y-m-d H:i:s', time());
-                    return [$element['processName'], $element['source'], $element['server'], $now, $now];
+                    return [$element['streamName'], $element['source'], $element['server'], $now, $now];
                 });
                     $db = Yii::$app->db;
-                    $db->createCommand()->batchInsert('process', $columns, $rows)->execute();
-                    $streamStr = implode(',', ArrayHelper::getColumn($allStreams, 'processName'));
+                    $db->createCommand()->batchInsert('stream', $columns, $rows)->execute();
+                    $streamStr = implode(',', ArrayHelper::getColumn($allStreams, 'streamName'));
                     $serverStr = implode(',', ArrayHelper::getColumn($allStreams, 'server'));
-                    Yii::info("import " . count($rows) . " streams, they are $streamStr on $serverStr respectively", 'Process');
+                    Yii::info("import " . count($rows) . " streams, they are $streamStr on $serverStr respectively", 'Stream');
                     $state['message'] = 'Success:import success, there are totally ' . count($rows) .' streams added to DB, they are ' . $streamStr . ' on ' . $serverStr . ' respectively';
                     $state['class'] = 'alert-success';
                     $state['percent'] = 100;
@@ -188,12 +188,12 @@ class ProcessController extends Controller{
      * @param string $processName
      * @param string $server
      */
-    public function actionUpdate($processName, $server){
-        $model = Process::findProcessByKey($processName, $server);
-        $model->scenario = Process::SCENARIO_SAVE;
+    public function actionUpdate($streamName, $server){
+        $model = Stream::findStreamByKey($streamName, $server);
+        $model->scenario = Stream::SCENARIO_SAVE;
         if($model->load(Yii::$app->request->post()) && $model->save()){
-            Yii::info("Update $model->processName on $model->server", 'Process');
-            return $this->redirect(['view', 'processName' => $model->processName, 'server' => $model->server]);
+            Yii::info("Update $model->streamName on $model->server", 'Stream');
+            return $this->redirect(['view', 'streamName' => $model->streamName, 'server' => $model->server]);
         }
         $allServers = Server::find()->asArray()->all();
         $servers = ArrayHelper::map($allServers, 'serverName', 'serverName');

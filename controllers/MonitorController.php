@@ -12,17 +12,17 @@ use yii\helpers\ArrayHelper;
 use app\models\RAM;
 use app\models\Disk;
 use app\models\Load;
-use app\models\Process;
-use app\models\ProcessInfoSearch;
 use app\models\RAMSearch;
 use app\models\DiskSearch;
 use app\models\LoadSearch;
 use app\models\RealTime;
-use app\models\ProcessInfo;
 use app\models\Threshold;
 use yii\db\Query;
 use app\models\MySqlSearch;
 use app\models\NginxSearch;
+use app\models\StreamInfo;
+use app\models\StreamInfoSearch;
+use app\models\Stream;
 
 class MonitorController extends Controller
 {
@@ -104,8 +104,8 @@ class MonitorController extends Controller
         $ramData = $this->getRamWarningData($startTime, $endTime, $threshold->memory);
         $diskData = $this->getDiskWarningData($startTime, $endTime, $threshold->disk);
         $loadData = $this->getLoadWarningData($startTime, $endTime, $threshold->loads);
-        $processData = $this->getProcessWarningData($startTime, $endTime);
-        $processData2 = $this->getProcessNames($startTime, $endTime);
+        $streamData = $this->getStreamWarningData($startTime, $endTime);
+        $streamData2 = $this->getStreamNames($startTime, $endTime);
         $mySqlData = $this->getMySqlWarningData($startTime, $endTime);
         $mySqlData2 = $this->getMySqlServers($startTime, $endTime);
         $nginxData = $this->getNginxWarningData($startTime, $endTime);
@@ -115,8 +115,8 @@ class MonitorController extends Controller
             'ramData' => $ramData,
             'diskData' => $diskData,
             'loadData' => $loadData,
-            'processData' => $processData,
-            'processData2' => json_encode($processData2),
+            'streamData' => $streamData,
+            'streamData2' => json_encode($streamData2),
             'mySqlData' => $mySqlData,
             'mySqlData2' => json_encode($mySqlData2),
             'nginxData' => $nginxData,
@@ -300,7 +300,7 @@ class MonitorController extends Controller
     }
     
     /**
-     * 将进程的总利用率和内存利用率数据传回
+     * 将串流进程的总利用率和内存利用率数据传回
      * @param string $serverName 服务器名
      */
     public function actionStreams($serverName=null)
@@ -314,7 +314,7 @@ class MonitorController extends Controller
         $endTime = date('Y-m-d H:i:s',time());
         $data = $this->getStreamsData($serverName, $startTime, $endTime);
         $range = $startTime.' - '.$endTime;
-        $minDate = ProcessInfo::find()->where(['server'=>$serverName])->min('recordTime');
+        $minDate = StreamInfo::find()->where(['server'=>$serverName])->min('recordTime');
         return $this->render('streams', [
             'server' => $server,
             'servers' => $this->getServersForDrop(),
@@ -330,7 +330,7 @@ class MonitorController extends Controller
      * 传回表格中的数据
      */
     public function actionStreamsGrid($type){
-        $searchModel = new ProcessInfoSearch();
+        $searchModel = new StreamInfoSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         return $this->render('streams-grid',[
             'searchModel' => $searchModel,
@@ -430,8 +430,8 @@ class MonitorController extends Controller
             case 'RAM':$response->data = $this->getRamWarningData($startTime, $endTime, $threshold->memory);break;
             case 'DISK':$response->data = $this->getDiskWarningData($startTime, $endTime, $threshold->disk);break;
             case 'LOAD':$response->data = $this->getLoadWarningData($startTime, $endTime, $threshold->loads);break;
-            case 'Process':
-                $response->data = [$this->getProcessWarningData($startTime, $endTime), $this->getProcessNames($startTime, $endTime)];
+            case 'Stream':
+                $response->data = [$this->getStreamWarningData($startTime, $endTime), $this->getStreamNames($startTime, $endTime)];
                 break;
             case 'MySql':
                 $response->data = [$this->getMySqlWarningData($startTime, $endTime), $this->getMySqlServers($startTime, $endTime)];
@@ -639,24 +639,24 @@ class MonitorController extends Controller
      * @param string $endTime
      */
     private function getStreamsData($serverName, $startTime, $endTime){
-        $processName = Process::find()
+        $streamName = Stream::find()
             ->where(['server'=>$serverName])
             ->all();
         $totalData = array();
         $memoryData = array();
-        for($i=0;$i<count($processName);$i++){
-            $process = $processName[$i]
-            ->getProcesses($startTime, $endTime)
+        for($i=0;$i<count($streamName);$i++){
+            $stream = $streamName[$i]
+            ->getStreams($startTime, $endTime)
             ->asArray()
             ->all();
-            $processTotal = [
-                'name' => $processName[$i]['processName'],
-                'data' => $this -> getChartDataByProperty($process, 'recordTime', 'total')
+            $streamTotal = [
+                'name' => $streamName[$i]['streamName'],
+                'data' => $this -> getChartDataByProperty($stream, 'recordTime', 'total')
             ];
-            array_push($totalData, $processTotal);
+            array_push($totalData, $streamTotal);
             $processMemory = [
-                'name' => $processName[$i]['processName'],
-                'data' => $this -> getChartDataByProperty($process, 'recordTime', 'memory')
+                'name' => $streamName[$i]['streamName'],
+                'data' => $this -> getChartDataByProperty($stream, 'recordTime', 'memory')
             ];
             array_push($memoryData, $processMemory);
         }
@@ -775,18 +775,18 @@ class MonitorController extends Controller
         return $loadData;
     }
     /**
-     * 各个时间点进程断的个数
+     * 各个时间点串流断的个数
      * @param string $startTime
      * @param string $endTime
      */
-    private function getProcessWarningData($startTime, $endTime){
+    private function getStreamWarningData($startTime, $endTime){
         $servers = Server::find()->asArray()->all();
-        $processData=[];
+        $streamData=[];
         for($i=0;$i<count($servers);$i++){
             $rows = (new Query())
             ->select(['DATE_FORMAT(DATE_FORMAT(recordTime,"%Y-%m-%d %H:%i"),"%Y-%m-%d %H:%i:%s") as time', 'count(if(status=0,true,null )) as count'])
-            ->from('process as p, process_info as pi')
-            ->where('p.server=pi.server and p.processName=pi.processName and p.server="'.$servers[$i]['serverName'].'" and recordTime between "'.$startTime.'" and "'.$endTime.'"')
+            ->from('stream as p, stream_info as pi')
+            ->where('p.server=pi.server and p.streamName=pi.streamName and p.server="'.$servers[$i]['serverName'].'" and recordTime between "'.$startTime.'" and "'.$endTime.'"')
             ->groupBy('time,p.server')
             ->all();
             $data = [];
@@ -794,42 +794,42 @@ class MonitorController extends Controller
                 $time = strtotime($rows[$j]['time'])*1000;
                 array_push($data, [$time, $rows[$j]['count']+0]);
             }
-            $processes = [
+            $streams = [
                 'name' => $servers[$i]['serverName'],
                 'data' => $data
             ];
-            array_push($processData, $processes);
+            array_push($streamData, $streams);
         }
-        return $processData;
+        return $streamData;
     }
     /**
-     * 某一时间点断开的进程
+     * 某一时间点断开的串流
      * @param string $startTime
      * @param string $endTime
      */
-    private function getProcessNames($startTime, $endTime){
-        $deadProcess = (new Query())
-        ->select(['DATE_FORMAT(DATE_FORMAT(recordTime,"%Y-%m-%d %H:%i"),"%Y-%m-%d %H:%i:%s") as time', 'p.server','p.processName as pName'])
-        ->from('process as p, process_info as pi')
-        ->where("status=0 and p.server=pi.server and p.processName=pi.processName and recordTime between '$startTime' and '$endTime'")
-        ->orderBy(['recordTime' => SORT_ASC, 'server' => SORT_ASC, 'pName'=> SORT_ASC])
+    private function getStreamNames($startTime, $endTime){
+        $deadStreams = (new Query())
+        ->select(['DATE_FORMAT(DATE_FORMAT(recordTime,"%Y-%m-%d %H:%i"),"%Y-%m-%d %H:%i:%s") as time', 's.server','s.streamName as sName'])
+        ->from('stream as s, stream_info as si')
+        ->where("status=0 and s.server=si.server and s.streamName=si.streamName and recordTime between '$startTime' and '$endTime'")
+        ->orderBy(['recordTime' => SORT_ASC, 'server' => SORT_ASC, 'sName'=> SORT_ASC])
         ->all();
-        $processes = [];
+        $streams = [];
         $time = null;
         $server = null;
-        for($i=0;$i<count($deadProcess);$i++){
-            $recordTime = ''.strtotime($deadProcess[$i]['time'])*1000;
-            $newServer = $deadProcess[$i]['server'];
-            $processName = $deadProcess[$i]['pName'];
+        for($i=0;$i<count($deadStreams);$i++){
+            $recordTime = ''.strtotime($deadStreams[$i]['time'])*1000;
+            $newServer = $deadStreams[$i]['server'];
+            $streamName = $deadStreams[$i]['pName'];
             if($newServer==$server && $recordTime==$time){
-                array_push($processes[$newServer][$recordTime], $processName);
+                array_push($streams[$newServer][$recordTime], $streamName);
             }else{
-                $processes[$newServer][$recordTime] = [$processName];
+                $streams[$newServer][$recordTime] = [$streamName];
                 $time = $recordTime;
                 $server = $newServer;
             }
         }
-        return $processes;
+        return $streams;
     }
     /**
      * 某一时间点断开的mysql数

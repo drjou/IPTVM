@@ -11,7 +11,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <?= $form->field($model, 'server')->dropDownList($servers) ?>
 
-<?= $form->field($model, 'processName')->textInput()?>
+<?= $form->field($model, 'streamName')->textInput()?>
 
 <?= $form->field($model, 'source')->textInput()?>
 

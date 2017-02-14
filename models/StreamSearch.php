@@ -3,7 +3,7 @@ namespace app\models;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-class ProcessSearch extends Process{
+class StreamSearch extends Stream{
     
     /**
      * 表单验证规则
@@ -12,7 +12,7 @@ class ProcessSearch extends Process{
      */
     public function rules(){
         return [
-            [['processName', 'source', 'server'], 'safe']
+            [['streamName', 'source', 'server'], 'safe']
         ];
     }
     /**
@@ -29,7 +29,7 @@ class ProcessSearch extends Process{
      * @param string $params
      */
     public function search($params){
-        $query = Process::find()
+        $query = Stream::find()
         ->orderBy('server');
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -42,7 +42,7 @@ class ProcessSearch extends Process{
             return $dataProvider;
         }
         
-        $query->andFilterWhere(['like', 'processName', $this->processName])->
+        $query->andFilterWhere(['like', 'streamName', $this->streamName])->
         andFilterWhere(['like', 'source', $this->source])
         ->andFilterWhere(['=', 'server', $this->server]);
         

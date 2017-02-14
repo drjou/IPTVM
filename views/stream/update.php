@@ -2,7 +2,7 @@
 
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
-$this->title = "Update $model->processName on $model->server";
+$this->title = "Update $model->streamName on $model->server";
 $this->params['breadcrumbs'][] = ['label' => 'Monitored Streams', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -10,7 +10,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <?= $form->field($model, 'server')->dropDownList($servers) ?>
 
-<?= $form->field($model, 'processName')->textInput()?>
+<?= $form->field($model, 'streamName')->textInput()?>
 
 <?= $form->field($model, 'source')->textInput()?>
 

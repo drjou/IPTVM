@@ -4,21 +4,21 @@ use yii\helpers\Html;
 $this->title = 'IPTV Monitor';
 $this->params['breadcrumbs'][] = $this->title;
 
-$operationProcess = '
-    var time = $("#process-date-range").val().split(" - ");
+$operationStream = '
+    var time = $("#stream-date-range").val().split(" - ");
     var startTime = Date.parse(new Date(time[0]));
     var endTime = Date.parse(new Date(time[1]));
-    $("#process-chart").highcharts().showLoading();
-    $.get("index.php?r=monitor/update-warning-line&type=Process&startTime="+startTime+"&endTime="+endTime,
+    $("#stream-chart").highcharts().showLoading();
+    $.get("index.php?r=monitor/update-warning-line&type=Stream&startTime="+startTime+"&endTime="+endTime,
         function(data,status){
             var obj = eval(data);
             for(var i=0;i<obj[0].length;i++){
-                var series=$("#process-chart").highcharts().series[i];
+                var series=$("#stream-chart").highcharts().series[i];
                 series.setData(obj[0][i].data,false);
             }
-            $("#process-chart").highcharts().redraw();
-            $("#process-chart").highcharts().hideLoading();
-            updateProcessTooltip(obj[1]);
+            $("#stream-chart").highcharts().redraw();
+            $("#stream-chart").highcharts().hideLoading();
+            updateStreamTooltip(obj[1]);
     });
 ';
 $operationMySql = '
@@ -171,13 +171,13 @@ $operationNginx = '
 	<div class="col-lg-12">
 		<div class="panel panel-default">
 			<div class="panel-heading" style="background-color: #eeeeee;">
-				<h5 style="font-weight: bold;">Process Status</h5>
+				<h5 style="font-weight: bold;">Stream Status</h5>
 			</div>
 			<!-- /.panel-heading -->
 			<div class="panel-body">
 				<div class="dataTable_wrapper">
                     <?php 
-                        ChartDraw::drawDateRange($range, $minDate, $operationProcess, 'process-date-range');
+                        ChartDraw::drawDateRange($range, $minDate, $operationStream, 'stream-date-range');
                     ?>
                     <div class="btn-group right">
                     	<?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', null, ['class' => 'btn btn-default']);?>
@@ -186,7 +186,7 @@ $operationNginx = '
                     <br/><br/>
                     
                     <?php
-                        echo ChartDraw::drawLineChart('process-chart', $this, 'Disconnected Streams', 'The Numeber of Dead Processes', '', $processData);
+                        echo ChartDraw::drawLineChart('stream-chart', $this, 'Disconnected Streams', 'The Numeber of Dead Streams', '', $streamData);
                     ?>
 				</div>
 			</div>
@@ -284,25 +284,25 @@ $this->registerJs("
             });
         }
     }
-    function updateProcessTooltip(obj){
-        var chart = $('#process-chart').highcharts();
+    function updateStreamTooltip(obj){
+        var chart = $('#stream-chart').highcharts();
         chart.update({
             tooltip:{
                 shared:false,
                 formatter:function () {
-                    var process = '';
+                    var stream = '';
                     var date = new Date(this.x);
                     var minute = date.getMinutes()<10?'0'+date.getMinutes():date.getMinutes();
                     var time = (1+date.getMonth())+'-'+date.getDate()+' '+date.getHours()+':'+minute+':00';
                     if(obj.length!=0){
                         if(obj.hasOwnProperty(this.series.name)){
                             if(obj[this.series.name].hasOwnProperty(this.x+'')){
-                                var process = '<br/>They are:<br/>';
+                                var stream = '<br/>They are:<br/>';
                                 for(var i=0;i<obj[this.series.name][this.x+''].length;i++){
                                     if(i%2==0){
-                                        process = process + '<b>' + obj[this.series.name][this.x+''][i] + '<b/>  ';
+                                        stream = stream + '<b>' + obj[this.series.name][this.x+''][i] + '<b/>  ';
                                     }else{
-                                        process = process + '<b>' + obj[this.series.name][this.x+''][i] + '<b/><br/>';
+                                        stream = stream + '<b>' + obj[this.series.name][this.x+''][i] + '<b/><br/>';
                                     }
                                 }
                             }
@@ -310,7 +310,7 @@ $this->registerJs("
                     }
                     return 'time:<b>' + time + '</b><br/>'+
                         'count: <b>' + this.y + '</b>' +
-                         process;
+                         stream;
                 }
             }
         });
@@ -348,8 +348,8 @@ $this->registerJs("
         addLine(diskChart, $diskThreshold);
         var loadChart = $('#load-chart').highcharts();
         addLine(loadChart, $loadsThreshold);
-        var obj = eval($processData2);
-        updateProcessTooltip(obj);
+        var obj = eval($streamData2);
+        updateStreamTooltip(obj);
         var obj2 = eval($mySqlData2);
         var chart1 = $('#mysql-chart').highcharts();
         updateTooltip(obj2, chart1);
