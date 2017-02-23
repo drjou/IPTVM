@@ -9,7 +9,7 @@ class Server extends ActiveRecord{
     public $importFile;
     const SCENARIO_SAVE = 'save';
     const SCENARIO_IMPORT = 'import';
-    const SCENARIO_CHANGE_STATE = 'changeState';
+    const SCENARIO_CHANGE_STATUS = 'changeStatus';
     
     /**
      * 设置模型对应表名
@@ -42,7 +42,7 @@ class Server extends ActiveRecord{
      */
     public function rules(){
         return [
-            [['serverName', 'serverIp', 'state', 'operatingSystem'], 'required'],
+            [['serverName', 'serverIp', 'status', 'operatingSystem'], 'required'],
             ['importFile', 'file', 'skipOnEmpty' => false, 'mimeTypes' => ['application/xml', 'text/xml'], 'extensions' => ['xml'], 'maxSize' => 50*1024*1024],
             ['serverName', 'trim'],
             ['serverName', 'string', 'length' => [1, 20]],
@@ -57,9 +57,9 @@ class Server extends ActiveRecord{
      */
     public function scenarios(){
         return [
-            self::SCENARIO_SAVE => ['serverName', 'serverIp', 'state', 'operatingSystem'],
+            self::SCENARIO_SAVE => ['serverName', 'serverIp', 'status', 'operatingSystem'],
             self::SCENARIO_IMPORT => ['importFile'],
-            self::SCENARIO_CHANGE_STATE => ['state']
+            self::SCENARIO_CHANGE_STATUS => ['status']
         ];
     }
     

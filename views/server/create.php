@@ -6,7 +6,7 @@ $this->title = 'Add Server';
 $this->params['breadcrumbs'][] = ['label' => 'Monitored Servers', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
-$state = [
+$status = [
     1 => 'up',
     0 => 'down'
 ];
@@ -18,7 +18,7 @@ $state = [
 
 <?= $form->field($model, 'serverIp')->textInput() ?>
 
-<?= $form->field($model, 'state')->dropDownList($state) ?>
+<?= $form->field($model, 'status')->dropDownList($status) ?>
 
 <?= $form->field($model, 'operatingSystem')->textInput() ?>
 

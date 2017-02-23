@@ -5,7 +5,7 @@ use yii\helpers\Html;
 $this->title = 'Update Server';
 $this->params['breadcrumbs'][] = ['label' => 'Monitored Servers', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
-$states = [
+$status = [
     1 => 'up',
     0 => 'down',
 ];
@@ -16,7 +16,7 @@ $states = [
 
 <?= $form->field($model, 'serverIp')->textInput()?>
 
-<?= $form->field($model, 'state')->dropDownList($states) ?>
+<?= $form->field($model, 'status')->dropDownList($status) ?>
 
 <?= $form->field($model, 'operatingSystem')->textInput() ?>
 

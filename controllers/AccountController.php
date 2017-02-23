@@ -345,6 +345,7 @@ class AccountController extends Controller{
      */
     public function actionDisable($accountId){
         $model = Account::findAccountById($accountId);
+        $model->scenario = Account::SCENARIO_SAVE;
         $model->enable = 0;
         $model->save();
         Yii::info("disabled stb account $model->accountId", 'administrator');
@@ -357,6 +358,7 @@ class AccountController extends Controller{
      */
     public function actionEnable($accountId){
         $model = Account::findAccountById($accountId);
+        $model->scenario = Account::SCENARIO_SAVE;
         $model->enable = 1;
         $model->save();
         Yii::info("enabled stb account $model->accountId", 'administrator');

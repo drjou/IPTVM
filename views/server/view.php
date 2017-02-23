@@ -21,8 +21,8 @@ $this->params['breadcrumbs'][] = $this->title;
                             'serverName',
                             'serverIp',
                             [
-                                'attribute' => 'state',
-                                'value' => $model->state ? 'up' : 'down',
+                                'attribute' => 'status',
+                                'value' => $model->status ? 'up' : 'down',
                             ],
                             'operatingSystem',
                             'createTime',

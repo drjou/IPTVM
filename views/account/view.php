@@ -39,7 +39,8 @@ $states = [
 					        ],
                             [
                                 'attribute' => 'enable',
-                                'value' => $model->enable == 1 ? 'enabled' : 'disabled',
+                                'format' => 'html',
+                                'value' => $model->enable == 1 ? '<i class="glyphicon glyphicon-ok" style="color:green;"></i>' : '<i class="glyphicon glyphicon-remove" style="color:red;"></i>',
 				            ],
                             'createTime',
                             'updateTime',

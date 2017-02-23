@@ -5,7 +5,7 @@ use yii\grid\GridView;
 use yii\base\Widget;
 $this->title = 'Monitored Servers';
 $this->params['breadcrumbs'][] = $this->title;
-$states = [
+$status = [
     1 => 'up',
     0 => 'down'
 ]
@@ -48,16 +48,16 @@ echo GridView::widget([
         'serverName',
         'serverIp',
         [
-            'attribute' => 'state',
+            'attribute' => 'status',
             'value' => function($model){
-                if($model->state==1){
+                if($model->status==1){
                     return 'up';
                 }
                 else{
                     return 'down';
                 }
             },
-            'filter' => $states
+            'filter' => $status,
         ],
         'operatingSystem',
         [
@@ -82,7 +82,7 @@ echo GridView::widget([
                         ['title' => 'Delete', 'data' => ['confirm' => "Are you sure to delete server $key?"]]);
                 },
                 'enable' => function($url, $model, $key){
-                    if($model->state==1){
+                    if($model->status==1){
                         return Html::a('<span class="glyphicon glyphicon-ban-circle"></span>',
                             ['disable', 'serverName' => $key],
                             ['title' => 'Disable', 'data' => ['confirm' => "Are you sure to disable server $key ?"]]);
