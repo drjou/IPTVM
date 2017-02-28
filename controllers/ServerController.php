@@ -122,7 +122,7 @@ class ServerController extends Controller{
                         . '&nbsp;&nbsp;&lt;Server&gt;</br>'
                         . '&nbsp;&nbsp;&nbsp;&nbsp;&lt;serverName&gt;server2&lt;/serverName&gt;</br>'
                         . '&nbsp;&nbsp;&nbsp;&nbsp;&lt;serverIp&gt;1.1.1.1&lt;/serverIp&gt;</br>'
-                        . '&nbsp;&nbsp;&nbsp;&nbsp;&lt;state&gt;1&lt;/state&gt;</br>'
+                        . '&nbsp;&nbsp;&nbsp;&nbsp;&lt;status&gt;1&lt;/status&gt;</br>'
                         . '&nbsp;&nbsp;&nbsp;&nbsp;&lt;operatingSystem&gt;1&lt;/operatingSystem&gt;</br>'
                         . '&nbsp;&nbsp;&lt;/Server&gt;</br>'
                         . '&nbsp;&nbsp;&lt;Server&gt;</br>'
@@ -139,7 +139,7 @@ class ServerController extends Controller{
             try {
                 $xmlArray = simplexml_load_file($model->importFile->tempName);
                 $servers = json_decode(json_encode($xmlArray), true);
-                $columns = ['serverName', 'serverIp', 'state', 'operatingSystem', 'createTime', 'updateTime'];
+                $columns = ['serverName', 'serverIp', 'status', 'operatingSystem', 'createTime', 'updateTime'];
                 $allServers = null;
                 if(ArrayHelper::isIndexed($servers['Server'])){
                     $allServers = $servers['Server'];
@@ -148,7 +148,7 @@ class ServerController extends Controller{
                 }
                 $rows = ArrayHelper::getColumn($allServers, function($element){
                     $now = date('Y-m-d H:i:s', time());
-                    return [$element['serverName'], $element['serverIp'], $element['state'], $element['operatingSystem'], $now, $now];
+                    return [$element['serverName'], $element['serverIp'], $element['status'], $element['operatingSystem'], $now, $now];
                 });
                     $db = Yii::$app->db;
                     $db->createCommand()->batchInsert('server', $columns, $rows)->execute();
@@ -174,8 +174,8 @@ class ServerController extends Controller{
      */
     public function actionEnable($serverName){
         $model = Server::findServerByName($serverName);
-        $model->scenario = Server::SCENARIO_CHANGE_STATE;
-        $model->state = 1;
+        $model->scenario = Server::SCENARIO_CHANGE_STATUS;
+        $model->status = 1;
         $model->save();
         Yii::info("Enable server $serverName",'server');
         return $this->redirect(['index']);
@@ -186,8 +186,8 @@ class ServerController extends Controller{
      */
     public function actionDisable($serverName){
         $model = Server::findServerByName($serverName);
-        $model->scenario = Server::SCENARIO_CHANGE_STATE;
-        $model->state=0;
+        $model->scenario = Server::SCENARIO_CHANGE_STATUS;
+        $model->status=0;
         $model->save();
         Yii::info("Disable server $serverName", 'server');
         return $this->redirect(['index']);

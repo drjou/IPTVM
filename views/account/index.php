@@ -70,8 +70,9 @@ $enables = [
         ],
         [
             'attribute' => 'enable',
+            'format' => 'html',
             'value' => function($model){
-                return $model->enable == 1 ? 'enabled' : 'diabled';
+                return $model->enable == 1 ? '<i class="glyphicon glyphicon-ok" style="color:green;"></i>' : '<i class="glyphicon glyphicon-remove" style="color:red;"></i>';
             },
             'filter' => $enables,
         ],

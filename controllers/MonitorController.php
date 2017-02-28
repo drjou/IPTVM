@@ -797,10 +797,10 @@ class MonitorController extends Controller
         $streamData=[];
         for($i=0;$i<count($servers);$i++){
             $rows = (new Query())
-            ->select(['DATE_FORMAT(DATE_FORMAT(recordTime,"%Y-%m-%d %H:%i"),"%Y-%m-%d %H:%i:%s") as time', 'count(if(pi.status=0,true,null )) as count'])
-            ->from('stream as p, stream_info as pi')
-            ->where('p.server=pi.server and p.streamName=pi.streamName and p.server="'.$servers[$i]['serverName'].'" and recordTime between "'.$startTime.'" and "'.$endTime.'"')
-            ->groupBy('time,p.server')
+            ->select(['DATE_FORMAT(DATE_FORMAT(recordTime,"%Y-%m-%d %H:%i"),"%Y-%m-%d %H:%i:%s") as time', 'count(if(si.status=0,true,null )) as count'])
+            ->from('stream as s, stream_info as si')
+            ->where('s.server=si.server and s.streamName=si.streamName and s.server="'.$servers[$i]['serverName'].'" and recordTime between "'.$startTime.'" and "'.$endTime.'"')
+            ->groupBy('time,s.server')
             ->all();
             $data = [];
             for($j=0;$j<count($rows);$j++){
