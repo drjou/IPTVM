@@ -12,7 +12,7 @@ class StreamSearch extends Stream{
      */
     public function rules(){
         return [
-            [['streamName', 'source', 'server'], 'safe']
+            [['status', 'streamName', 'source', 'sourceStatus', 'server'], 'safe']
         ];
     }
     /**
@@ -42,8 +42,10 @@ class StreamSearch extends Stream{
             return $dataProvider;
         }
         
-        $query->andFilterWhere(['like', 'streamName', $this->streamName])->
-        andFilterWhere(['like', 'source', $this->source])
+        $query->andFilterWhere(['like', 'streamName', $this->streamName])
+        ->andFilterWhere(['=', 'status', $this->status])
+        ->andFilterWhere(['like', 'source', $this->source])
+        ->andFilterWhere(['=', 'sourceStatus', $this->sourceStatus])
         ->andFilterWhere(['=', 'server', $this->server]);
         
         return $dataProvider;

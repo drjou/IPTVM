@@ -8,6 +8,14 @@ class MySql extends ActiveRecord{
      * @return string
      */
     public static function tableName(){
-        return 'mysql_info';
+        return 'mysql';
+    }
+    
+    /**
+     * 获取Mysql所属服务器的信息
+     * @return ActiveQuery
+     */
+    public function getServerInfo(){
+        return $this->hasOne(Server::className(), ['serverName' => 'server']);
     }
 }

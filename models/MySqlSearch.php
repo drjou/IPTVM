@@ -12,7 +12,7 @@ class MySqlSearch extends MySql{
     public function rules()
     {
         return [
-            [['server', 'recordTime', 'status', 'totalConnections', 'activeConnections', 'qps', 'tps', 'receiveTraffic', 'sendTraffic'], 'safe'],
+            [['server', 'status'], 'safe'],
         ];
     }
     /**
@@ -29,8 +29,7 @@ class MySqlSearch extends MySql{
      * @param string $params
      */
     public function search($params){
-        $query = MySql::find()
-        ->orderBy(['recordTime'=>SORT_DESC]);
+        $query = MySql::find();
         $dataProvider  = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
@@ -43,14 +42,7 @@ class MySqlSearch extends MySql{
         }
         //'server', 'recordTime', 'status', 'totalConnections', 'activeConnections', 'qps', 'tps', 'receiveTraffic', 'sendTraffic'
         $query->andFilterWhere(['=', 'server', $this->server])
-        ->andFilterWhere(['like', 'recordTime', $this->recordTime])
-        ->andFilterWhere(['=', 'status', $this->status])
-        ->andFilterWhere(['=', 'totalConnections', $this->totalConnections])
-        ->andFilterWhere(['=', 'activeConnections', $this->activeConnections])
-        ->andFilterWhere(['=', 'qps', $this->qps])
-        ->andFilterWhere(['=', 'tps', $this->tps])
-        ->andFilterWhere(['=', 'receiveTraffic', $this->receiveTraffic])
-        ->andFilterWhere(['=', 'sendTraffic', $this->sendTraffic]);
+        ->andFilterWhere(['=', 'status', $this->status]);
         return $dataProvider;
     }
 }
