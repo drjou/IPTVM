@@ -59,7 +59,6 @@ class Stream extends ActiveRecord{
             self::SCENARIO_IMPORT => ['importFile'],
         ];
     }
-    
     /**
      * 返回所有服务器的所有进程信息
      */
@@ -67,6 +66,7 @@ class Stream extends ActiveRecord{
         return $this->hasMany(StreamInfo::className(), ['streamName' => 'streamName','server' => 'server'])
         ->where('recordTime between "'.$startTime.'" and "'.$endTime.'"');
     }
+    
     /**
      * 通过主键寻找stream
      * @param string $streamName

@@ -52,6 +52,7 @@ class MonitorController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'index' => ['get'],
+                    'servers-fault' => ['get'],
                     'cpu-chart' => ['get'],
                     'cpu-grid' => ['get'],
                     'ram-chart' => ['get'],
@@ -89,11 +90,18 @@ class MonitorController extends Controller
             ]
         ];
     }
-
     /**
      * Dashboard action
      */
     public function actionIndex()
+    {
+        return $this->render('index',[]);
+    }
+    
+    /**
+     * Servers Fault action
+     */
+    public function actionServersFault()
     {
         $startTime = date('Y-m-d H:i:s',time()-24*3600);
         $endTime = date('Y-m-d H:i:s',time());
@@ -110,7 +118,7 @@ class MonitorController extends Controller
         $mySqlData2 = $this->getMySqlServers($startTime, $endTime);
         $nginxData = $this->getNginxWarningData($startTime, $endTime);
         $nginxData2 = $this->getNginxServers($startTime, $endTime);
-        return $this->render('index', [
+        return $this->render('servers-fault', [
             'cpuData' => $cpuData,
             'ramData' => $ramData,
             'diskData' => $diskData,
@@ -450,6 +458,11 @@ class MonitorController extends Controller
         $response->data = $this->getHeatMapData();
     }
     
+    public function actionUpdateServerStatus(){
+        $response = Yii::$app->response;
+        $response->format = \yii\web\Response::FORMAT_JSON;
+        $response->data = $this->getRealTimeStatus();
+    }
     
     /**
      * 整理折线图横轴和纵轴的数据
@@ -740,12 +753,12 @@ class MonitorController extends Controller
         $diskData = [];
         for($i=0;$i<count($servers);$i++){
             $diskInfo = $servers[$i]->getDiskInfo($startTime, $endTime)
-            ->andWhere("freePercent<=$threshold")
+            ->andWhere("usedPercent>=$threshold")
             ->asArray()
             ->all();
             $disk = [
                 'name' => $servers[$i]['serverName'],
-                'data' => $this->getChartDataByProperty($diskInfo, 'recordTime', 'freePercent')
+                'data' => $this->getChartDataByProperty($diskInfo, 'recordTime', 'usedPercent')
             ];
             array_push($diskData, $disk);
         }
@@ -784,7 +797,7 @@ class MonitorController extends Controller
         $streamData=[];
         for($i=0;$i<count($servers);$i++){
             $rows = (new Query())
-            ->select(['DATE_FORMAT(DATE_FORMAT(recordTime,"%Y-%m-%d %H:%i"),"%Y-%m-%d %H:%i:%s") as time', 'count(if(status=0,true,null )) as count'])
+            ->select(['DATE_FORMAT(DATE_FORMAT(recordTime,"%Y-%m-%d %H:%i"),"%Y-%m-%d %H:%i:%s") as time', 'count(if(pi.status=0,true,null )) as count'])
             ->from('stream as p, stream_info as pi')
             ->where('p.server=pi.server and p.streamName=pi.streamName and p.server="'.$servers[$i]['serverName'].'" and recordTime between "'.$startTime.'" and "'.$endTime.'"')
             ->groupBy('time,p.server')
@@ -811,7 +824,7 @@ class MonitorController extends Controller
         $deadStreams = (new Query())
         ->select(['DATE_FORMAT(DATE_FORMAT(recordTime,"%Y-%m-%d %H:%i"),"%Y-%m-%d %H:%i:%s") as time', 's.server','s.streamName as sName'])
         ->from('stream as s, stream_info as si')
-        ->where("status=0 and s.server=si.server and s.streamName=si.streamName and recordTime between '$startTime' and '$endTime'")
+        ->where("si.status=0 and s.server=si.server and s.streamName=si.streamName and recordTime between '$startTime' and '$endTime'")
         ->orderBy(['recordTime' => SORT_ASC, 'server' => SORT_ASC, 'sName'=> SORT_ASC])
         ->all();
         $streams = [];
@@ -820,7 +833,7 @@ class MonitorController extends Controller
         for($i=0;$i<count($deadStreams);$i++){
             $recordTime = ''.strtotime($deadStreams[$i]['time'])*1000;
             $newServer = $deadStreams[$i]['server'];
-            $streamName = $deadStreams[$i]['pName'];
+            $streamName = $deadStreams[$i]['sName'];
             if($newServer==$server && $recordTime==$time){
                 array_push($streams[$newServer][$recordTime], $streamName);
             }else{
@@ -929,5 +942,25 @@ class MonitorController extends Controller
             }
         }
         return $servers;
+    }
+    /**
+     * 获取最新的服务器及串流状态
+     */
+    private function getRealTimeStatus(){
+        $servers = Server::find()->all();
+        $statusData = [];
+        for($i=0;$i<count($servers);$i++){
+            $streams = $servers[$i]->getLatestStreamStatus()->asArray()->all();
+            $streamStatus = [];
+            for($j=0;$j<count($streams);$j++){
+                if($servers[$i]['state']===1){
+                    array_push($streamStatus, [$streams[$j]['streamName'], $streams[$j]['status']]);
+                }else{
+                    array_push($streamStatus, [$streams[$j]['streamName'], -1]);
+                }
+            }
+            array_push($statusData, [$servers[$i]['serverName'], $servers[$i]['state'], $streamStatus]);
+        }
+        return $statusData;
     }
 }

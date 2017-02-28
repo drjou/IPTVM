@@ -112,4 +112,12 @@ class Server extends ActiveRecord{
         return $this->hasMany(Load::className(), ['server' => 'serverName'])
         ->where('recordTime between "'.$startTime.'" and "'.$endTime.'"');
     }
+    /**
+     * 将server表与stream表关联
+     * @return ActiveQuery
+     */
+    public function getLatestStreamStatus(){
+        return $this->hasMany(Stream::className(), ['server' => 'serverName'])
+        ->orderBy('streamName');
+    }
 }
