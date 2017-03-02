@@ -13,7 +13,7 @@ class StreamInfoSearch extends StreamInfo{
     public function rules()
     {
         return [
-            [['server', 'streamName', 'status', 'total','user', 'system', 'memory', 'rss', 'readByte', 'writeByte', 'recordTime'], 'safe'],
+            [['server', 'streamName', 'status', 'sourceStatus', 'total','user', 'system', 'memory', 'rss', 'readByte', 'writeByte', 'recordTime'], 'safe'],
         ];
     }
     /**
@@ -32,8 +32,7 @@ class StreamInfoSearch extends StreamInfo{
      */
     public function search($params){
         $query = StreamInfo::find()
-        ->innerJoin('stream','stream.streamName=stream_info.streamName and stream.server=stream_info.server')
-        ->orderBy(['recordTime'=>SORT_DESC]);
+        ->innerJoin('stream','stream.streamName=stream_info.streamName and stream.server=stream_info.server');
         $dataProvider  = new ActiveDataProvider([
            'query' => $query,
            'pagination' => [
@@ -47,6 +46,7 @@ class StreamInfoSearch extends StreamInfo{
         $query->andFilterWhere(['like', 'stream_info.server', $this->server])
         ->andFilterWhere(['like', 'stream_info.streamName', $this->streamName])
         ->andFilterWhere(['=', 'status', $this->status])
+        ->andFilterWhere('=', 'sourceStatus', $this->sourceStatus)
         ->andFilterWhere(['=', 'total', $this->total])
         ->andFilterWhere(['=', 'user', $this->user])
         ->andFilterWhere(['=', 'system', $this->system])

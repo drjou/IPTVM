@@ -23,6 +23,8 @@ use app\models\NginxSearch;
 use app\models\StreamInfo;
 use app\models\StreamInfoSearch;
 use app\models\Stream;
+use app\models\ServerSearch;
+use app\models\StreamSearch;
 
 class MonitorController extends Controller
 {
@@ -53,6 +55,8 @@ class MonitorController extends Controller
                 'actions' => [
                     'index' => ['get'],
                     'servers-fault' => ['get'],
+                    'servers-status' => ['get','post'],
+                    'streams-monitor' => ['get','post'],
                     'cpu-chart' => ['get'],
                     'cpu-grid' => ['get'],
                     'ram-chart' => ['get'],
@@ -97,6 +101,26 @@ class MonitorController extends Controller
     {
         return $this->render('index',[]);
     }
+    /**
+     * Servers Status action
+     */
+    public function actionServersStatus(){
+        $filterModel = new ServerSearch();
+        $dataProvider = $filterModel->search(\Yii::$app->request->queryParams);
+        $model = new Server();
+        $model->scenario = Server::SCENARIO_SELECT_SERVERS;
+        if($model->load(Yii::$app->request->post())){
+            $serversStr = implode(',', $model->servers);
+            return $this->redirect(['servers','servers'=>$serversStr]);
+        }
+        $servers = ArrayHelper::map(Server::find()->asArray()->all(), 'serverName', 'serverName');
+        return $this->render('servers-status', [
+            'filterModel' => $filterModel,
+            'dataProvider' => $dataProvider,
+            'model' => $model,
+            'servers' => $servers
+        ]);
+    }
     
     /**
      * Servers Fault action
@@ -138,6 +162,40 @@ class MonitorController extends Controller
         ]);
     }
 
+    public function actionStreamsMonitor($serverName=null)
+    {
+        if($serverName===null){
+            $serverName = Server::find()->one()->serverName;
+        }
+        $model = new Server();
+        $model->scenario = Server::SCENARIO_CHANGE_SERVER;
+        $model->serverName = $serverName;
+        if($model->load(Yii::$app->request->post())){
+            if($model->streams===null){
+                return $this->redirect(['streams-monitor', 'serverName'=>$model->serverName]);
+            }
+        }
+        $model2 = new Server();
+        $model2->scenario = Server::SCENARIO_SELECT_STREAMS;
+        $model2->serverName = $serverName;
+        if($model2->load(Yii::$app->request->post())){
+            return $this->redirect(['streams', 'serverName'=>$model2->serverName, 'streams'=>implode(',', $model2->streams)]);
+        }
+        $server = Server::find()->asArray()->all();
+        $servers = ArrayHelper::map($server, 'serverName', 'serverName');
+        $streams = ArrayHelper::map($model2->getStreams()->all(), 'streamName', 'streamName');
+        $filterModel = new StreamSearch();
+        $dataProvider = $filterModel->searchOnSomeServer(Yii::$app->request->queryParams, $serverName);
+        return $this->render('streams-monitor',[
+            'model' => $model,
+            'servers' => $servers,
+            'model2' => $model2,
+            'streams' => $streams,
+            'filterModel' => $filterModel,
+            'dataProvider' => $dataProvider
+        ]);
+    }
+    
     /**
      * 传回cpu折线图相关数据
      * @param string $serverName
@@ -311,22 +369,15 @@ class MonitorController extends Controller
      * 将串流进程的总利用率和内存利用率数据传回
      * @param string $serverName 服务器名
      */
-    public function actionStreams($serverName=null)
+    public function actionStreams($serverName, $streams)
     {
-        if($serverName==null){
-            $firstServer = Server::find()->one();
-            $serverName = $firstServer->serverName;
-        }
         $server = new Server();
         $startTime = date('Y-m-d H:i:s',time()-3600);
         $endTime = date('Y-m-d H:i:s',time());
-        $data = $this->getStreamsData($serverName, $startTime, $endTime);
+        $data = $this->getStreamsData($serverName, $streams, $startTime, $endTime);
         $range = $startTime.' - '.$endTime;
         $minDate = StreamInfo::find()->where(['server'=>$serverName])->min('recordTime');
         return $this->render('streams', [
-            'server' => $server,
-            'servers' => $this->getServersForDrop(),
-            'serverName' => $serverName,
             'totalData' => $data[0],
             'memoryData' => $data[1],
             'range' => $range,
@@ -350,13 +401,12 @@ class MonitorController extends Controller
     /**
      * 传回不同服务器的相关数据
      */
-    public function actionServers(){
+    public function actionServers($servers){
         $startTime = date('Y-m-d H:i:s',time()-24*3600);
         $endTime = date('Y-m-d H:i:s',time());
-        $data = $this->getServersData($startTime, $endTime);
+        $data = $this->getServersData($servers, $startTime, $endTime);
         $range = $startTime.' - '.$endTime;
         $minDate = CPU::find()->min('recordTime');
-        $heatData = $this->getHeatMapData();
         $realTimes = RealTime::find()->asArray()->all();
         $xCategories = ArrayHelper::getColumn($realTimes, 'server');
         return $this->render('servers', [
@@ -367,7 +417,6 @@ class MonitorController extends Controller
             'range' => $range,
             'minDate' => $minDate,
             'xCategories' => $xCategories,
-            'heatData' => $heatData
         ]);
     }
     /**
@@ -418,13 +467,37 @@ class MonitorController extends Controller
             case 'LOAD':
                 $response->data = $this->getLoadData($serverName, $startTime, $endTime);
                 break;
-            case 'Servers':
-                $response->data = $this->getServersData($startTime, $endTime);
-                break;
             case 'Streams':
                 $response->data = $this->getStreamsData($serverName, $startTime, $endTime);
                 break;
         }
+    }
+    /**
+     * 更新服务器相关历史数据
+     * @param string $servers
+     * @param string $startTime
+     * @param string $endTime
+     */
+    public function actionUpdateServersData($servers, $startTime, $endTime){
+        $startTime = date('Y-m-d H:i:s',$startTime/1000);
+        $endTime = date('Y-m-d H:i:s',$endTime/1000);
+        $response = Yii::$app->response;
+        $response->format = \yii\web\Response::FORMAT_JSON;
+        $response->data = $this->getServersData($servers, $startTime, $endTime);
+    }
+    /**
+     * 更新服务器上串流相关历史数据
+     * @param string $servers
+     * @param string $streams
+     * @param string $startTime
+     * @param string $endTime
+     */
+    public function actionUpdateStreamsData($serverName, $streams, $startTime, $endTime){
+        $startTime = date('Y-m-d H:i:s',$startTime/1000);
+        $endTime = date('Y-m-d H:i:s',$endTime/1000);
+        $response = Yii::$app->response;
+        $response->format = \yii\web\Response::FORMAT_JSON;
+        $response->data = $this->getStreamsData($serverName, $streams, $startTime, $endTime);
     }
     
     public function actionUpdateWarningLine($type, $startTime, $endTime){
@@ -450,14 +523,8 @@ class MonitorController extends Controller
         }
     }
     /**
-     * 传回最新的热力图数据
+     * 更新服务器表格内的相关数据
      */
-    public function actionUpdateHeatMap(){
-        $response = Yii::$app->response;
-        $response->format = \yii\web\Response::FORMAT_JSON;
-        $response->data = $this->getHeatMapData();
-    }
-    
     public function actionUpdateServerStatus(){
         $response = Yii::$app->response;
         $response->format = \yii\web\Response::FORMAT_JSON;
@@ -611,8 +678,10 @@ class MonitorController extends Controller
      * @param string $startTime
      * @param string $endTime
      */
-    private function getServersData($startTime, $endTime){
-        $servers = Server::find()->all();
+    private function getServersData($servers, $startTime, $endTime){
+        $serverArr = explode(',', $servers);
+        $where = implode('" or serverName="', $serverArr);
+        $servers = Server::find()->where('serverName="'.$where.'"')->all();
         $cpuData = array();
         $ramData = array();
         $diskData = array();
@@ -651,9 +720,12 @@ class MonitorController extends Controller
      * @param string $startTime
      * @param string $endTime
      */
-    private function getStreamsData($serverName, $startTime, $endTime){
+    private function getStreamsData($serverName, $streams, $startTime, $endTime){
+        $streamArr = explode(',', $streams);
+        $where = implode('" or streamName="', $streamArr);
+        $where = '(streamName="'.$where.'") and server="'.$serverName.'"';
         $streamName = Stream::find()
-            ->where(['server'=>$serverName])
+            ->where($where)
             ->all();
         $totalData = array();
         $memoryData = array();
@@ -674,29 +746,6 @@ class MonitorController extends Controller
             array_push($memoryData, $processMemory);
         }
         return array($totalData, $memoryData);
-    }
-    
-    /**
-     * 获取热力图数据
-     */
-    private function getHeatMapData(){
-         $data = RealTime::find()->asArray()->all();
-         $heatData = array();
-         for($i=0;$i<count($data);$i++){
-             $cpuData = [$i,0,$data[$i]['cpuUtilize']];
-             $ramData = [$i,1,$data[$i]['memoryUtilize']];
-             $diskData = [$i,2,$data[$i]['diskUtilize']];
-             $loadData = [$i,3,$data[$i]['load1']];
-             array_push($heatData, $cpuData, $ramData, $diskData, $loadData);
-         }
-         return $heatData;
-    }
-    /**
-     * 获取应用于下拉框的server数据
-     */
-    private function getServersForDrop(){
-        $allServers = Server::find()->asArray()->all();
-        return ArrayHelper::map($allServers, 'serverName', 'serverName');
     }
     /**
      * 得到阈值以上的cpu值
@@ -902,7 +951,7 @@ class MonitorController extends Controller
     private function getNginxWarningData($startTime, $endTime){
         $rows = (new Query())
         ->select(['DATE_FORMAT(DATE_FORMAT(recordTime,"%Y-%m-%d %H:%i"),"%Y-%m-%d %H:%i:%s") as time', 'count(if(status=0,true,null )) as count'])
-        ->from(['nginx'])
+        ->from(['nginx_info'])
         ->where('recordTime BETWEEN "'.$startTime.'" and "'.$endTime.'"')
         ->groupBy('time')
         ->all();
@@ -925,7 +974,7 @@ class MonitorController extends Controller
     private function getNginxServers($startTime, $endTime){
         $rows = (new Query())
         ->select(['DATE_FORMAT(DATE_FORMAT(recordTime,"%Y-%m-%d %H:%i"),"%Y-%m-%d %H:%i:%s") as time', 'server'])
-        ->from(['nginx'])
+        ->from(['nginx_info'])
         ->where('status=0 and recordTime BETWEEN "'.$startTime.'" and "'.$endTime.'"')
         ->orderBy('time')
         ->all();
@@ -943,24 +992,12 @@ class MonitorController extends Controller
         }
         return $servers;
     }
+    
     /**
-     * 获取最新的服务器及串流状态
+     * 获取应用于下拉框的server数据
      */
-    private function getRealTimeStatus(){
-        $servers = Server::find()->all();
-        $statusData = [];
-        for($i=0;$i<count($servers);$i++){
-            $streams = $servers[$i]->getLatestStreamStatus()->asArray()->all();
-            $streamStatus = [];
-            for($j=0;$j<count($streams);$j++){
-                if($servers[$i]['state']===1){
-                    array_push($streamStatus, [$streams[$j]['streamName'], $streams[$j]['status']]);
-                }else{
-                    array_push($streamStatus, [$streams[$j]['streamName'], -1]);
-                }
-            }
-            array_push($statusData, [$servers[$i]['serverName'], $servers[$i]['state'], $streamStatus]);
-        }
-        return $statusData;
+    private function getServersForDrop(){
+        $allServers = Server::find()->asArray()->all();
+        return ArrayHelper::map($allServers, 'serverName', 'serverName');
     }
 }

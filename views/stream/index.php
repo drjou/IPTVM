@@ -43,17 +43,7 @@ echo GridView::widget([
             'class' => 'yii\grid\SerialColumn',
             'headerOptions' => ['width' => '10'],
         ],
-        [
-            'attribute' => 'streamName',
-            'format' => 'html',
-            'value' => function($model){
-                return '<div class="progress">
-  <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;">
-    60
-  </div>
-</div>';
-            }
-        ],
+        'streamName',
         'source',
         [
             'attribute' => 'server',

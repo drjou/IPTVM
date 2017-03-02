@@ -30,7 +30,15 @@ $columns = [
     [
         'attribute' => 'status',
         'value' => function($model){
-        return $model->status == 1 ? 'up' : 'down';
+            return $model->status == 1 ? 'up' : 'down';
+        },
+        'filter' => $enables,
+        'headerOptions' => ['width' => '85'],
+    ],
+    [
+        'attribute' => 'sourceStatus',
+        'value' => function($model){
+            return $model->sourceStatus == 1 ? 'up' : 'down';
         },
         'filter' => $enables,
         'headerOptions' => ['width' => '85'],

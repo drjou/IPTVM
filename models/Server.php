@@ -7,9 +7,13 @@ use yii\db\Expression;
 use yii\web\NotFoundHttpException;
 class Server extends ActiveRecord{
     public $importFile;
+    public $servers;
     const SCENARIO_SAVE = 'save';
     const SCENARIO_IMPORT = 'import';
     const SCENARIO_CHANGE_STATUS = 'changeStatus';
+    const SCENARIO_SELECT_SERVERS = 'selectServers';
+    const SCENARIO_CHANGE_SERVER = 'changeServer';
+    const SCENARIO_SELECT_STREAMS = 'selectStreams';
     
     /**
      * 设置模型对应表名
@@ -42,7 +46,7 @@ class Server extends ActiveRecord{
      */
     public function rules(){
         return [
-            [['serverName', 'serverIp', 'status', 'operatingSystem'], 'required'],
+            [['serverName', 'serverIp', 'status', 'operatingSystem', 'servers', 'streams'], 'required'],
             ['importFile', 'file', 'skipOnEmpty' => false, 'mimeTypes' => ['application/xml', 'text/xml'], 'extensions' => ['xml'], 'maxSize' => 50*1024*1024],
             ['serverName', 'trim'],
             ['serverName', 'string', 'length' => [1, 20]],
@@ -59,7 +63,10 @@ class Server extends ActiveRecord{
         return [
             self::SCENARIO_SAVE => ['serverName', 'serverIp', 'status', 'operatingSystem'],
             self::SCENARIO_IMPORT => ['importFile'],
-            self::SCENARIO_CHANGE_STATUS => ['status']
+            self::SCENARIO_CHANGE_STATUS => ['status'],
+            self::SCENARIO_SELECT_SERVERS => ['servers'],
+            self::SCENARIO_CHANGE_SERVER => ['serverName'],
+            self::SCENARIO_SELECT_STREAMS => ['streams']
         ];
     }
     
@@ -113,11 +120,17 @@ class Server extends ActiveRecord{
         ->where('recordTime between "'.$startTime.'" and "'.$endTime.'"');
     }
     /**
+     * 设置属性$streams
+     * @param array $streams
+     */
+    public function setStreams($streams){
+        $this->streams = $streams;
+    }
+    /**
      * 将server表与stream表关联
      * @return ActiveQuery
      */
-    public function getLatestStreamStatus(){
-        return $this->hasMany(Stream::className(), ['server' => 'serverName'])
-        ->orderBy('streamName');
+    public function getStreams(){
+        return $this->hasMany(Stream::className(), ['server' => 'serverName']);
     }
 }

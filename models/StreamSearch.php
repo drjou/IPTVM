@@ -12,7 +12,7 @@ class StreamSearch extends Stream{
      */
     public function rules(){
         return [
-            [['streamName', 'source', 'server'], 'safe']
+            [['streamName', 'status', 'sourceStatus', 'source', 'server'], 'safe']
         ];
     }
     /**
@@ -42,10 +42,36 @@ class StreamSearch extends Stream{
             return $dataProvider;
         }
         
-        $query->andFilterWhere(['like', 'streamName', $this->streamName])->
-        andFilterWhere(['like', 'source', $this->source])
+        $query->andFilterWhere(['like', 'streamName', $this->streamName])
+        ->andFilterWhere(['like', 'source', $this->source])
         ->andFilterWhere(['=', 'server', $this->server]);
         
+        return $dataProvider;
+    }
+    
+    /**
+     * 检索过滤
+     * @param string $params
+     */
+    public function searchOnSomeServer($params, $serverName){
+        $query = Stream::find()
+        ->where(['server'=>$serverName]);
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'pagination' => [
+                'pageSize' => 10
+            ]
+        ]);
+        $this->load($params);
+        if(!$this->validate()){
+            return $dataProvider;
+        }
+    
+        $query->andFilterWhere(['like', 'streamName', $this->streamName])
+        ->andFilterWhere(['=', 'status', $this->status])
+        ->andFilterWhere(['=', 'sourceStatus', $this->sourceStatus])
+        ->andFilterWhere(['like', 'source', $this->source]);
+    
         return $dataProvider;
     }
 }
