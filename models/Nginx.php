@@ -10,4 +10,12 @@ class Nginx extends ActiveRecord{
     public static function tableName(){
         return 'nginx';
     }
+    
+    /**
+     * 获取Nginx所在服务器的信息
+     * @return ActiveQuery
+     */
+    public function getServerInfo(){
+        return $this->hasOne(Server::className(), ['serverName' => 'server']);
+    }
 }

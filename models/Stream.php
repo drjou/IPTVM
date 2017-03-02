@@ -80,6 +80,13 @@ class Stream extends ActiveRecord{
             throw new NotFoundHttpException("The stream $streamName on $server doesn't exist, please try the right way to access stream.");
         }
     }
+    /**
+     * 获取对应的server的信息
+     * @return ActiveQuery
+     */
+    public function getServerInfo(){
+        return $this->hasOne(Server::className(), ['serverName' => 'server']);
+    }
     
     /**
      * 验证服务器上是否有该流名

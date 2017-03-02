@@ -43,7 +43,9 @@ class StreamSearch extends Stream{
         }
         
         $query->andFilterWhere(['like', 'streamName', $this->streamName])
+        ->andFilterWhere(['=', 'status', $this->status])
         ->andFilterWhere(['like', 'source', $this->source])
+        ->andFilterWhere(['=', 'sourceStatus', $this->sourceStatus])
         ->andFilterWhere(['=', 'server', $this->server]);
         
         return $dataProvider;

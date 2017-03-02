@@ -12,7 +12,7 @@ class NginxSearch extends Nginx{
     public function rules()
     {
         return [
-            [['server', 'recordTime', 'status', 'accept', 'handle', 'request', 'active', 'readRequest', 'writeRequest', 'wait', 'qps', 'responseTime'], 'safe'],
+            [['status', 'server'], 'safe'],
         ];
     }
     /**
@@ -29,8 +29,7 @@ class NginxSearch extends Nginx{
      * @param string $params
      */
     public function search($params){
-        $query = Nginx::find()
-        ->orderBy(['recordTime'=>SORT_DESC]);
+        $query = Nginx::find();
         $dataProvider  = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
@@ -43,17 +42,7 @@ class NginxSearch extends Nginx{
         }
         //'server', 'recordTime', 'status', 'accept', 'handle', 'request', 'active', 'readRequest', 'writeRequest', 'wait', 'qps', 'responseTime'
         $query->andFilterWhere(['=', 'server', $this->server])
-        ->andFilterWhere(['like', 'recordTime', $this->recordTime])
-        ->andFilterWhere(['=', 'status', $this->status])
-        ->andFilterWhere(['=', 'accept', $this->accept])
-        ->andFilterWhere(['=', 'handle', $this->handle])
-        ->andFilterWhere(['=', 'request', $this->request])
-        ->andFilterWhere(['=', 'active', $this->active])
-        ->andFilterWhere(['=', 'readRequest', $this->readRequest])
-        ->andFilterWhere(['=', 'writeRequest', $this->writeRequest])
-        ->andFilterWhere(['=', 'wait', $this->wait])
-        ->andFilterWhere(['=', 'qps', $this->qps])
-        ->andFilterWhere(['=', 'responseTime', $this->responseTime]);
+        ->andFilterWhere(['=', 'status', $this->status]);
         return $dataProvider;
     }
 }

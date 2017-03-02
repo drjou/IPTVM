@@ -99,7 +99,21 @@ class MonitorController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index',[]);
+        $servers = $this->getRealtimeServerStatus();
+        $streams = $this->getRealtimeStreamStatus();
+        $mysqls = $this->getRealtimeMysqlStatus();
+        $nginxes = $this->getRealtimeNginxStatus();
+        $filter = [
+            0 => 'DOWN',
+            1 => 'UP'
+        ];
+        return $this->render('index',[
+            'servers' => $servers,
+            'streams' => $streams,
+            'mysqls' => $mysqls,
+            'nginxes' => $nginxes,
+            'filter' => $filter,
+        ]);
     }
     /**
      * Servers Status action
@@ -529,6 +543,59 @@ class MonitorController extends Controller
         $response = Yii::$app->response;
         $response->format = \yii\web\Response::FORMAT_JSON;
         $response->data = $this->getRealTimeStatus();
+    }
+    
+    /**
+     * 获取所有server的实时状态信息
+     * @return \app\models\ServerSearch[]|\yii\data\ActiveDataProvider[]
+     */
+    private function getRealtimeServerStatus(){
+        $searchModel = new ServerSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        return [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ];
+    }
+    
+    /**
+     * 获取所有stream的实时状态信息
+     * @return \app\models\ServerSearch[]|\yii\data\ActiveDataProvider[]
+     */
+    private function getRealtimeStreamStatus(){
+        $searchModel = new StreamSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        return [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ];
+    }
+    
+    /**
+     * 获取所有MySQL的实时状态信息
+     * @return \app\models\ServerSearch[]|\yii\data\ActiveDataProvider[]
+     */
+    private function getRealtimeMysqlStatus(){
+        $searchModel = new MySqlSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        return [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ];
+    }
+    
+    
+    /**
+     * 获取所有Nginx的实时状态信息
+     * @return \app\models\ServerSearch[]|\yii\data\ActiveDataProvider[]
+     */
+    private function getRealtimeNginxStatus(){
+        $searchModel = new NginxSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        return [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ];
     }
     
     /**
