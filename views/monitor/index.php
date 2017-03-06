@@ -52,7 +52,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'buttons' => [
                                     'view' => function($url, $model, $key){
                                     return Html::a('<i class="glyphicon glyphicon-eye-open"></i>',
-                                        ['server', 'serverName' => $key],
+                                        ['detail', 'serverName' => $key],
                                         ['title' => 'View']);
                                     },
                                 ],
@@ -337,12 +337,56 @@ $this->params['breadcrumbs'][] = $this->title;
 	<div class="col-lg-12">
 		<div class="panel panel-default">
 			<div class="panel-heading" style="background-color: #eeeeee;">
-				<h5 style="font-weight: bold;">Online Clients</h5>
+				<h5 style="font-weight: bold;">Online Clients
+				<span class="label label-success">UP</span>
+                <span class="label label-warning">UNKNOWN</span></h5>
 			</div>
 			<!-- /.panel-heading -->
 			<div class="panel-body">
 				<div class="dataTable_wrapper">
-                    
+                    <?= GridView::widget([
+                        'options' => ['class' => 'gridview', 'style' => 'overflow:auto', 'id' => 'grid'],
+                        'dataProvider' => $onlineClients['dataProvider'],
+                        'filterModel' => $onlineClients['searchModel'],
+                        'pager' => [
+                            'firstPageLabel' => 'First Page',
+                            'lastPageLabel' => 'Last Page',
+                        ],
+                        'rowOptions' => function($model, $key, $index, $grid){
+                            return ['class' => $index % 2 == 0 ? 'label-white' : 'label-grey' ];
+                        },
+                        'columns' => [
+                            [
+                                'class' => 'yii\grid\SerialColumn',
+                                'headerOptions' => ['width' => '10'],
+                            ],
+                            [
+                                'attribute' => 'status',
+                                'format' => 'html',
+                                'value' => function($model){
+                                    if($model->serverInfo->status == 0) return '<i class="fa fa-circle" style="color:#f0ad4e;"></i>';
+                                    return '<i class="fa fa-circle" style="color:#5cb85c;"></i>';
+                                },
+                                'headerOptions' => ['width' => '10'],
+                            ],
+                            'accountId',
+                            'Ip',
+                            [
+                                'class' => 'yii\grid\ActionColumn',
+                                'header' => 'Operations',
+                                'headerOptions' => ['width' => '10'],
+                                'template' => '{view}&nbsp;&nbsp;&nbsp;{enable}',
+                                'buttons' => [
+                                    'view' => function($url, $model, $key){
+                                        return Html::a('<i class="glyphicon glyphicon-eye-open"></i>',
+                                            ['client-monitor', 'OnlineClientSearch[accountId]' => $key['accountId']],
+                                            ['title' => 'View']);
+                                    },
+                                ],
+                            ],
+                        ],
+                    ]); 
+                    ?>
 				</div>
 			</div>
 			<!-- /.panel-body -->
