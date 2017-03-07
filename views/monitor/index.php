@@ -52,7 +52,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'buttons' => [
                                     'view' => function($url, $model, $key){
                                     return Html::a('<i class="glyphicon glyphicon-eye-open"></i>',
-                                        ['server', 'serverName' => $key],
+                                        ['server-detail', 'serverName' => $key],
                                         ['title' => 'View']);
                                     },
                                 ],
@@ -122,7 +122,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'attribute' => 'server',
                                 'format' => 'raw',
                                 'value' => function($model){
-                                    return Html::a($model->server, ['monitor/server', 'serverName' => $model->server]);
+                                    return Html::a($model->server, ['monitor/server-detail', 'serverName' => $model->server]);
                                 },
                             ],
                             [
@@ -133,7 +133,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'buttons' => [
                                     'view' => function($url, $model, $key){
                                     return Html::a('<i class="glyphicon glyphicon-eye-open"></i>',
-                                        ['view', 'streamName' => $key],
+                                        ['stream-detail', 'streamName' => $model->streamName, 'serverName'=>$model->server],
                                         ['title' => 'View']);
                                     },
                                     'switch' => function($url, $model, $key){
@@ -211,7 +211,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'attribute' => 'server',
                                 'format' => 'raw',
                                 'value' => function($model){
-                                    return Html::a($model->server, ['monitor/server', 'serverName' => $model->server]);
+                                    return Html::a($model->server, ['monitor/server-detail', 'serverName' => $model->server]);
                                 },
                             ],
                             [
@@ -222,7 +222,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'buttons' => [
                                     'view' => function($url, $model, $key){
                                     return Html::a('<i class="glyphicon glyphicon-eye-open"></i>',
-                                        ['view', 'sever' => $key],
+                                        ['mysql-chart', 'serverName' => $model->server],
                                         ['title' => 'View']);
                                     },
                                     'switch' => function($url, $model, $key){
@@ -292,7 +292,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'attribute' => 'server',
                                 'format' => 'raw',
                                 'value' => function($model){
-                                    return Html::a($model->server, ['monitor/server', 'serverName' => $model->server]);
+                                    return Html::a($model->server, ['monitor/server-detail', 'serverName' => $model->server]);
                                 },
                             ],
                             [
@@ -303,7 +303,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'buttons' => [
                                     'view' => function($url, $model, $key){
                                     return Html::a('<i class="glyphicon glyphicon-eye-open"></i>',
-                                        ['view', 'sever' => $key],
+                                        ['nginx-chart', 'serverName' => $model->server],
                                         ['title' => 'View']);
                                     },
                                     'switch' => function($url, $model, $key){

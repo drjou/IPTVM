@@ -89,6 +89,15 @@ class Stream extends ActiveRecord{
     }
     
     /**
+     * 获取最近一次断开的时间
+     */
+    public function getLatestDisconnectedTime(){
+        return $this->hasMany(StreamInfo::className(), ['server' => 'server', 'streamName'=>'streamName'])
+        ->where(['status'=>0])
+        ->min('recordTime');
+    }
+    
+    /**
      * 验证服务器上是否有该流名
      * @param string $attribute
      * @param string $params

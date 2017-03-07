@@ -18,6 +18,10 @@ $status = [
         'data-toggle' => 'modal',
         'data-target' => '#create-modal'
 ]) ?>
+&nbsp;&nbsp;&nbsp;
+<span>Status:</span>
+<span class="label label-success">UP</span>
+<span class="label label-danger">DOWN</span>
 
 <?php 
 
@@ -67,8 +71,9 @@ echo GridView::widget([
         [
             'attribute' => 'status',
             'filter' => $status,
+            'format' => 'html',
             'value' => function($model){
-                return $model->status == 1 ? 'up' : 'down';
+                return $model->status == 1 ? '<i class="fa fa-circle" style="color:#5cb85c;"></i>' : '<i class="fa fa-circle" style="color:#d9534f;"></i>';
             },
         ],
         'serverName',
@@ -142,7 +147,7 @@ echo GridView::widget([
             'buttons' => [
                 'view' => function($url, $model, $key){
                     return Html::a('<i class="glyphicon glyphicon-eye-open"></i>',
-                        ['detail', 'serverName' => $model->serverName],
+                        ['server-detail', 'serverName' => $model->serverName],
                         ['title' => 'View']);
                 }
             ],
@@ -169,32 +174,33 @@ $this->registerJs("
         }
     }
     function setProgressOnClick(){
-        var \$process = $('.progress .progress-bar')
-        for(var i=0,j=0;i<\$process.length;i+=4,j++){
-            var server = $($('.progress')[j]).parent().siblings().eq(2).html();
+        var \$tds = $('td');
+        for(var i=14;i<\$tds.length;i+=10){
             for(var k=i;k<i+4;k++){
-                $(\$process[k]).css('cursor','pointer');
+                $(\$tds[k]).css('cursor','pointer');
             }
-            $(\$process[i]).click(function(){
+            $(\$tds[i]).click(function(){
+                var server = $(this).siblings().eq(2).html();
                 window.location.href='index.php?r=monitor/cpu-chart&serverName='+server;
             });
-            $(\$process[i+1]).click(function(){
+            $(\$tds[i+1]).click(function(){
+                var server = $(this).siblings().eq(2).html();
                 window.location.href='index.php?r=monitor/ram-chart&serverName='+server;
             });
-            $(\$process[i+2]).click(function(){
+            $(\$tds[i+2]).click(function(){
+                var server = $(this).siblings().eq(2).html();
                 window.location.href='index.php?r=monitor/disk-chart&serverName='+server;
             });
-            $(\$process[i+3]).click(function(){
+            $(\$tds[i+3]).click(function(){
+                var server = $(this).siblings().eq(2).html();
                 window.location.href='index.php?r=monitor/load-chart&serverName='+server;
             });
         }
     }
-    var updateProcess = function(){
-        var \$process = $('.progress .progress-bar')
-        for(var i=0,j=0;i<\$process.length;i+=4,j++){
-            var server = $($('.progress')[j]).parent().siblings().eq(2).html();
-            var k=i;
-            $.get('index.php?r=monitor/update-gauge-info&serverName='+server,function(data,status){
+    
+    var updateServer = function(serverName, k){
+        var \$process = $('.progress .progress-bar');
+            $.get('index.php?r=monitor/update-server-grid-info&serverName='+serverName,function(data,status){
                 changeProcessColor($(\$process[k]),data.cpuInfo);
                 $(\$process[k]).css('width',data.cpuInfo+'%');
                 $(\$process[k]).text(data.cpuInfo+'%');
@@ -208,12 +214,18 @@ $this->registerJs("
                 $(\$process[k+3]).css('width',data.loadInfo+'%');
                 $(\$process[k+3]).text(data.loadInfo+'%');
             });
+    }
+    var updateServers = function(){
+        var \$process = $('.progress .progress-bar');
+        for(var i=0;i<\$process.length;i+=4){
+            var server = $($('.progress')[i]).parent().siblings().eq(2).html();
+            updateServer(server, i);
         }
     }
     $(document).ready(function() {
         setProgressOnClick();
-        updateProcess();
-        setInterval(updateProcess,2000);
+        updateServers();
+        setInterval(updateServers,2000);
         $('.all').change(function(){
     		if(this.checked){
     			$('.label-all').html('Deselect All');

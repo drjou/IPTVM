@@ -12,7 +12,6 @@ class Server extends ActiveRecord{
     const SCENARIO_IMPORT = 'import';
     const SCENARIO_CHANGE_STATUS = 'changeStatus';
     const SCENARIO_SELECT_SERVERS = 'selectServers';
-    const SCENARIO_CHANGE_SERVER = 'changeServer';
     const SCENARIO_SELECT_STREAMS = 'selectStreams';
     
     /**
@@ -65,7 +64,6 @@ class Server extends ActiveRecord{
             self::SCENARIO_IMPORT => ['importFile'],
             self::SCENARIO_CHANGE_STATUS => ['status'],
             self::SCENARIO_SELECT_SERVERS => ['servers'],
-            self::SCENARIO_CHANGE_SERVER => ['serverName'],
             self::SCENARIO_SELECT_STREAMS => ['streams']
         ];
     }
@@ -132,5 +130,29 @@ class Server extends ActiveRecord{
      */
     public function getStreams(){
         return $this->hasMany(Stream::className(), ['server' => 'serverName']);
+    }
+    /**
+     * 获取该服务器中总串流的个数
+     */
+    public function getStreamsCount(){
+        return count($this->getStreams()->all());
+    }
+    /**
+     * 获取该服务器中活跃串流的个数
+     */
+    public function getLiveStreamsCount(){
+        return count($this->getStreams()->andWhere(['stream.status'=>1])->all());
+    }
+    /**
+     * 获取该服务器中nginx的通断状态
+     */
+    public function getNginx(){
+        return $this->hasOne(Nginx::className(), ['server' => 'serverName']);
+    }
+    /**
+     * 获取该服务器中MySQL的通断状态
+     */
+    public function getMysql(){
+        return $this->hasOne(mysql::className(), ['server' => 'serverName']);
     }
 }
