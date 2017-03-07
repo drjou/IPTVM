@@ -48,9 +48,7 @@ $config = [
                     'categories' => [
                         'administrator',
                     ],
-                    'except' => [
-                        'application',
-                    ],
+                    'logVars' => [],
                     'prefix' => function ($message) {
                         $userName = Yii::$app->user->identity->userName;
                         return "$userName";
@@ -63,9 +61,7 @@ $config = [
                     'categories' => [
                         'stb',
                     ],
-                    'except' => [
-                        'application',
-                    ],
+                    'logVars' => [],
                     'prefix' => function ($message) {
                         $accountId = Yii::$app->request->get('accountId');
                         return "$accountId";

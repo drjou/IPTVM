@@ -29,6 +29,7 @@ use app\models\Nginx;
 use app\models\NginxInfo;
 use app\models\MysqlInfo;
 use app\models\MySql;
+use app\models\OnlineClientSearch;
 
 class MonitorController extends Controller
 {
@@ -107,6 +108,7 @@ class MonitorController extends Controller
         $streams = $this->getRealtimeStreamStatus();
         $mysqls = $this->getRealtimeMysqlStatus();
         $nginxes = $this->getRealtimeNginxStatus();
+        $onlineClients = $this->getOnlineClients();
         $filter = [
             0 => 'DOWN',
             1 => 'UP'
@@ -116,6 +118,7 @@ class MonitorController extends Controller
             'streams' => $streams,
             'mysqls' => $mysqls,
             'nginxes' => $nginxes,
+            'onlineClients' => $onlineClients,
             'filter' => $filter,
         ]);
     }
@@ -659,6 +662,19 @@ class MonitorController extends Controller
     }
     
     /**
+     * 在线用户监控
+     * @return \app\models\OnlineClientSearch[]|\yii\data\ActiveDataProvider[]
+     */
+    public function actionClientMonitor(){
+        $searchModel = new OnlineClientSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        return $this->render('client-monitor', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+    
+    /**
      * 获取所有server的实时状态信息
      * @return \app\models\ServerSearch[]|\yii\data\ActiveDataProvider[]
      */
@@ -704,6 +720,19 @@ class MonitorController extends Controller
      */
     private function getRealtimeNginxStatus(){
         $searchModel = new NginxSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        return [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ];
+    }
+    
+    /**
+     * 获取所有在线用户信息
+     * @return \app\models\ServerSearch[]|\yii\data\ActiveDataProvider[]
+     */
+    private function getOnlineClients(){
+        $searchModel = new OnlineClientSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         return [
             'searchModel' => $searchModel,
