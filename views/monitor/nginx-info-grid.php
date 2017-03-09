@@ -1,12 +1,12 @@
 <?php
-
 use yii\grid\GridView;
 use yii\helpers\Html;
-
-$this->title='MySql Grid';
+$request = Yii::$app->request;
+$this->title = 'Nginx Info Grid';
 $this->params['breadcrumbs'][]=['label'=>'IPTV Monitor', 'url'=>['index']];
-$this->params['breadcrumbs'][]=['label'=>'Servers Fault', 'url'=>['servers-fault']];
-$this->params['breadcrumbs'][]=$this->title;
+$this->params['breadcrumbs'][] = ['label' => 'Servers Monitor', 'url' => ['servers-status']];
+$this->params['breadcrumbs'][] = ['label' => 'Server Details', 'url' => ['server-detail' ,'serverName'=>$request->get('serverName')]];
+$this->params['breadcrumbs'][] = $this->title;
 
 $status=[
     1=>'on',
@@ -15,7 +15,7 @@ $status=[
 ?>
 
 <div class="btn-group right">
-	<?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', ['servers-fault'], ['class' => 'btn btn-default']);?>
+	<?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', ['nginx-chart' ,'serverName'=>$request->get('serverName')], ['class' => 'btn btn-default']);?>
 	<?= Html::a('<i class="iconfont iconfont-blue icon-grid"></i>', null, ['class' => 'btn btn-default', 'style'=>"background-color:#CCCCCC"]);?>
 </div><br/><br/>
 
@@ -51,7 +51,17 @@ echo GridView::widget([
             },
             'filter' => $status,
             'headerOptions' => ['width' => '85'],
-        ]
+        ],
+        'accept', 
+        'handle', 
+        'request', 
+        'active', 
+        'readRequest', 
+        'writeRequest', 
+        'wait', 
+        'qps', 
+        'responseTime',
+        'recordTime'
     ]
 ]);
 ?>

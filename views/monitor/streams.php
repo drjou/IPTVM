@@ -4,6 +4,7 @@ use app\models\ChartDraw;
 
 $request = Yii::$app->request;
 $this->title = 'Streams Utilization';
+$this->params['breadcrumbs'][]=['label'=>'IPTV Monitor', 'url'=>['index']];
 $this->params['breadcrumbs'][] = ['label' => 'Streams Monitor', 'url' => ['streams-monitor', 'serverName'=>$request->get('serverName')]];
 $this->params['breadcrumbs'][] = $this->title;
 
@@ -41,8 +42,8 @@ $operation = 'var time = $("#date-range").val().split(" - ");
 ?>
 
 <div class="btn-group right">
-    <?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', null, ['class' => 'btn btn-default']);?>
-    <?= Html::a('<i class="iconfont iconfont-blue icon-grid"></i>', ['streams-grid','type'=>1], ['class' => 'btn btn-default']);?>
+    <?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', null, ['class' => 'btn btn-default', 'style'=>"background-color:#CCCCCC"]);?>
+    <?= Html::a('<i class="iconfont iconfont-blue icon-grid"></i>', ['stream-info-grid','streams'=>$request->get('streams'),'serverName'=>$request->get('serverName'),'streamName'=>'','StreamInfoSearch[server]'=>$request->get('serverName')], ['class' => 'btn btn-default']);?>
 </div>
 
 <?php
@@ -52,3 +53,10 @@ echo ChartDraw::drawLineChart('total-chart', $this, 'Total Utilization of Stream
 
 <?php
 echo ChartDraw::drawLineChart('memory-chart', $this, 'Memory Utilization of Stream Process', 'Memory Utilization Percentage of Stream Process(%)', '%', $memoryData);
+
+$this->registerJs("
+    $(document).ready(function(){
+        $operation
+    });
+");
+

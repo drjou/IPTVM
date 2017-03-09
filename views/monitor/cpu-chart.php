@@ -4,8 +4,9 @@ use yii\helpers\Html;
 
 $request = Yii::$app->request;
 $this->title = 'CPU Chart';
-$this->params['breadcrumbs'][] = ['label' => 'Servers Status', 'url' => ['servers-status']];
-$this->params['breadcrumbs'][] = ['label' => 'Servers Details', 'url' => ['server-detail','serverName'=>$request->get('serverName')]];
+$this->params['breadcrumbs'][]=['label'=>'IPTV Monitor', 'url'=>['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Servers Monitor', 'url' => ['servers-status']];
+$this->params['breadcrumbs'][] = ['label' => 'Server Details', 'url' => ['server-detail','serverName'=>$request->get('serverName')]];
 $this->params['breadcrumbs'][] = $this->title;
 
 
@@ -30,7 +31,7 @@ $operation = 'var time = $("#date-range").val().split(" - ");
 ?>
     
 <div class="btn-group right">
-	<?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', null, ['class' => 'btn btn-default']);?>
+	<?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', null, ['class' => 'btn btn-default',  'style'=>"background-color:#CCCCCC"]);?>
 	<?= Html::a('<i class="iconfont iconfont-blue icon-grid"></i>', ['cpu-grid','serverName'=>$request->get('serverName'),'type'=>1], ['class' => 'btn btn-default']);?>
 </div>
 <br/><br/>

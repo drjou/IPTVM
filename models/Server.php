@@ -143,6 +143,11 @@ class Server extends ActiveRecord{
     public function getLiveStreamsCount(){
         return count($this->getStreams()->andWhere(['stream.status'=>1])->all());
     }
+    
+    public function getOnlineClient(){
+        return count($this->hasMany(OnlineClient::className(), ['server' => 'serverName'])->all());
+    }
+    
     /**
      * 获取该服务器中nginx的通断状态
      */
@@ -155,4 +160,6 @@ class Server extends ActiveRecord{
     public function getMysql(){
         return $this->hasOne(MySql::className(), ['server' => 'serverName']);
     }
+    
+    
 }

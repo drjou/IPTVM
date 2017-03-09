@@ -2,9 +2,10 @@
 use app\models\ChartDraw;
 use yii\helpers\Html;
 $request = Yii::$app->request;
-$this->title = 'Status of Nginx';
-$this->params['breadcrumbs'][] = ['label' => 'Servers Status', 'url' => ['servers-status']];
-$this->params['breadcrumbs'][] = ['label' => 'Servers Detail', 'url' => ['server-detail', 'serverName'=>$request->get('serverName')]];
+$this->title = 'Nginx Chart';
+$this->params['breadcrumbs'][]=['label'=>'IPTV Monitor', 'url'=>['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Servers Monitor', 'url' => ['servers-status']];
+$this->params['breadcrumbs'][] = ['label' => 'Server Details', 'url' => ['server-detail', 'serverName'=>$request->get('serverName')]];
 $this->params['breadcrumbs'][] = $this->title;
 
 $operation = 'var time = $("#date-range").val().split(" - ");
@@ -29,8 +30,8 @@ $operation = 'var time = $("#date-range").val().split(" - ");
 <?php echo '<span style="font-size:x-large;">Status:'.($status==1 ? '<i class="fa fa-circle" style="color:#5cb85c;"></i></span>' : '<i class="fa fa-circle" style="color:#d9534f;"></i></span>')?>
 
 <div class="btn-group right">
-	<?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', null, ['class' => 'btn btn-default']);?>
-	<?= Html::a('<i class="iconfont iconfont-blue icon-grid"></i>', null, ['class' => 'btn btn-default']);?>
+	<?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', null, ['class' => 'btn btn-default', 'style'=>"background-color:#CCCCCC"]);?>
+	<?= Html::a('<i class="iconfont iconfont-blue icon-grid"></i>', ['nginx-info-grid', 'NginxInfoSearch[server]'=>$request->get('serverName'), 'serverName'=>$request->get('serverName')], ['class' => 'btn btn-default']);?>
 </div>
 <br/><br/>
 

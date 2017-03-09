@@ -30,9 +30,15 @@ class StreamInfoSearch extends StreamInfo{
      * @param string $params
      * @return \yii\data\ActiveDataProvider
      */
-    public function search($params){
-        $query = StreamInfo::find()
-        ->innerJoin('stream','stream.streamName=stream_info.streamName and stream.server=stream_info.server');
+    public function search($params, $streams, $serverName){
+        if($streams===null){
+            $query = StreamInfo::find();
+        }else{
+            $streamArr = explode(',', $streams);
+            $where = implode('","', $streamArr);
+            $where = 'streamName in ("'.$where.'") and server="'.$serverName.'"';
+            $query = StreamInfo::find()->where($where);
+        }
         $dataProvider  = new ActiveDataProvider([
            'query' => $query,
            'pagination' => [
@@ -46,7 +52,7 @@ class StreamInfoSearch extends StreamInfo{
         $query->andFilterWhere(['like', 'stream_info.server', $this->server])
         ->andFilterWhere(['like', 'stream_info.streamName', $this->streamName])
         ->andFilterWhere(['=', 'status', $this->status])
-        ->andFilterWhere('=', 'sourceStatus', $this->sourceStatus)
+        ->andFilterWhere(['=', 'sourceStatus', $this->sourceStatus])
         ->andFilterWhere(['=', 'total', $this->total])
         ->andFilterWhere(['=', 'user', $this->user])
         ->andFilterWhere(['=', 'system', $this->system])
