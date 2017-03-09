@@ -7,16 +7,13 @@ $this->title = 'Streams Monitor';
 $this->params['breadcrumbs'][] = $this->title;
 
 $status = [
-    1 => 'up',
-    0 => 'down'
-]
+    1 => 'UP',
+    0 => 'DOWN'
+];
+
 ?>
 
-<?php $form=ActiveForm::begin(['id'=>'form'])?>
-
-<?=$form->field($model, 'serverName')->dropDownList($servers, ['style'=>['width'=>'100px', 'float'=>'left'],'label'=>''])->label(false) ?>
-
-<?php ActiveForm::end(); ?>
+<?=Html::dropDownList('serverName', $model, $servers, ['id'=>'server-servername','class' => 'form-control','style'=>'width:100px;float:left']);?>
 &nbsp;&nbsp;&nbsp;
 <?= Html::a('Generate Comparation Chart', '#', 
     ['class' => 'btn btn-success',
@@ -24,6 +21,11 @@ $status = [
         'data-toggle' => 'modal',
         'data-target' => '#create-modal'
 ]) ?>
+&nbsp;&nbsp;&nbsp;
+<span>Status:</span>
+<span class="label label-success">UP</span>
+<span class="label label-warning">UNKNOWN</span>
+<span class="label label-danger">DOWN</span>
 <?php 
 
 Modal::begin([
@@ -32,7 +34,7 @@ Modal::begin([
 ]);
 ?>
     <?php $form = ActiveForm::begin(); ?>
-        <?= $form->field($model2, 'streams', ['template' => 
+        <?= $form->field($model, 'streams', ['template' => 
             '{label}
             <div class="checkgroup">
                 <input type="checkbox" class="all" Name="CheckAll"><label for="all" class="label-all">Check All</label><br/>
@@ -72,25 +74,29 @@ echo GridView::widget([
         [
             'attribute' => 'status',
             'filter' => $status,
+            'format' => 'html',
             'value' => function($model){
-                return $model->status == 1 ? 'up' : 'down';
-            }
+                if($model->serverInfo->status == 0) return '<i class="fa fa-circle" style="color:#f0ad4e;"></i>';
+                return $model->status == 1 ? '<i class="fa fa-circle" style="color:#5cb85c;"></i>' : '<i class="fa fa-circle" style="color:#d9534f;"></i>';
+            },
         ],
         'streamName',
         'source',
         [
             'attribute' => 'sourceStatus',
             'filter' => $status,
+            'format' => 'html',
             'value' => function($model){
-                return $model->sourceStatus == 1 ? 'up' : 'down';
-            }
+                if($model->serverInfo->status == 0) return '<i class="fa fa-circle" style="color:#f0ad4e;"></i>';
+                return $model->status == 1 ? '<i class="fa fa-circle" style="color:#5cb85c;"></i>' : '<i class="fa fa-circle" style="color:#d9534f;"></i>';
+            },
         ],
         [
             'attribute' => 'CPU',
             'format' => 'html',
             'headerOptions' => ['width' => '100'],
             'value' => function($model){
-                if($model->status===0 || $model->sourceStatus===0){
+                if($model->status===0){
                     return '<span>---</span>';
                 }
                 return '<div class="progress"  style="margin-bottom: 0px;">
@@ -105,7 +111,7 @@ echo GridView::widget([
             'format' => 'html',
             'headerOptions' => ['width' => '100'],
             'value' => function($model){
-                if($model->status===0 || $model->sourceStatus===0){
+                if($model->status===0){
                     return '<span>---</span>';
                 }
                 return '<div class="progress"  style="margin-bottom: 0px;">
@@ -119,36 +125,53 @@ echo GridView::widget([
             'class' => 'yii\grid\ActionColumn',
             'header' => 'Operations',
             'headerOptions' => ['width' => 120],
-            'template' => '{view}&nbsp;&nbsp;&nbsp;{turnoff}&nbsp;&nbsp;&nbsp;{restart}&nbsp;&nbsp;&nbsp;{start}',
+            'template' => '{view}&nbsp;&nbsp;&nbsp;{switch}&nbsp;&nbsp;&nbsp;{restart}&nbsp;&nbsp;&nbsp;{play}',
             'buttons' => [
-                'view' => function($url, $model, $key){
-                    return Html::a('<i class="glyphicon glyphicon-eye-open"></i>',
-                        ['view', 'serverName' => $key],
-                        ['title' => 'View']);
+                'view' => function ($url, $model, $key) {
+                    return Html::a('<i class="glyphicon glyphicon-eye-open"></i>', [
+                        'stream-detail', 
+                        'streamName' => $model->streamName, 
+                        'serverName'=>$model->server
+                    ], [
+                        'title' => 'View'
+                    ]);
                 },
-                'turnoff' => function($url, $model, $key){
-                    return Html::a('<i class="glyphicon glyphicon-off" style="color:red"></i>',
-                        ['update', 'serverName' => $key],
-                        ['title' => 'Turn Off']);
+                'switch' => function ($url, $model, $key) {
+                    if ($model->status == 0)
+                        return Html::a('<i class="fa fa-power-off" style="color:#5cb85c;"></i>', [
+                            'switch',
+                            'streamName' => $key
+                        ], [
+                            'title' => 'Start'
+                        ]);
+                    return Html::a('<i class="fa fa-power-off" style="color:#d9534f;"></i>', [
+                        'switch',
+                        'streamName' => $key
+                    ], [
+                        'title' => 'Stop'
+                    ]);
                 },
-                'restart' => function($url, $model, $key){
-                    return Html::a('<span class="glyphicon glyphicon-refresh"></span>',
-                        ['delete', 'serverName' => $key],
-                        ['title' => 'Restart']);
+                'restart' => function ($url, $model, $key) {
+                    if ($model->status == 0)
+                        return '<span class="fa fa-refresh" style="color:gray;"></span>';
+                    return Html::a('<span class="fa fa-refresh"></span>', [
+                        'restart',
+                        'streamName' => $key
+                    ], [
+                        'title' => 'Restart'
+                    ]);
                 },
-                'start' => function($url, $model, $key){
-                    if($model->status==1){
-                        return Html::a('<span class="glyphicon glyphicon-play-circle"></span>',
-                            ['disable', 'serverName' => $key],
-                            ['title' => 'Start']);
-                    }
-                    else{
-                        return Html::a('<span class="glyphicon glyphicon-ok-circle"></span>',
-                            ['enable', 'serverName' => $key],
-                            ['title' => 'Enable']);
-                    }
-                }
-                ],
+                'play' => function ($url, $model, $key) {
+                    if ($model->status == 0)
+                        return '<span class="fa fa-play-circle" style="color:gray;"></span>';
+                    return Html::a('<span class="fa fa-play-circle"></span>', [
+                        'play',
+                        'streamName' => $key
+                    ], [
+                        'title' => 'Delete'
+                    ]);
+                 },
+             ],
         ]
     ]
 ])
@@ -156,9 +179,64 @@ echo GridView::widget([
 
 <?php 
 $this->registerJs("
+    function changeProcessColor(\$selector,value){
+        if(value>=0 && value<=30){
+            \$selector.removeClass('progress-bar-warning');
+            \$selector.removeClass('progress-bar-danger');
+            \$selector.addClass('progress-bar-success');
+        }else if(value>30 && value<=70){
+            \$selector.removeClass('progress-bar-sucess');
+            \$selector.removeClass('progress-bar-danger');
+            \$selector.addClass('progress-bar-warning');
+        }else{
+            \$selector.removeClass('progress-bar-warning');
+            \$selector.removeClass('progress-bar-sucess');
+            \$selector.addClass('progress-bar-danger');
+        }
+    }
+    function setProgressOnClick(){
+        var \$tds = $('td');
+        for(var i=13,j=0;i<\$tds.length;i+=8,j++){
+            for(var k=i;k<i+2;k++){
+                $(\$tds[k]).css('cursor','pointer');
+            }
+            
+            $(\$tds[i]).click(function(){
+                var streamName = $(this).siblings().eq(2).html();
+                window.location.href='index.php?r=monitor/streams&streams='+streamName+'&serverName=$serverName';
+            });
+            $(\$tds[i+1]).click(function(){
+                var streamName = $(this).siblings().eq(2).html();
+                window.location.href='index.php?r=monitor/streams&streams='+streamName+'&serverName=$serverName';
+            });
+        }
+    }
+    var updateStream = function(streamName, k){
+        var \$process = $('.progress .progress-bar');
+        var serverName = '$serverName';
+            $.get('index.php?r=monitor/update-stream-grid-info&serverName='+serverName+'&streamName='+streamName,function(data,status){
+                changeProcessColor($(\$process[k]),data.cpuInfo);
+                $(\$process[k]).css('width',data.cpuInfo+'%');
+                $(\$process[k]).text(data.cpuInfo+'%');
+                changeProcessColor($(\$process[k+1]),data.ramInfo);
+                $(\$process[k+1]).css('width',data.ramInfo+'%');
+                $(\$process[k+1]).text(data.ramInfo+'%');
+            });
+    }
+    var updateStreams = function(){
+        var \$process = $('.progress .progress-bar');
+        for(var i=0;i<\$process.length;i+=2){
+            var streamName = $($('.progress')[i]).parent().siblings().eq(2).html();
+            updateStream(streamName, i);
+        }
+    }
     $(document).ready(function() {
+        setProgressOnClick();
+        updateStreams();
+        setInterval(updateStreams,30000);
         $('#server-servername').change(function(){
-            $('#form').submit();
+            var server = $('#server-servername option:selected').text();
+            location.href='index.php?r=monitor/streams-monitor&serverName='+server;
         });
         $('.all').change(function(){
     		if(this.checked){

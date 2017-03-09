@@ -4,8 +4,8 @@ use app\models\ChartDraw;
 
 $request = Yii::$app->request;
 $this->title = 'RAM Chart';
-$this->params['breadcrumbs'][] = ['label' => 'Server Monitor', 'url' => ['servers']];
-$this->params['breadcrumbs'][] = ['label' => 'Server Details', 'url' => ['detail','serverName'=>$request->get('serverName')]];
+$this->params['breadcrumbs'][] = ['label' => 'Servers Status', 'url' => ['servers-status']];
+$this->params['breadcrumbs'][] = ['label' => 'Server Details', 'url' => ['server-detail','serverName'=>$request->get('serverName')]];
 $this->params['breadcrumbs'][] = $this->title;
 
 

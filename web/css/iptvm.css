@@ -526,10 +526,6 @@ table.dataTable thead .sorting:after {
     float:left;	
 }
 
-.gauge {
-    width: 250px;
-}
-
 .icon-index {
 	font-size: 5em;
 }
@@ -546,26 +542,6 @@ div.server-icon {
 	width: 360px;
 	margin-top: 1px;
 	margin-left: 3px;
-}
-
-#heat-map:-moz-full-screen {
-    width: 100%;
-	background: black;
-}
-
-#heat-map:-webkit-full-screen {
-  	width: 100%;
-	background: black;
-}
-
-#heat-map:-ms-fullscreen {
-    width: 100%;
-	background: black;
-}
-
-#heat-map:fullscreen {
-    width: 100%;
-	background: black;
 }
 .gototop{
 	position:fixed;

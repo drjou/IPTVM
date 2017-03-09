@@ -4,8 +4,8 @@ use yii\helpers\Html;
 
 $request = Yii::$app->request;
 $this->title = 'CPU Chart';
-$this->params['breadcrumbs'][] = ['label' => 'Server Monitor', 'url' => ['servers']];
-$this->params['breadcrumbs'][] = ['label' => 'Server Details', 'url' => ['detail','serverName'=>$request->get('serverName')]];
+$this->params['breadcrumbs'][] = ['label' => 'Servers Status', 'url' => ['servers-status']];
+$this->params['breadcrumbs'][] = ['label' => 'Servers Details', 'url' => ['server-detail','serverName'=>$request->get('serverName')]];
 $this->params['breadcrumbs'][] = $this->title;
 
 
