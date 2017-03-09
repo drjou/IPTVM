@@ -153,7 +153,7 @@ class StreamController extends Controller{
             try {
                 $xmlArray = simplexml_load_file($model->importFile->tempName);
                 $streams = json_decode(json_encode($xmlArray), true);
-                $columns = ['streamName', 'source', 'server', 'createTime', 'updateTime'];
+                $columns = ['streamName', 'status', 'source', 'sourceStatus', 'server', 'createTime', 'updateTime'];
                 $allStreams = null;
                 if(ArrayHelper::isIndexed($streams['Stream'])){
                     $allStreams = $streams['Stream'];
@@ -162,7 +162,7 @@ class StreamController extends Controller{
                 }
                 $rows = ArrayHelper::getColumn($allStreams, function($element){
                     $now = date('Y-m-d H:i:s', time());
-                    return [$element['streamName'], $element['source'], $element['server'], $now, $now];
+                    return [$element['streamName'], 1, $element['source'], 1, $element['server'], $now, $now];
                 });
                     $db = Yii::$app->db;
                     $db->createCommand()->batchInsert('stream', $columns, $rows)->execute();
