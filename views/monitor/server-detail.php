@@ -4,7 +4,8 @@ use yii\helpers\Url;
 use yii\widgets\DetailView;
 use yii\widgets\ActiveForm;
 $this->title = 'Server Details';
-$this->params['breadcrumbs'][] = ['label' => 'Server Status', 'url' => ['servers-status']];
+$this->params['breadcrumbs'][]=['label'=>'IPTV Monitor', 'url'=>['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Server Monitor', 'url' => ['servers-status']];
 $this->params['breadcrumbs'][] = $this->title;
 
 $request = Yii::$app->request;
@@ -83,6 +84,13 @@ $request = Yii::$app->request;
                                 'value' => '<span>'.$model->liveStreamsCount.' of '.$model->streamsCount.' Active</span>&nbsp;&nbsp;
                                 <a href="'.Url::to(['monitor/streams-monitor', 'serverName'=>$request->get('serverName')]).
                                 '&StreamSearch%5Bstatus%5D=1">View Details</a>',
+                            ],
+                            [
+                                'label' => 'Online Clients',
+                                'format' => 'html',
+                                'value' => '<span>'.$model->onlineClient.'</span>&nbsp;&nbsp;
+                                    <a href="'.Url::to(['monitor/client-monitor']).
+                                                            '">View Details</a>',
                             ],
                             [
                                 'label' => 'Nginx Status',

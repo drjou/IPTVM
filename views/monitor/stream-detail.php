@@ -6,6 +6,7 @@ use yii\helpers\Html;
 use app\models\ChartDraw;
 $request = Yii::$app->request;
 $this->title = 'Stream Details';
+$this->params['breadcrumbs'][]=['label'=>'IPTV Monitor', 'url'=>['index']];
 $this->params['breadcrumbs'][] = ['label' => 'Streams Monitor', 'url' => ['streams-monitor', 'serverName'=>$request->get('serverName')]];
 $this->params['breadcrumbs'][] = $this->title;
 $operation='
@@ -17,7 +18,6 @@ $operation='
                 $.get("index.php?r=monitor/update-stream-data&serverName='.$request->get('serverName').'&streamName='.$request->get('streamName').'&startTime="+startTime+"&endTime="+endTime,
                         function(data,status){
                              var obj = eval(data);
-                            console.log(obj);
                              for(var i=0;i<obj.length;i++){
                                 var id;
                                 switch(i){
@@ -35,6 +35,8 @@ $operation='
                             $("#memory-chart").highcharts().hideLoading();
                         });
     ';
+
+
 ?>
 <div class="row">
 	<div class="col-lg-12">
@@ -101,8 +103,8 @@ $operation='
                     <?= ChartDraw::drawDateRange($range, $minDate, $operation);?>
                     
                     <div class="btn-group right">
-                        <?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', null, ['class' => 'btn btn-default']);?>
-                        <?= Html::a('<i class="iconfont iconfont-blue icon-grid"></i>', null, ['class' => 'btn btn-default']);?>
+                        <?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', null, ['class' => 'btn btn-default', 'style'=>"background-color:#CCCCCC"]);?>
+                        <?= Html::a('<i class="iconfont iconfont-blue icon-grid"></i>', ['stream-info-grid','streamName'=>$request->get('streamName'),'serverName'=>$request->get('serverName'),'streams'=>'','StreamInfoSearch[server]'=>$request->get('serverName'),'StreamInfoSearch[streamName]'=>$request->get('streamName')], ['class' => 'btn btn-default']);?>
                     </div>
                     
                     <?= ChartDraw::drawLineChart('total-chart', $this, 'CPU Utilization of Stream', 'CPU Utilization Percentage of Process(%)', '%', $cpuData);?>
@@ -117,3 +119,12 @@ $operation='
 	</div>
 	<!-- /.col-lg-12 -->
 </div>
+
+<?php 
+$this->registerJs("
+    $(document).ready(function(){
+        $operation
+    });
+");
+
+?>

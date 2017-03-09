@@ -4,6 +4,7 @@ use yii\helpers\Html;
 
 $this->title='Nginx Grid';
 $this->params['breadcrumbs'][]=['label'=>'IPTV Monitor', 'url'=>['index']];
+$this->params['breadcrumbs'][]=['label'=>'Servers Fault', 'url'=>['servers-fault']];
 $this->params['breadcrumbs'][]=$this->title;
 
 $status=[
@@ -13,8 +14,8 @@ $status=[
 ?>
 
 <div class="btn-group right">
-	<?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', ['index'], ['class' => 'btn btn-default']);?>
-	<?= Html::a('<i class="iconfont iconfont-blue icon-grid"></i>', null, ['class' => 'btn btn-default']);?>
+	<?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', ['servers-fault'], ['class' => 'btn btn-default']);?>
+	<?= Html::a('<i class="iconfont iconfont-blue icon-grid"></i>', null, ['class' => 'btn btn-default', 'style'=>"background-color:#CCCCCC"]);?>
 </div><br/><br/>
 
 <?php 
@@ -36,7 +37,11 @@ echo GridView::widget([
         [
             'attribute' => 'server',
             'headerOptions' => ['width' => '100'],
-            'filter' => $servers
+            'filter' => $servers,
+            'format' => 'html',
+            'value' => function($model){
+                return Html::a($model->server, ['monitor/server-detail', 'serverName' => $model->server]);
+            },
         ],
         [
             'attribute' => 'status',
@@ -46,10 +51,6 @@ echo GridView::widget([
             'filter' => $status,
             'headerOptions' => ['width' => '85'],
         ],
-        [
-            'attribute' => 'recordTime',
-            'headerOptions' => ['width' => '180'],
-        ]
     ]
 ]);
 ?>

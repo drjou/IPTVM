@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\bootstrap\Modal;
 use yii\grid\GridView;
 $this->title = 'Streams Monitor';
+$this->params['breadcrumbs'][]=['label'=>'IPTV Monitor', 'url'=>['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
 $status = [
@@ -262,6 +263,7 @@ $this->registerJs("
         		$('.label-all').html('Deselect All');
         	}
 	    });
+        $('#server-streams .checkbox').css('display', 'inline');
     });
 ");
 ?>

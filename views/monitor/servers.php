@@ -3,7 +3,8 @@ use app\models\ChartDraw;
 use miloschuman\highcharts\Highcharts;
 use yii\web\JsExpression;
 $this->title = 'Server Utilization';
-$this->params['breadcrumbs'][] = ['label' => 'Servers Status', 'url' => ['servers-status']];
+$this->params['breadcrumbs'][]=['label'=>'IPTV Monitor', 'url'=>['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Servers Monitor', 'url' => ['servers-status']];
 $this->params['breadcrumbs'][] = $this->title;
 
 $operation = 'var time = $("#date-range").val().split(" - ");
@@ -55,3 +56,11 @@ $operation = 'var time = $("#date-range").val().split(" - ");
 <div class="gototop">
 	<a href="javascript:;" title="返回顶部"></a>
 </div>
+
+<?php 
+    $this->registerJs("
+        $(document).ready(function(){
+            $operation
+        });
+    ");
+?>

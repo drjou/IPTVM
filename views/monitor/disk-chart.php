@@ -4,7 +4,8 @@ use app\models\ChartDraw;
 
 $request = Yii::$app->request;
 $this->title = 'RAM Chart';
-$this->params['breadcrumbs'][] = ['label' => 'Servers Status', 'url' => ['servers-status']];
+$this->params['breadcrumbs'][]=['label'=>'IPTV Monitor', 'url'=>['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Servers Monitor', 'url' => ['servers-status']];
 $this->params['breadcrumbs'][] = ['label' => 'Server Details', 'url' => ['server-detail','serverName'=>$request->get('serverName')]];
 $this->params['breadcrumbs'][] = $this->title;
 
@@ -30,10 +31,10 @@ $operation = 'var time = $("#date-range").val().split(" - ");
 ?>
 
 <div class="btn-group right">
-	<?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', null, ['class' => 'btn btn-default']);?>
+	<?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', null, ['class' => 'btn btn-default', 'style'=>"background-color:#CCCCCC"]);?>
 	<?= Html::a('<i class="iconfont iconfont-blue icon-grid"></i>', ['disk-grid','serverName' => $request->get('serverName'),'type'=>1], ['class' => 'btn btn-default']);?>
 </div>
 <br/><br/>
 
 <?php
-echo ChartDraw::drawLineChart('linechart', $this, 'Disk Utilization', 'Free Percentage Disk(%)', '%', $data);
+echo ChartDraw::drawLineChart('linechart', $this, 'Disk Utilization', 'Used Percentage of Disk(%)', '%', $data);

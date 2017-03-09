@@ -30,6 +30,14 @@ use app\models\NginxInfo;
 use app\models\MysqlInfo;
 use app\models\MySql;
 use app\models\OnlineClientSearch;
+use app\models\StreamingLogSearch;
+use app\models\StreamingLog;
+use app\models\AgentLog;
+use app\models\AgentLogSearch;
+use app\models\StreamAccessLogSearch;
+use app\models\StreamAccessLog;
+use app\models\NginxInfoSearch;
+use app\models\MysqlInfoSearch;
 
 class MonitorController extends Controller
 {
@@ -153,27 +161,27 @@ class MonitorController extends Controller
         $range = $startTime.' - '.$endTime;
         $minDate = CPU::find()->min('recordTime');
         $threshold = Threshold::find()->one();
-        $cpuData = $this->getCpuWarningData($startTime, $endTime, $threshold->cpu);
-        $ramData = $this->getRamWarningData($startTime, $endTime, $threshold->memory);
-        $diskData = $this->getDiskWarningData($startTime, $endTime, $threshold->disk);
-        $loadData = $this->getLoadWarningData($startTime, $endTime, $threshold->loads);
-        $streamData = $this->getStreamWarningData($startTime, $endTime);
-        $streamData2 = $this->getStreamNames($startTime, $endTime);
-        $mySqlData = $this->getMySqlWarningData($startTime, $endTime);
-        $mySqlData2 = $this->getMySqlServers($startTime, $endTime);
+        $servers = Server::find()->asArray()->all();
+        $data = [];
+        for($i=0;$i<count($servers);$i++){
+            array_push($data, [
+                'name'=>$servers[$i]['serverName'],
+                'data'=>[]
+            ]);
+        }
+        $mySqlData = [
+            ['name'=>'count','data'=>[]]
+        ];
         $nginxData = $this->getNginxWarningData($startTime, $endTime);
         $nginxData2 = $this->getNginxServers($startTime, $endTime);
         return $this->render('servers-fault', [
-            'cpuData' => $cpuData,
-            'ramData' => $ramData,
-            'diskData' => $diskData,
-            'loadData' => $loadData,
-            'streamData' => $streamData,
-            'streamData2' => json_encode($streamData2),
+            'cpuData' => $data,
+            'ramData' => $data,
+            'diskData' => $data,
+            'loadData' => $data,
+            'streamData' => $data,
             'mySqlData' => $mySqlData,
-            'mySqlData2' => json_encode($mySqlData2),
-            'nginxData' => $nginxData,
-            'nginxData2' => json_encode($nginxData2),
+            'nginxData' => $mySqlData,
             'range' =>  $range,
             'minDate' => $minDate,
             'cpuThreshold' => $threshold->cpu+0,
@@ -183,6 +191,10 @@ class MonitorController extends Controller
         ]);
     }
 
+    /**
+     * stream-monitor界面所需数据
+     * @param string $serverName
+     */
     public function actionStreamsMonitor($serverName=null)
     {
         if($serverName===null){
@@ -205,6 +217,69 @@ class MonitorController extends Controller
             'dataProvider' => $dataProvider,
             'serverName' => $serverName
         ]);
+    }
+    /**
+     * streaming log界面数据
+     * @return string
+     */
+    public function actionStreamingLog(){
+        $filterModel = new StreamingLogSearch();
+        $dataProvider = $filterModel->search(Yii::$app->request->queryParams);
+        return $this->render('streaming-log',[
+            'filterModel' => $filterModel,
+            'dataProvider' => $dataProvider
+        ]);
+    }
+    /**
+     * 删除一个streaming log
+     */
+    public function actionDeleteStreamingLog($id){
+        $model = StreamingLog::findLogById($id);
+        $model->delete();
+        Yii::info("delete a streaming log named $id", 'monitor');
+        return $this->redirect(['streaming-log']);
+    }
+    /**
+     * agent log界面数据
+     * @return string
+     */
+    public function actionAgentLog(){
+        $filterModel = new AgentLogSearch();
+        $dataProvider = $filterModel->search(Yii::$app->request->queryParams);
+        return $this->render('agent-log',[
+            'filterModel' => $filterModel,
+            'dataProvider' => $dataProvider
+        ]);
+    }
+    /**
+     * 删除一个agent log
+     */
+    public function actionDeleteAgentLog($id){
+        $model = AgentLog::findLogById($id);
+        $model->delete();
+        Yii::info("delete a agent log named $id", 'monitor');
+        return $this->redirect(['agent-log']);
+    }
+    /**
+     * stream access log界面数据
+     * @return string
+     */
+    public function actionStreamAccessLog(){
+        $filterModel = new StreamAccessLogSearch();
+        $dataProvider = $filterModel->search(Yii::$app->request->queryParams);
+        return $this->render('stream-access-log',[
+            'filterModel' => $filterModel,
+            'dataProvider' => $dataProvider
+        ]);
+    }
+    /**
+     * 删除一个stream access log
+     */
+    public function actionDeleteStreamAccessLog($id){
+        $model = StreamAccessLog::findLogById($id);
+        $model->delete();
+        Yii::info("delete a stream access log named $id", 'monitor');
+        return $this->redirect(['stream-access-log']);
     }
     
     /**
@@ -365,6 +440,18 @@ class MonitorController extends Controller
         ]);
     }
     /**
+     * MySqlInfo数据
+     */
+    public function actionMysqlInfoGrid($serverName){
+        $filterModel = new MysqlInfoSearch();
+        $dataProvider = $filterModel->search(Yii::$app->request->queryParams);
+        return $this->render('mysql-info-grid',[
+            'filterModel' => $filterModel,
+            'dataProvider' => $dataProvider,
+            'servers' => $this->getServersForDrop()
+        ]);
+    }
+    /**
      * Nginx数据
      */
     public function actionNginxGrid(){
@@ -376,7 +463,18 @@ class MonitorController extends Controller
             'servers' => $this->getServersForDrop()
         ]);
     }
-    
+    /**
+     * NginxInfo数据
+     */
+    public function actionNginxInfoGrid($serverName){
+        $filterModel = new NginxInfoSearch();
+        $dataProvider = $filterModel->search(Yii::$app->request->queryParams);
+        return $this->render('nginx-info-grid',[
+            'filterModel' => $filterModel,
+            'dataProvider' => $dataProvider,
+            'servers' => $this->getServersForDrop()
+        ]);
+    }
     /**
      * 将串流进程的总利用率和内存利用率数据传回
      * @param string $serverName 服务器名
@@ -386,12 +484,19 @@ class MonitorController extends Controller
         $server = new Server();
         $startTime = date('Y-m-d H:i:s',time()-3600);
         $endTime = date('Y-m-d H:i:s',time());
-        $data = $this->getStreamsData($serverName, $streams, $startTime, $endTime);
         $range = $startTime.' - '.$endTime;
-        $minDate = StreamInfo::find()->where(['server'=>$serverName])->min('recordTime');
+        $minDate = CPU::find()->where(['server'=>$serverName])->min('recordTime');
+        $streamArr = explode(',', $streams);
+        $data = [];
+        for($i=0;$i<count($streamArr);$i++){
+            array_push($data, [
+                'name'=>$streamArr[$i],
+                'data'=>[]
+            ]);
+        }
         return $this->render('streams', [
-            'totalData' => $data[0],
-            'memoryData' => $data[1],
+            'totalData' => $data,
+            'memoryData' => $data,
             'range' => $range,
             'minDate' => $minDate
         ]);
@@ -400,11 +505,26 @@ class MonitorController extends Controller
     /**
      * 传回表格中的数据
      */
-    public function actionStreamsGrid($type){
-        $searchModel = new StreamInfoSearch();
+    public function actionStreamsGrid(){
+        $searchModel = new StreamSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
         return $this->render('streams-grid',[
             'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'servers' => $this->getServersForDrop()
+        ]);
+    }
+    
+    public function actionStreamInfoGrid($serverName, $streamName, $streams){
+        $filterModel = new StreamInfoSearch();
+        $dataProvider = null;
+        if($streams===''){
+            $dataProvider = $filterModel->search(Yii::$app->request->queryParams, null, null);
+        }else{
+            $dataProvider = $filterModel->search(Yii::$app->request->queryParams, $streams, $serverName);
+        }
+        return $this->render('streams-info-grid',[
+            'filterModel' => $filterModel,
             'dataProvider' => $dataProvider,
             'servers' => $this->getServersForDrop()
         ]);
@@ -416,19 +536,24 @@ class MonitorController extends Controller
     public function actionServers($servers){
         $startTime = date('Y-m-d H:i:s',time()-24*3600);
         $endTime = date('Y-m-d H:i:s',time());
-        $data = $this->getServersData($servers, $startTime, $endTime);
         $range = $startTime.' - '.$endTime;
         $minDate = CPU::find()->min('recordTime');
         $realTimes = RealTime::find()->asArray()->all();
-        $xCategories = ArrayHelper::getColumn($realTimes, 'server');
+        $serverArr = explode(',', $servers);
+        $data = [];
+        for($i=0;$i<count($serverArr);$i++){
+            array_push($data, [
+                'name'=>$serverArr[$i],
+                'data'=>[]
+            ]);
+        }
         return $this->render('servers', [
-            'cpuData' => $data[0],
-            'ramData' => $data[1],
-            'diskData' => $data[2],
-            'loadData' => $data[3],
+            'cpuData' => $data,
+            'ramData' => $data,
+            'diskData' => $data,
+            'loadData' => $data,
             'range' => $range,
             'minDate' => $minDate,
-            'xCategories' => $xCategories,
         ]);
     }
     /**
@@ -452,15 +577,22 @@ class MonitorController extends Controller
         $model = Stream::findStreamByKey($streamName, $serverName);
         $startTime = date('Y-m-d H:i:s',time()-24*3600);
         $endTime = date('Y-m-d H:i:s',time());
-        $data = $this->getStreamData($serverName, $streamName, $startTime, $endTime);
         $range = $startTime.' - '.$endTime;
-        $minDate = StreamInfo::find()->where(['server'=>$serverName])->min('recordTime');
+        $minDate = CPU::find()->where(['server'=>$serverName])->min('recordTime');
+        $cpuData = [
+            ['name'=>'Server CPU','data'=>[]],
+            ['name'=>'Stream CPU','data'=>[]]
+        ];
+        $ramData = [
+            ['name'=>'Server RAM','data'=>[]],
+            ['name'=>'Stream RAM','data'=>[]]
+        ];
         return $this->render('stream-detail', [
             'model' => $model,
-            'cpuData' => $data[0],
-            'ramData' => $data[1],
             'range' =>  $range,
             'minDate' => $minDate,
+            'cpuData' => $cpuData,
+            'ramData' => $ramData
         ]);
     }
     
@@ -479,7 +611,7 @@ class MonitorController extends Controller
             'minDate' => $minDate,
             'servers' => $this->getServersForDrop(),
             'model' => $model,
-            'status' => $status
+            'status' => $status,
         ]);
     }
     
@@ -851,8 +983,8 @@ class MonitorController extends Controller
         ->all();
         return [
             [
-                'name' => 'free',
-                'data' => $this->getChartDataByProperty($diskData, 'recordTime', 'freePercent')
+                'name' => 'used',
+                'data' => $this->getChartDataByProperty($diskData, 'recordTime', 'usedPercent')
             ]
         ];
     }

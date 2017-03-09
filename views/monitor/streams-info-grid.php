@@ -4,9 +4,9 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 
 $request = \Yii::$app->request;
-$this->title = 'Streams Grid';
+$this->title = 'Streams Info Grid';
 $this->params['breadcrumbs'][]=['label'=>'IPTV Monitor', 'url'=>['index']];
-$this->params['breadcrumbs'][] = ['label'=>'Servers Fault', 'url'=>'servers-fault'];
+$this->params['breadcrumbs'][] = ['label'=>'Streams Monitor', 'url'=>['streams-monitor', 'serverName'=>$request->get('serverName')]];
 $this->params['breadcrumbs'][] = $this->title;
 
 $enables = [
@@ -32,7 +32,6 @@ $columns = [
         'filter' => $enables,
         'headerOptions' => ['width' => '85'],
     ],
-    'source',
     [
         'attribute' => 'sourceStatus',
         'value' => function($model){
@@ -40,20 +39,29 @@ $columns = [
         },
         'filter' => $enables,
         'headerOptions' => ['width' => '85'],
-    ]
+    ],
+    'total','user', 'system', 'memory', 'rss', 'readByte', 'writeByte', 'recordTime'
 ];
+
+$url=null;
+if($request->get('streams')===''){
+    $url=['stream-detail', 'streamName'=>$request->get('streamName'), 'serverName'=>$request->get('serverName')];
+}else{
+    $url=['streams', 'streams'=>$request->get('streams'), 'serverName'=>$request->get('serverName')];
+}
 
 ?>
 
+
 <div class="btn-group right">
-	<?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', ['servers-fault'], ['class' => 'btn btn-default']);?>
+	<?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', $url, ['class' => 'btn btn-default']);?>
 	<?= Html::a('<i class="iconfont iconfont-blue icon-grid"></i>', null, ['class' => 'btn btn-default', 'style'=>"background-color:#CCCCCC"]);?>
 </div><br/><br/>
 
 <?php 
 echo GridView::widget([
     'dataProvider' => $dataProvider,
-    'filterModel' => $searchModel,
+    'filterModel' => $filterModel,
     'pager' => [
         'firstPageLabel' => 'First Page',
         'lastPageLabel' => 'Last Page',

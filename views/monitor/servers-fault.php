@@ -1,9 +1,15 @@
 <?php
 use app\models\ChartDraw;
 use yii\helpers\Html;
-$this->title = 'IPTV Monitor';
+
+$this->params['breadcrumbs'][]=['label'=>'IPTV Monitor', 'url'=>['index']];
+$this->title = 'Servers Fault';
 $this->params['breadcrumbs'][] = $this->title;
 
+$operationCPU = ChartDraw::operation('CPU', 'cpu-data-range', 'cpu-chart');
+$operationRAM = ChartDraw::operation('RAM', 'ram-data-range', 'ram-chart');
+$operationDisk = ChartDraw::operation('DISK', 'disk-data-range', 'disk-chart');
+$operationLoad = ChartDraw::operation('LOAD', 'load-data-range', 'load-chart');
 $operationStream = '
     var time = $("#stream-date-range").val().split(" - ");
     var startTime = Date.parse(new Date(time[0]));
@@ -61,10 +67,10 @@ $operationNginx = '
 			<div class="panel-body">
 				<div class="dataTable_wrapper">
                     <?php 
-                        ChartDraw::drawDateRange($range, $minDate, ChartDraw::operation('CPU', 'cpu-data-range', 'cpu-chart'), 'cpu-data-range');
+                        ChartDraw::drawDateRange($range, $minDate, $operationCPU, 'cpu-data-range');
                     ?>
                     <div class="btn-group right">
-                    	<?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', null, ['class' => 'btn btn-default']);?>
+                    	<?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', null, ['class' => 'btn btn-default', 'style'=>"background-color:#CCCCCC"]);?>
                     	<?= Html::a('<i class="iconfont iconfont-blue icon-grid"></i>', ['cpu-grid', 'serverName'=>'', 'type'=>0], ['class' => 'btn btn-default']);?>
                     </div>
                     <br/><br/>
@@ -90,10 +96,10 @@ $operationNginx = '
 			<div class="panel-body">
 				<div class="dataTable_wrapper">
                     <?php 
-                        ChartDraw::drawDateRange($range, $minDate, ChartDraw::operation('RAM', 'ram-data-range', 'ram-chart'), 'ram-data-range');
+                        ChartDraw::drawDateRange($range, $minDate, $operationRAM, 'ram-data-range');
                     ?>
                     <div class="btn-group right">
-                    	<?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', null, ['class' => 'btn btn-default']);?>
+                    	<?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', null, ['class' => 'btn btn-default', 'style'=>"background-color:#CCCCCC"]);?>
                     	<?= Html::a('<i class="iconfont iconfont-blue icon-grid"></i>', ['ram-grid', 'serverName'=>'', 'type'=>0], ['class' => 'btn btn-default']);?>
                     </div>
                     <br/><br/>
@@ -119,10 +125,10 @@ $operationNginx = '
 			<div class="panel-body">
 				<div class="dataTable_wrapper">
                     <?php 
-                        ChartDraw::drawDateRange($range, $minDate, ChartDraw::operation('DISK', 'disk-data-range', 'disk-chart'), 'disk-data-range');
+                        ChartDraw::drawDateRange($range, $minDate, $operationDisk, 'disk-data-range');
                     ?>
                     <div class="btn-group right">
-                    	<?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', null, ['class' => 'btn btn-default']);?>
+                    	<?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', null, ['class' => 'btn btn-default', 'style'=>"background-color:#CCCCCC"]);?>
                     	<?= Html::a('<i class="iconfont iconfont-blue icon-grid"></i>', ['disk-grid', 'serverName'=>'', 'type'=>0], ['class' => 'btn btn-default']);?>
                     </div>
                     <br/><br/>
@@ -148,10 +154,10 @@ $operationNginx = '
 			<div class="panel-body">
 				<div class="dataTable_wrapper">
                     <?php 
-                        ChartDraw::drawDateRange($range, $minDate, ChartDraw::operation('LOAD', 'load-data-range', 'load-chart'), 'load-data-range');
+                        ChartDraw::drawDateRange($range, $minDate, $operationLoad, 'load-data-range');
                     ?>
                     <div class="btn-group right">
-                    	<?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', null, ['class' => 'btn btn-default']);?>
+                    	<?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', null, ['class' => 'btn btn-default', 'style'=>"background-color:#CCCCCC"]);?>
                     	<?= Html::a('<i class="iconfont iconfont-blue icon-grid"></i>', ['load-grid', 'serverName'=>'', 'type'=>0], ['class' => 'btn btn-default']);?>
                     </div>
                     <br/><br/>
@@ -180,8 +186,8 @@ $operationNginx = '
                         ChartDraw::drawDateRange($range, $minDate, $operationStream, 'stream-date-range');
                     ?>
                     <div class="btn-group right">
-                    	<?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', null, ['class' => 'btn btn-default']);?>
-                    	<?= Html::a('<i class="iconfont iconfont-blue icon-grid"></i>', ['streams-grid','type'=>0], ['class' => 'btn btn-default']);?>
+                    	<?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', null, ['class' => 'btn btn-default', 'style'=>"background-color:#CCCCCC"]);?>
+                    	<?= Html::a('<i class="iconfont iconfont-blue icon-grid"></i>', ['streams-grid','type'=>0, 'StreamSearch[status]'=>0], ['class' => 'btn btn-default']);?>
                     </div>
                     <br/><br/>
                     
@@ -209,8 +215,8 @@ $operationNginx = '
                         ChartDraw::drawDateRange($range, $minDate, $operationMySql, 'mysql-date-range');
                     ?>
                     <div class="btn-group right">
-                    	<?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', null, ['class' => 'btn btn-default']);?>
-                    	<?= Html::a('<i class="iconfont iconfont-blue icon-grid"></i>', ['mysql-grid'], ['class' => 'btn btn-default']);?>
+                    	<?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', null, ['class' => 'btn btn-default', 'style'=>"background-color:#CCCCCC"]);?>
+                    	<?= Html::a('<i class="iconfont iconfont-blue icon-grid"></i>', ['mysql-grid', 'MySqlSearch[status]'=>0], ['class' => 'btn btn-default']);?>
                     </div>
                     <br/><br/>
                     
@@ -238,8 +244,8 @@ $operationNginx = '
                         ChartDraw::drawDateRange($range, $minDate, $operationNginx, 'nginx-date-range');
                     ?>
                     <div class="btn-group right">
-                    	<?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', null, ['class' => 'btn btn-default']);?>
-                    	<?= Html::a('<i class="iconfont iconfont-blue icon-grid"></i>', ['nginx-grid'], ['class' => 'btn btn-default']);?>
+                    	<?= Html::a('<i class="iconfont iconfont-blue icon-linechart"></i>', null, ['class' => 'btn btn-default', 'style'=>"background-color:#CCCCCC"]);?>
+                    	<?= Html::a('<i class="iconfont iconfont-blue icon-grid"></i>', ['nginx-grid', 'NginxSearch[status]'=>0], ['class' => 'btn btn-default']);?>
                     </div>
                     <br/><br/>
                     
@@ -274,15 +280,9 @@ $this->registerJs("
             },
             zIndex:100
         });
-        if(chart==$('#disk-chart').highcharts()){
-            chart.yAxis[0].update({
-                max:threshold
-            });
-        }else{
-            chart.yAxis[0].update({
-                min:threshold
-            });
-        }
+        chart.yAxis[0].update({
+            min:threshold
+        });
     }
     function updateStreamTooltip(obj){
         var chart = $('#stream-chart').highcharts();
@@ -339,44 +339,50 @@ $this->registerJs("
             }
         });
     }
-    function updateStreamStatus(){
-        $.get('index.php?r=monitor/update-server-status',function(data,status){
-            var obj = eval(data);
-            console.log(obj);
-            $('.hover-window').html(data);
-        })
-    }
     
-    window.onload = function(){
+    function initCpuChart(){
         var cpuChart = $('#cpu-chart').highcharts();
         addLine(cpuChart, $cpuThreshold);
+        $operationCPU
+    }
+    
+    function initRamChart(){
         var ramChart = $('#ram-chart').highcharts();
         addLine(ramChart, $memoryThreshold);
+        $operationRAM
+    }
+    
+    function initDiskChart(){
         var diskChart = $('#disk-chart').highcharts();
         addLine(diskChart, $diskThreshold);
+        $operationDisk
+    }
+    
+    function initLoadChart(){
         var loadChart = $('#load-chart').highcharts();
         addLine(loadChart, $loadsThreshold);
-        var obj = eval($streamData2);
-        updateStreamTooltip(obj);
-        var obj2 = eval($mySqlData2);
-        var chart1 = $('#mysql-chart').highcharts();
-        updateTooltip(obj2, chart1);
-        var obj3 = eval($nginxData2);
-        var chart2 = $('#nginx-chart').highcharts();
-        updateTooltip(obj3, chart2);
-        updateStreamStatus();
-        //setInterval(updateStreamStatus,1000);
-        $('.hover-btn').click(function(){
-            if($('#hide').html()=='hide'){
-                $('.hover-btn').animate({bottom:'0px'});
-                $('#hide').html('show');
-            }else{
-                $('#hide').html('hide');
-                $('.hover-btn').animate({bottom:'160px'});
-            }
-            $('.hover-window').slideToggle();
-            
-        }); 
+        $operationLoad
+    }
+    
+    function initStreamChart(){
+        $operationStream
+    }
+    
+    function initMySqlChart(){
+        $operationMySql
+    }
+    
+    function initNginxChart(){
+        $operationNginx
+    }
+    window.onload = function(){
+        initCpuChart();
+        initRamChart();
+        initDiskChart();
+        initLoadChart();
+        initStreamChart();
+        initMySqlChart();
+        initNginxChart();
     }
 ");
 

@@ -4,7 +4,8 @@ use yii\grid\GridView;
 use yii\bootstrap\Modal;
 use yii\bootstrap\ActiveForm;
 
-$this->title = 'Servers Status';
+$this->params['breadcrumbs'][]=['label'=>'IPTV Monitor', 'url'=>['index']];
+$this->title = 'Servers Monitor';
 $this->params['breadcrumbs'][] = $this->title;
 
 $status = [
@@ -225,7 +226,7 @@ $this->registerJs("
     $(document).ready(function() {
         setProgressOnClick();
         updateServers();
-        setInterval(updateServers,2000);
+        setInterval(updateServers,1000);
         $('.all').change(function(){
     		if(this.checked){
     			$('.label-all').html('Deselect All');
@@ -250,5 +251,6 @@ $this->registerJs("
         		$('.label-all').html('Deselect All');
         	}
 	    });
+        $('#server-servers .checkbox').css('display', 'inline');
     });
 ");
