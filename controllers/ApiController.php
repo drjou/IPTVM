@@ -111,7 +111,9 @@ class ApiController extends Controller{
                     'productName' => function($accountProduct){
                         return $accountProduct->product->productName;
                     },
-                    'endDate',
+                    'endDate' => function($accountProduct){
+                        return date("Y-m-d", $accountProduct->endDate);
+                    }
                 ],
             ]);
             Yii::info('get products', 'stb');
@@ -373,7 +375,7 @@ class ApiController extends Controller{
                 $model->scenario = Account::SCENARIO_SAVE;
                 if($model->save()){//首先更新stb状态为1001
                     $bindProducts = Stbbind::find()->where(['accountId' => $accountId])->all();
-                    $now = date('Y-m-d H:i:s', time());
+                    $now = time();
                     foreach ($bindProducts as $bindProduct){
                         $bindProduct->isActive = 1;
                         $bindProduct->activeDate = $now;
@@ -381,7 +383,7 @@ class ApiController extends Controller{
                             $db->createCommand()->insert('account_product', [
                                 'accountId' => $accountId,
                                 'productId' => $bindProduct->productId,
-                                'endDate' => date('Y-m-d', strtotime("+$bindProduct->bindDay day")),
+                                'endDate' => strtotime("+$bindProduct->bindDay day"),
                             ])->execute();
                             
                         }else {//保存失败就rollback
@@ -459,10 +461,10 @@ class ApiController extends Controller{
                 $accountProduct = AccountProduct::find()->where(['accountId' => $accountId, 'productId' => $card->productId])->one();
                 if(!empty($accountProduct)){//如果之前就有，则只需更新下产品的到期时间
                     $transaction = Yii::$app->db->beginTransaction();
-                    $accountProduct->endDate = date('Y-m-d', strtotime("+$card->cardValue day", strtotime($accountProduct->endDate)));
+                    $accountProduct->endDate = strtotime("+$card->cardValue day", $accountProduct->endDate);
                     if($accountProduct->save()){//保存成功则购买成功，更新充值卡状态
                         $card->cardState = 1;
-                        $card->useDate = date('Y-m-d', time());
+                        $card->useDate = time();
                         $card->accountId = $accountId;
                         $card->scenario = Productcard::SCENARIO_API;
                         if($card->save()){//修改充值卡状态成功
@@ -489,10 +491,10 @@ class ApiController extends Controller{
                     $accountProduct = new AccountProduct();
                     $accountProduct->accountId = $accountId;
                     $accountProduct->productId = $card->productId;
-                    $accountProduct->endDate = date('Y-m-d', strtotime("+$card->cardValue day"));
+                    $accountProduct->endDate = strtotime("+$card->cardValue day");
                     if($accountProduct->save()){//成功
                         $card->cardState = 1;
-                        $card->useDate = date('Y-m-d', time());
+                        $card->useDate = time();
                         $card->accountId = $accountId;
                         $card->scenario = Productcard::SCENARIO_API;
                         if($card->save()){//修改充值卡状态成功
@@ -523,10 +525,10 @@ class ApiController extends Controller{
                     $accountProduct = new AccountProduct();
                     $accountProduct->accountId = $accountId;
                     $accountProduct->productId = $card->productId;
-                    $accountProduct->endDate = date('Y-m-d', strtotime("+$card->cardValue day"));
+                    $accountProduct->endDate = strtotime("+$card->cardValue day");
                     if($accountProduct->save()){//数据加入成功
                         $card->cardState = 1;
-                        $card->useDate = date('Y-m-d', time());
+                        $card->useDate = time();
                         $card->accountId = $accountId;
                         $card->scenario = Productcard::SCENARIO_API;
                         if($card->save()){//修改充值卡状态成功
@@ -570,10 +572,10 @@ class ApiController extends Controller{
                 $accountProduct = new AccountProduct();
                 $accountProduct->accountId = $accountId;
                 $accountProduct->productId = $card->productId;
-                $accountProduct->endDate = date('Y-m-d', strtotime("+$card->cardValue day"));
+                $accountProduct->endDate = strtotime("+$card->cardValue day");
                 if($accountProduct->save()){//加入新的数据成功
                     $card->cardState = 1;
-                    $card->useDate = date('Y-m-d', time());
+                    $card->useDate = time();
                     $card->accountId = $accountId;
                     $card->scenario = Productcard::SCENARIO_API;
                     if($card->save()){//修改充值卡状态成功
