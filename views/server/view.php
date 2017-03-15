@@ -2,6 +2,7 @@
 
 use yii\widgets\DetailView;
 use yii\helpers\Html;
+use app\models\Timezone;
 $this->title = 'Server ' . $model->serverName;
 $this->params['breadcrumbs'][] = ['label' => 'Monitored Servers', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
@@ -25,8 +26,14 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'value' => $model->status ? 'up' : 'down',
                             ],
                             'operatingSystem',
-                            'createTime',
-                            'updateTime',
+                            [
+                                'attribute' => 'createTime',
+                                'value' => Timezone::date($model->createTime),
+                            ],
+                            [
+                                'attribute' => 'updateTime',
+                                'value' => Timezone::date($model->updateTime),
+                            ],
                         ],
                     ]) ?>
 				</div>

@@ -124,7 +124,7 @@ class LanguageController extends Controller{
                 $languages = json_decode(json_encode($xmlArray), true);
                 $columns = ['languageName', 'createTime', 'updateTime'];
                 $rows = ArrayHelper::getColumn($languages['Language'], function($element){
-                    $now = date('Y-m-d H:i:s', time());
+                    $now = time();
                     return [$element['languageName'], $now, $now];
                 });
                     $db = Yii::$app->db;

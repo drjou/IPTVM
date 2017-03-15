@@ -122,7 +122,7 @@ class AccountController extends Controller{
                 $accouts = json_decode(json_encode($xmlArray), true);
                 $columns = ['accountId', 'state', 'enable', 'createTime', 'updateTime'];
                 $rows = ArrayHelper::getColumn($accouts['Account'], function($element){
-                    $now = date('Y-m-d H:i:s', time());
+                    $now = time();
                     return [$element['accountId'], $element['state'], $element['enable'], $now, $now];
                 });
                 $db = Yii::$app->db;

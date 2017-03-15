@@ -1,6 +1,7 @@
 <?php
 use yii\grid\GridView;
 use yii\helpers\Html;
+use app\models\Timezone;
 $this->title = 'Agent Log';
 $this->params['breadcrumbs'][]=['label'=>'IPTV Monitor', 'url'=>['index']];
 $this->params['breadcrumbs'][] = $this->title;
@@ -43,7 +44,12 @@ $status = [
             },
         ],
         'detail',
-        'recordTime',
+        [
+            'attribute' => 'recordTime',
+            'value' => function($model){
+                return Timezone::date($model->recordTime);
+            }
+        ],
         [
             'class' => 'yii\grid\ActionColumn',
             'header' => 'Operations',

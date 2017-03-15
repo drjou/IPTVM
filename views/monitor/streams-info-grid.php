@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use app\models\Timezone;
 
 $request = \Yii::$app->request;
 $this->title = 'Streams Info Grid';
@@ -40,7 +41,13 @@ $columns = [
         'filter' => $enables,
         'headerOptions' => ['width' => '85'],
     ],
-    'total','user', 'system', 'memory', 'rss', 'readByte', 'writeByte', 'recordTime'
+    'total','user', 'system', 'memory', 'rss', 'readByte', 'writeByte', 
+    [
+        'attribute' => 'recordTime',
+        'value' => function($model){
+            return Timezone::date($model->recordTime);
+        }
+    ],
 ];
 
 $url=null;

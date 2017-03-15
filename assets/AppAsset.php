@@ -28,6 +28,7 @@ class AppAsset extends AssetBundle
     public $js = [
         'js/iptvm.js',
         'plugins/metisMenu/metisMenu.min.js',
+        'js/iconfont.js',
     ];
     public $depends = [
         'yii\web\YiiAsset',

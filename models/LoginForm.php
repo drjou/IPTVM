@@ -67,7 +67,7 @@ class LoginForm extends Model
             $state = Yii::$app->user->login($user, $this->rememberMe ? 3600*24*30 : 0);
             if($state){
                 //更新最后一次登录时间
-                $user->lastLoginTime = date('Y-m-d H:i:s',time());
+                $user->lastLoginTime = time();
                 $user->scenario = Admin::SCENARIO_UPDATE;
                 $user->save();
             }

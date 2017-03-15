@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\base\Widget;
+use app\models\Timezone;
 $this->title = 'Administrator List';
 $this->params['breadcrumbs'][] = $this->title;
 $types = [
@@ -60,8 +61,12 @@ $types = [
             },
             'filter' => $types,
         ],
-        'lastLoginTime',
-        'createTime',
+        [
+            'attribute' => 'lastLoginTime',
+            'value' => function($model){
+                return Timezone::date($model->lastLoginTime);
+            },
+        ],
         [
             'class' => 'yii\grid\ActionColumn',
             'header' => 'Operations',

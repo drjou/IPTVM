@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\base\Widget;
 use app\models\Admin;
+use app\models\Timezone;
 $this->title = 'Administrator Log List';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -35,7 +36,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
             },
         ],
-        'log_time',
+        [
+            'attribute' => 'log_time',
+            'value' => function($model){
+                return Timezone::date($model->log_time);
+            }
+        ],
         [
             'attribute' => 'message',
             'value' => function($model){

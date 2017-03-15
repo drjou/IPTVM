@@ -11,7 +11,7 @@ class StreamingLogSearch extends StreamingLog{
      */
     public function rules(){
         return [
-            [['id', 'streamName', 'server', 'status', 'detail', 'recordTime'], 'safe']
+            [['id', 'streamName', 'server', 'status', 'detail'], 'safe']
         ];
     }
     /**
@@ -44,8 +44,7 @@ class StreamingLogSearch extends StreamingLog{
         ->andFilterWhere(['like', 'streamName', $this->streamName])
         ->andFilterWhere(['like', 'server', $this->server])
         ->andFilterWhere(['=', 'status', $this->status])
-        ->andFilterWhere(['like', 'detail', $this->detail])
-        ->andFilterWhere(['like', 'recordTime', $this->recordTime]);
+        ->andFilterWhere(['like', 'detail', $this->detail]);
         return $dataProvider;
     }
 }

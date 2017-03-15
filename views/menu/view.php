@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\base\Widget;
 use yii\grid\GridView;
+use app\models\Timezone;
 $this->title = 'Menu ' . $model->menuName;
 $this->params['breadcrumbs'][] = ['label' => 'Menu List', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
@@ -34,8 +35,14 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'value' => $model->icon . '<span class="' . $model->icon . '"></span>',
                                 'format' => 'html',
                             ],
-                            'createTime',
-                            'updateTime',
+                            [
+                                'attribute' => 'createTime',
+                                'value' => Timezone::date($model->createTime),
+                            ],
+                            [
+                                'attribute' => 'updateTime',
+                                'value' => Timezone::date($model->updateTime),
+                            ],
                         ],
                     ]) ?>
 				</div>

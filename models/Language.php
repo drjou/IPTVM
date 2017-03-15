@@ -30,7 +30,6 @@ class Language extends ActiveRecord{
                 'class' => TimestampBehavior::className(),
                 'createdAtAttribute' => 'createTime',
                 'updatedAtAttribute' => 'updateTime',
-                'value' => new Expression('NOW()'),
             ],
         ];
     }

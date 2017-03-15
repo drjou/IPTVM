@@ -22,24 +22,386 @@
 .iconfont-blue {
 	color:#337ab7
 }
+.icon-shijian:before { content: "\e611"; }
+
+.icon-linechart:before { content: "\e64a"; }
+
+.icon-dashboard:before { content: "\e663"; }
+
 .icon-home:before { content: "\e602"; }
+
+.icon-stream:before { content: "\e644"; }
+
 .icon-language:before { content: "\e609"; }
+
+.icon-monitor:before { content: "\e76a"; }
+
+.icon-msnui-alive:before { content: "\e72f"; }
+
+.icon-server:before { content: "\e610"; }
+
+.icon-streaming-log:before { content: "\ea1b"; }
+
+.icon-logs:before { content: "\ea2c"; }
+
+.icon-agent-log:before { content: "\ea44"; }
+
+.icon-fullscreen:before { content: "\e63a"; }
+
+.icon-api-access-log:before { content: "\e625"; }
+
 .icon-channel:before { content: "\e603"; }
+
+.icon-status:before { content: "\e61a"; }
+
+.icon-fault:before { content: "\e61b"; }
+
+.icon-grid:before { content: "\e64c"; }
+
+.icon-client:before { content: "\e626"; }
+
 .icon-product:before { content: "\e604"; }
-.icon-iconfontiptv1:before { content: "\e600"; }
+
+.icon-iptv:before { content: "\e600"; }
+
 .icon-productcard:before { content: "\e605"; }
-.icon-stb-log:before { content: "\e60e"; }
+
+.icon-stream-access-log:before { content: "\e618"; }
+
+.icon-zhuangtai:before { content: "\e60c"; }
+
+.icon-onlineuser:before { content: "\e803"; }
+
+.icon-configuration:before { content: "\e616"; }
+
 .icon-user:before { content: "\e606"; }
+
 .icon-menu:before { content: "\e60a"; }
+
 .icon-directory:before { content: "\e607"; }
+
 .icon-log:before { content: "\e60b"; }
+
 .icon-admin:before { content: "\e608"; }
+
 .icon-houtaiguanli:before { content: "\e601"; }
+
+.icon-dian:before { content: "\e612"; }
+
 .icon-admin-log:before { content: "\e60f"; }
-.icon-dashboard:before { content: "\e663";}
-.icon-linechart:before { content: "\e64a"}
-.icon-grid:before { content: "\e64c"}
-.icon-server:before { content: "\e610"}
-.icon-fullscreen:before { content: "\e63a"}
-.icon-monitor:before { content: "\e76a"}
-.icon-stream:before { content: "\e644"}
+
+.icon-connections:before { content: "\e60d"; }
+
+.icon-threshold:before { content: "\e83b"; }
+
+.icon-timezone:before { content: "\e613"; }
+
+.icon-bujinafasuo:before { content: "\e69a"; }
+
+.icon-bujinafasuo1:before { content: "\e69b"; }
+
+.icon-duoge:before { content: "\e69c"; }
+
+.icon-bulongdi:before { content: "\e69d"; }
+
+.icon-fodejiao:before { content: "\e69e"; }
+
+.icon-eliteliya:before { content: "\e69f"; }
+
+.icon-gangguominzhugongheguo:before { content: "\e6a0"; }
+
+.icon-gangguo:before { content: "\e6a1"; }
+
+.icon-jibuti:before { content: "\e6a2"; }
+
+.icon-jineiya:before { content: "\e6a3"; }
+
+.icon-jineiyabishao:before { content: "\e6a4"; }
+
+.icon-jiapeng:before { content: "\e6a5"; }
+
+.icon-chidaojineiya:before { content: "\e6a6"; }
+
+.icon-gangbiya:before { content: "\e6a7"; }
+
+.icon-jiana:before { content: "\e6a8"; }
+
+.icon-ketediwa:before { content: "\e6a9"; }
+
+.icon-kemoluo:before { content: "\e6aa"; }
+
+.icon-kenniya:before { content: "\e6ab"; }
+
+.icon-libiya:before { content: "\e6ac"; }
+
+.icon-libiliya:before { content: "\e6ad"; }
+
+.icon-luwangda:before { content: "\e6ae"; }
+
+.icon-jinbabuwei:before { content: "\e6af"; }
+
+.icon-madajiasijia:before { content: "\e6b0"; }
+
+.icon-mali:before { content: "\e718"; }
+
+.icon-maoliqiusi:before { content: "\e719"; }
+
+.icon-maolitaliya:before { content: "\e71a"; }
+
+.icon-namibiya:before { content: "\e71b"; }
+
+.icon-moluoge1:before { content: "\e71c"; }
+
+.icon-nirier:before { content: "\e71d"; }
+
+.icon-nanfei:before { content: "\e71e"; }
+
+.icon-niriliya:before { content: "\e71f"; }
+
+.icon-saineijiaer:before { content: "\e720"; }
+
+.icon-saisheer:before { content: "\e721"; }
+
+.icon-shengduomeihepulinxibi:before { content: "\e722"; }
+
+.icon-mosangbike:before { content: "\e723"; }
+
+.icon-malawei:before { content: "\e724"; }
+
+.icon-suomali:before { content: "\e725"; }
+
+.icon-sudan:before { content: "\e726"; }
+
+.icon-sailaliang:before { content: "\e727"; }
+
+.icon-tasangniya:before { content: "\e728"; }
+
+.icon-tunisi:before { content: "\e729"; }
+
+.icon-zhade:before { content: "\e72a"; }
+
+.icon-siweishilan:before { content: "\e72b"; }
+
+.icon-wuganda:before { content: "\e72c"; }
+
+.icon-zhongfei:before { content: "\e72d"; }
+
+.icon-aisaiebiya:before { content: "\e72e"; }
+
+.icon-angela:before { content: "\e730"; }
+
+.icon-bociwana:before { content: "\e731"; }
+
+.icon-zanbiya:before { content: "\e732"; }
+
+.icon-beining:before { content: "\e733"; }
+
+.icon-aerjiliya:before { content: "\e734"; }
+
+.icon-aiji:before { content: "\e735"; }
+
+.icon-boliweiya:before { content: "\e6b1"; }
+
+.icon-baxi:before { content: "\e6b2"; }
+
+.icon-gelunbiya:before { content: "\e6b3"; }
+
+.icon-guba:before { content: "\e6b4"; }
+
+.icon-gelinnada:before { content: "\e6b5"; }
+
+.icon-duominike:before { content: "\e6b6"; }
+
+.icon-guiyana:before { content: "\e6b7"; }
+
+.icon-hongdulasi:before { content: "\e6b8"; }
+
+.icon-jianada:before { content: "\e6b9"; }
+
+.icon-ejialagua:before { content: "\e6ba"; }
+
+.icon-meiguo:before { content: "\e6bb"; }
+
+.icon-shengjiciheniweisi:before { content: "\e70c"; }
+
+.icon-shengluxiya:before { content: "\e70d"; }
+
+.icon-shengwensentehegelinnadingsi:before { content: "\e70e"; }
+
+.icon-tenilidaheduobage:before { content: "\e70f"; }
+
+.icon-sulinan:before { content: "\e710"; }
+
+.icon-yamaijia:before { content: "\e711"; }
+
+.icon-zhili:before { content: "\e712"; }
+
+.icon-antiguahebadabu:before { content: "\e713"; }
+
+.icon-babaduosi:before { content: "\e714"; }
+
+.icon-bahama:before { content: "\e715"; }
+
+.icon-agenting:before { content: "\e716"; }
+
+.icon-wulagui:before { content: "\e717"; }
+
+.icon-bingdao:before { content: "\e6bc"; }
+
+.icon-bilishi:before { content: "\e6bd"; }
+
+.icon-bolan:before { content: "\e6be"; }
+
+.icon-danmai:before { content: "\e6bf"; }
+
+.icon-deguo:before { content: "\e6c0"; }
+
+.icon-bosiliyaheheisaiweina:before { content: "\e6c1"; }
+
+.icon-eluosi:before { content: "\e6c2"; }
+
+.icon-baieluosi:before { content: "\e6c3"; }
+
+.icon-fenlan:before { content: "\e6c4"; }
+
+.icon-faguo:before { content: "\e6c5"; }
+
+.icon-latuoweiya:before { content: "\e6c6"; }
+
+.icon-baojialiya:before { content: "\e6c7"; }
+
+.icon-jieke:before { content: "\e6c8"; }
+
+.icon-helan:before { content: "\e6c9"; }
+
+.icon-litaowan:before { content: "\e6ca"; }
+
+.icon-luomaniya:before { content: "\e6cb"; }
+
+.icon-maqidun:before { content: "\e6cc"; }
+
+.icon-moluoge:before { content: "\e6cd"; }
+
+.icon-lusenbao:before { content: "\e6ce"; }
+
+.icon-nuowei:before { content: "\e6f9"; }
+
+.icon-ruidian:before { content: "\e6fa"; }
+
+.icon-liezhidunshideng:before { content: "\e6fb"; }
+
+.icon-ruishi:before { content: "\e6fc"; }
+
+.icon-keluodiya:before { content: "\e6fd"; }
+
+.icon-sinuofake:before { content: "\e6fe"; }
+
+.icon-wukelan:before { content: "\e6ff"; }
+
+.icon-sinuowenniya:before { content: "\e700"; }
+
+.icon-moerduowa:before { content: "\e701"; }
+
+.icon-xila:before { content: "\e702"; }
+
+.icon-xiongyali:before { content: "\e703"; }
+
+.icon-yidali:before { content: "\e704"; }
+
+.icon-maerta:before { content: "\e705"; }
+
+.icon-aierlan:before { content: "\e706"; }
+
+.icon-yingguo:before { content: "\e707"; }
+
+.icon-aerbaniya:before { content: "\e708"; }
+
+.icon-aishaniya:before { content: "\e709"; }
+
+.icon-aodili:before { content: "\e70a"; }
+
+.icon-andaoer:before { content: "\e70b"; }
+
+.icon-dongdiwen:before { content: "\e6cf"; }
+
+.icon-gelujiya:before { content: "\e6d0"; }
+
+.icon-feilvbin:before { content: "\e6d1"; }
+
+.icon-zhaoxian:before { content: "\e6d2"; }
+
+.icon-qiataer:before { content: "\e6d3"; }
+
+.icon-hanguo:before { content: "\e6d4"; }
+
+.icon-keweite:before { content: "\e6d5"; }
+
+.icon-laozhua:before { content: "\e6d6"; }
+
+.icon-jierjisisitan:before { content: "\e6d7"; }
+
+.icon-libanen:before { content: "\e6d8"; }
+
+.icon-hasakesitan:before { content: "\e6d9"; }
+
+.icon-maerdaifu:before { content: "\e6da"; }
+
+.icon-mengjialaguo:before { content: "\e6db"; }
+
+.icon-niboer:before { content: "\e6dc"; }
+
+.icon-riben:before { content: "\e6dd"; }
+
+.icon-menggu:before { content: "\e6de"; }
+
+.icon-miandian:before { content: "\e6df"; }
+
+.icon-jianpuzhai:before { content: "\e6e0"; }
+
+.icon-sililanqia:before { content: "\e6e1"; }
+
+.icon-shatealabo:before { content: "\e6e2"; }
+
+.icon-malaixiya:before { content: "\e6e3"; }
+
+.icon-saipulusi:before { content: "\e6e4"; }
+
+.icon-tuerqi:before { content: "\e6e5"; }
+
+.icon-taiguo:before { content: "\e6e6"; }
+
+.icon-tajikesitan:before { content: "\e6e7"; }
+
+.icon-xinjiapo:before { content: "\e6e8"; }
+
+.icon-wuzibiekesitan:before { content: "\e6e9"; }
+
+.icon-xuliya:before { content: "\e6ea"; }
+
+.icon-yameiliya:before { content: "\e6eb"; }
+
+.icon-yemen:before { content: "\e6ec"; }
+
+.icon-yindunixiya:before { content: "\e6ed"; }
+
+.icon-yiselie:before { content: "\e6ee"; }
+
+.icon-yuedan:before { content: "\e6ef"; }
+
+.icon-zhongguo:before { content: "\e6f0"; }
+
+.icon-wenlai:before { content: "\e6f1"; }
+
+.icon-alabolianheqiuchangguo:before { content: "\e6f2"; }
+
+.icon-yilang:before { content: "\e6f3"; }
+
+.icon-balesitan:before { content: "\e6f4"; }
+
+.icon-asaibaijiang:before { content: "\e6f5"; }
+
+.icon-yindu:before { content: "\e6f6"; }
+
+.icon-balin:before { content: "\e6f7"; }
+
+.icon-yuenan:before { content: "\e6f8"; }

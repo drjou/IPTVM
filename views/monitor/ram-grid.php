@@ -1,6 +1,7 @@
 <?php
 use yii\helpers\Html;
 use yii\grid\GridView;
+use app\models\Timezone;
 
 $request = Yii::$app->request;
 $this->title = 'RAM Grid';
@@ -42,16 +43,18 @@ echo GridView::widget([
             'headerOptions' => ['width' => '100'],
             'filter' => $servers
         ],
-        [
-            'attribute' => 'recordTime',
-            'headerOptions' => ['width' => '180'],
-        ],
         'utilize', 
         'free', 
         'used', 
         'total', 
         'buffer', 
-        'cache'
+        'cache',
+        [
+            'attribute' => 'recordTime',
+            'value' => function($model){
+                return Timezone::date($model->recordTime);
+            }
+        ],
     ]
 ]);
 ?>

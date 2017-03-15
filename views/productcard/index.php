@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\base\Widget;
+use app\models\Timezone;
 $this->title = 'Productcard List';
 $this->params['breadcrumbs'][] = $this->title;
 $types = [
@@ -62,7 +63,12 @@ $types = [
             },
             'filter' => $types,
         ],
-        'useDate',
+        [
+            'attribute' => 'useDate',
+            'value' => function($model){
+                return Timezone::date($model->useDate);
+            }
+        ],
         [
             'attribute' => 'accountId',
             'format' => 'raw',
@@ -72,7 +78,6 @@ $types = [
                 }
             }
         ],
-        'createTime',
         [
             'class' => 'yii\grid\ActionColumn',
             'header' => 'Operations',

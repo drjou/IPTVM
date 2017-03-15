@@ -3,6 +3,7 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\DetailView;
 use yii\helpers\ArrayHelper;
+use app\models\Timezone;
 $this->title = 'Product ' . $model->productName;
 $this->params['breadcrumbs'][] = ['label' => 'Product List', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
@@ -28,8 +29,14 @@ $this->params['breadcrumbs'][] = $this->title;
 					    },
                         'attributes' => [
                             'productName',
-                            'createTime',
-                            'updateTime',
+                            [
+                                'attribute' => 'createTime',
+                                'value' => Timezone::date($model->createTime),
+                            ],
+                            [
+                                'attribute' => 'updateTime',
+                                'value' => Timezone::date($model->updateTime),
+                            ],
                         ],
                     ]) ?>
 				</div>
@@ -78,7 +85,12 @@ $this->params['breadcrumbs'][] = $this->title;
     					           return $model->cardState ? 'used' : 'not used';
     					        }
 					        ],
-                            'useDate',
+					        [
+    					        'attribute' => 'useDate',
+    					        'value' => function($model){
+    					           return Timezone::date($model->useDate);
+    					        }
+					        ],
                             [
                                 'attribute'=>"accountId",
                                 'format'=>'raw',
@@ -228,7 +240,12 @@ $this->params['breadcrumbs'][] = $this->title;
     					           return $model->isActive ? 'yes' : 'no';
     					        }
 					        ],
-                            'activeDate',
+					        [
+    					        'attribute' => 'activeDate',
+    					        'value' => function($model){
+    					           return Timezone::date($model->activeDate);
+    					        }
+					        ],
                         ],
                       ]);
                     ?>

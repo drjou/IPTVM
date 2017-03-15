@@ -124,7 +124,7 @@ class ProductController extends Controller{
                 $products = json_decode(json_encode($xmlArray), true);
                 $columns = ['productName', 'createTime', 'updateTime'];
                 $rows = ArrayHelper::getColumn($products['Product'], function($element){
-                    $now = date('Y-m-d H:i:s', time());
+                    $now = time();
                     return [$element['productName'], $now, $now];
                 });
                     $db = Yii::$app->db;

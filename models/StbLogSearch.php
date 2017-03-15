@@ -11,7 +11,7 @@ class StbLogSearch extends StbLog{
      */
     public function rules(){
         return [
-            [['prefix', 'log_time', 'message'], 'safe'],
+            [['prefix', 'message'], 'safe'],
         ];
     }
     /**
@@ -32,7 +32,6 @@ class StbLogSearch extends StbLog{
             return $dataProvider;
         }
         $query->andFilterWhere(['like', 'prefix', $this->prefix])
-        ->andFilterWhere(['like', 'log_time', $this->log_time])
         ->andFilterWhere(['like', 'message', $this->message]);
         return $dataProvider;
     }

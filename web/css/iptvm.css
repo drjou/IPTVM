@@ -104,7 +104,7 @@ body {
     z-index: 1;
     position: absolute;
     width: 250px;
-    margin-top: 51px;
+    margin-top: 60px;
   }
   .navbar-top-links .dropdown-messages,
   .navbar-top-links .dropdown-tasks,
@@ -565,4 +565,16 @@ div.server-icon {
 .gototop a:hover{
 	background:url(../images/gototop.gif) no-repeat;
 	outline:none;
+}
+
+.icon {
+	/* 通过设置 font-size 来改变图标大小 */
+    width: 2em; height: 2em; 
+    /* 图标和文字相邻时，垂直对齐 */
+    vertical-align: -0.7em;
+    /* 通过设置 color 来改变 SVG 的颜色/fill */
+    fill: currentColor;
+    /* path 和 stroke 溢出 viewBox 部分在 IE 下会显示
+       normalize.css 中也包含这行 */
+    overflow: hidden;
 }

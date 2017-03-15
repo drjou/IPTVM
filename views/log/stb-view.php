@@ -2,6 +2,7 @@
 use yii\widgets\DetailView;
 use yii\helpers\Html;
 use app\models\Account;
+use app\models\Timezone;
 $this->title = 'STB Log Detail';
 $this->params['breadcrumbs'][] = ['label' => 'STB Log List', 'url' => ['stb']];
 $this->params['breadcrumbs'][] = $this->title;
@@ -21,7 +22,10 @@ $this->params['breadcrumbs'][] = $this->title;
             'format' => 'raw',
             'value' => empty(Account::findOne($model->prefix)) ? $model->prefix : Html::a($model->prefix, ['account/view', 'accountId' => $model->prefix], ['title' => 'view']),
         ],
-        'log_time',
+        [
+            'attribute' => 'log_time',
+            'value' => Timezone::date($model->log_time),
+        ],
         'message',
         'category',
     ],

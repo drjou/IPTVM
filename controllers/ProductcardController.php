@@ -125,7 +125,7 @@ class ProductcardController extends Controller{
                 $productcards = json_decode(json_encode($xmlArray), true);
                 $columns = ['cardNumber', 'cardValue', 'productId', 'cardState', 'createTime', 'updateTime'];
                 $rows = ArrayHelper::getColumn($productcards['Productcard'], function($element){
-                    $now = date('Y-m-d H:i:s', time());
+                    $now = time();
                     return [$element['cardNumber'], $element['cardValue'], $element['productId'], $element['cardState'], $now, $now];
                 });
                     $db = Yii::$app->db;

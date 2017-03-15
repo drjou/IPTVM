@@ -1,6 +1,7 @@
 <?php
 use yii\helpers\Html;
 use yii\grid\GridView;
+use app\models\Timezone;
 
 $request = Yii::$app->request;
 
@@ -45,14 +46,16 @@ echo GridView::widget([
             'headerOptions' => ['width' => '100'],
             'filter' => $servers
         ],
-        [
-            'attribute' => 'recordTime',
-            'headerOptions' => ['width' => '180'],
-        ],
         'freePercent', 
         'free', 
         'used', 
-        'total'
+        'total',
+        [
+            'attribute' => 'recordTime',
+            'value' => function($model){
+                return Timezone::date($model->recordTime);
+            }
+        ],
     ]
 ]);
 ?>

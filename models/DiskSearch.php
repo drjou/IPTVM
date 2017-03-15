@@ -13,7 +13,7 @@ class DiskSearch extends Disk{
     public function rules()
     {
         return [
-            [['server', 'recordTime', 'freePercent', 'free', 'used', 'total'], 'safe'],
+            [['server', 'freePercent', 'free', 'used', 'total'], 'safe'],
         ];
     }
     /**
@@ -63,7 +63,7 @@ class DiskSearch extends Disk{
         if(!$this->validate()){
             return $dataProvider;
         }
-        $query->andFilterWhere(['like', 'recordTime', $this->recordTime])
+        $query->andFilterWhere(['=', 'server', $this->server])
         ->andFilterWhere(['=', 'freePercent', $this->freePercent])
         ->andFilterWhere(['=', 'free', $this->free])
         ->andFilterWhere(['=', 'used', $this->used])

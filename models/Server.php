@@ -33,7 +33,6 @@ class Server extends ActiveRecord{
                 'class' => TimestampBehavior::className(),
                 'createdAtAttribute' => 'createTime',
                 'updatedAtAttribute' => 'updateTime',
-                'value' => new Expression('NOW()')
             ]
         ];
     }

@@ -9,7 +9,7 @@ $config = [
     'bootstrap' => ['log'],
     //默认的路由
     'defaultRoute' => 'admin/login',
-    'timeZone' => 'PRC',
+    //'timeZone' => 'PRC',
     'components' => [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation

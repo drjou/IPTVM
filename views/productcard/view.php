@@ -1,6 +1,7 @@
 <?php
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use app\models\Timezone;
 $this->title = 'Productcard ' . $model->cardNumber;
 $this->params['breadcrumbs'][] = ['label' => 'Productcard List', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
@@ -37,15 +38,21 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                             [
                                 'attribute' => 'useDate',
-                                'value' => empty($model->useDate) ? '(not set)' : $model->useDate,
+                                'value' => Timezone::date($model->useDate),
                             ],
                             [
                                 'attribute' => 'accountId',
                                 'format' => 'raw',
                                 'value'=>  empty($model->accountId) ? '(not set)' : Html::a($model->accountId, ['account/view', 'accountId' => $model->accountId], ['class' => 'profile-link','title' => 'view']),
                             ],
-                            'createTime',
-                            'updateTime',
+                            [
+                                'attribute' => 'createTime',
+                                'value' => Timezone::date($model->createTime),
+                            ],
+                            [
+                                'attribute' => 'updateTime',
+                                'value' => Timezone::date($model->updateTime),
+                            ],
                         ],
                     ]) ?>
 				</div>

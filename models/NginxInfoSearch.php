@@ -12,7 +12,7 @@ class NginxInfoSearch extends NginxInfo{
     public function rules()
     {
         return [
-            [['server', 'recordTime', 'status', 'accept', 'handle', 'request', 'active', 'readRequest', 'writeRequest', 'wait', 'qps', 'responseTime'], 'safe'],
+            [['server', 'status', 'accept', 'handle', 'request', 'active', 'readRequest', 'writeRequest', 'wait', 'qps', 'responseTime'], 'safe'],
         ];
     }
     /**
@@ -51,8 +51,7 @@ class NginxInfoSearch extends NginxInfo{
         ->andFilterWhere(['like', 'writeRequest', $this->writeRequest])
         ->andFilterWhere(['like', 'wait', $this->wait])
         ->andFilterWhere(['like', 'qps', $this->qps])
-        ->andFilterWhere(['like', 'responseTime', $this->responseTime])
-        ->andFilterWhere(['like', 'recordTime', $this->recordTime]);
+        ->andFilterWhere(['like', 'responseTime', $this->responseTime]);
         return $dataProvider;
     }
 }

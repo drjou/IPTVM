@@ -161,7 +161,7 @@ class StreamController extends Controller{
                     $allStreams = [$streams['Stream']];
                 }
                 $rows = ArrayHelper::getColumn($allStreams, function($element){
-                    $now = date('Y-m-d H:i:s', time());
+                    $now = time();
                     return [$element['streamName'], 1, $element['source'], 1, $element['server'], $now, $now];
                 });
                     $db = Yii::$app->db;

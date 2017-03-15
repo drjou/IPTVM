@@ -12,7 +12,7 @@ class MysqlInfoSearch extends MysqlInfo{
     public function rules()
     {
         return [
-            [['status', 'totalConnections', 'activeConnections', 'qps', 'tps', 'receiveTraffic', 'sendTraffic', 'server', 'recordTime'], 'safe'],
+            [['status', 'totalConnections', 'activeConnections', 'qps', 'tps', 'receiveTraffic', 'sendTraffic', 'server'], 'safe'],
         ];
     }
     /**
@@ -48,8 +48,7 @@ class MysqlInfoSearch extends MysqlInfo{
         ->andFilterWhere(['like', 'qps', $this->qps])
         ->andFilterWhere(['like', 'tps', $this->tps])
         ->andFilterWhere(['like', 'receiveTraffic', $this->receiveTraffic])
-        ->andFilterWhere(['like', 'sendTraffic', $this->sendTraffic])
-        ->andFilterWhere(['like', 'recordTime', $this->recordTime]);
+        ->andFilterWhere(['like', 'sendTraffic', $this->sendTraffic]);
         return $dataProvider;
     }
 }

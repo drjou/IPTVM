@@ -11,8 +11,8 @@ class MenuSearch extends Menu{
      */
     public function rules(){
         return [
-            [['menuName', 'parentName', 'route', 'showLevel', 'updateTime'], 'safe'],
-            [['menuName', 'parentName', 'route', 'updateTime'], 'string'],
+            [['menuName', 'parentName', 'route', 'showLevel'], 'safe'],
+            [['menuName', 'parentName', 'route'], 'string'],
         ];
     }
     /**

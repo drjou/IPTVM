@@ -125,7 +125,7 @@ class ChannelController extends Controller{
                 $channels = json_decode(json_encode($xmlArray), true);
                 $columns = ['channelName', 'channelIp', 'channelPic', 'channelUrl', 'urlType', 'channelType', 'languageId', 'createTime', 'updateTime'];
                 $rows = ArrayHelper::getColumn($channels['Channel'], function($element){
-                    $now = date('Y-m-d H:i:s', time());
+                    $now = time();
                     return [$element['channelName'], $element['channelIp'], $element['channelPic'], $element['channelUrl'], $element['urlType'], $element['channelType'], $element['languageId'], $now, $now];
                 });
                     $db = Yii::$app->db;

@@ -126,7 +126,7 @@ class DirectoryController extends Controller{
                 $directories = json_decode(json_encode($xmlArray), true);
                 $columns = ['directoryName', 'showOrder', 'createTime', 'updateTime'];
                 $rows = ArrayHelper::getColumn($directories['Directory'], function($element){
-                    $now = date('Y-m-d H:i:s', time());
+                    $now = time();
                     return [$element['directoryName'], $element['showOrder'], $now, $now];
                 });
                 $db = Yii::$app->db;

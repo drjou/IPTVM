@@ -13,7 +13,7 @@ class LoadSearch extends Load{
     public function rules()
     {
         return [
-            [[ 'server', 'recordTime', 'load1', 'load5', 'load15', 'processRun', 'processTotal'], 'safe'],
+            [[ 'server', 'load1', 'load5', 'load15', 'processRun', 'processTotal'], 'safe'],
         ];
     }
     /**
@@ -56,7 +56,6 @@ class LoadSearch extends Load{
             return $dataProvider;
         }
         $query->andFilterWhere(['=', 'server', $this->server])
-        ->andFilterWhere(['like', 'recordTime', $this->recordTime])
         ->andFilterWhere(['=', 'load1', $this->load1])
         ->andFilterWhere(['=', 'load5', $this->load5])
         ->andFilterWhere(['=', 'load15', $this->load15])

@@ -34,7 +34,6 @@ class Admin extends ActiveRecord implements \yii\web\IdentityInterface{
                 'class' => TimestampBehavior::className(),
                 'createdAtAttribute' => 'createTime',
                 'updatedAtAttribute' => 'updateTime',
-                'value' => new Expression('NOW()'),
             ],
         ];
     }

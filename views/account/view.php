@@ -2,6 +2,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\DetailView;
+use app\models\Timezone;
 $this->title = 'Account ' . $model->accountId;
 $this->params['breadcrumbs'][] = ['label' => 'Account List', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
@@ -42,8 +43,14 @@ $states = [
                                 'format' => 'html',
                                 'value' => $model->enable == 1 ? '<i class="glyphicon glyphicon-ok" style="color:green;"></i>' : '<i class="glyphicon glyphicon-remove" style="color:red;"></i>',
 				            ],
-                            'createTime',
-                            'updateTime',
+                            [
+                                'attribute' => 'createTime',
+                                'value' => Timezone::date($model->createTime),
+                            ],
+                            [
+                                'attribute' => 'updateTime',
+                                'value' => Timezone::date($model->updateTime),
+                            ],
                         ],
                     ]) ?>
 				</div>
@@ -92,7 +99,12 @@ $states = [
     					           return $model->isActive ? 'yes' : 'no';
     					        }
 					        ],
-					        'activeDate',
+					        [
+    					        'attribute' => 'activeDate',
+    					        'value' => function($model){
+    					           return Timezone::date($model->activeDate);
+    					        }
+					        ],
                         ],
                       ]);
                     ?>
@@ -135,7 +147,12 @@ $states = [
                                     return Html::a($model->product->productName, ['product/view', 'productId' => $model->productId], ['class' => 'profile-link','title' => 'view']);
                                 }
                             ],
-					        'endDate',
+                            [
+                            'attribute' => 'endDate',
+                                'value' => function($model){
+                                    return Timezone::date($model->endDate);
+                                }
+                            ],
 					        'expire',
                         ],
                       ]);
@@ -180,7 +197,12 @@ $states = [
                                 }
                             ],
                             "cardValue",
-                            "useDate",
+                            [
+                            'attribute' => 'useDate',
+                                'value' => function($model){
+                                    return Timezone::date($model->useDate);
+                                }
+                            ],
                         ],
                       ]);
                     ?>
