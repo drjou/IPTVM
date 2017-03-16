@@ -49,7 +49,7 @@ $(function() {
     	}else{
     		if(uhref.substring(0, uhref.indexOf('/')) == thref.substring(0, thref.indexOf('/'))){
     			var uri = uhref.substring(uhref.indexOf('/')+1);
-    			var category = (uri == 'index') || (uri == 'create') || (uri == 'update') || (uri == 'view') || (uri == 'import');
+    			var category = (uri == 'create') || (uri == 'update') || (uri == 'view') || (uri == 'import');
     			if(category){
     				return true;
     			}else{
