@@ -6,7 +6,7 @@ $this->title = 'Server Utilization';
 $this->params['breadcrumbs'][]=['label'=>'IPTV Monitor', 'url'=>['index']];
 $this->params['breadcrumbs'][] = ['label' => 'Servers Monitor', 'url' => ['servers-status']];
 $this->params['breadcrumbs'][] = $this->title;
-
+$timezone =  'Asia/Shanghai';
 $operation = 'var time = $("#date-range").val().split(" - ");
                 var startTime = Date.parse(new Date(time[0]));
                 var endTime = Date.parse(new Date(time[1]));
@@ -47,10 +47,10 @@ $operation = 'var time = $("#date-range").val().split(" - ");
 ?><br/><br/>
                     
 <?php
-    echo ChartDraw::drawLineChart('cpu-chart', $this, 'CPU Utilization', 'CPU Utilization Percentage(%)', '%', $cpuData);
-    echo ChartDraw::drawLineChart('ram-chart', $this, 'RAM Utilization', 'RAM Utilization Percentage(%)', '%', $ramData);
-    echo ChartDraw::drawLineChart('disk-chart', $this, 'Disk Utilization', 'Free Percentage of Disk(%)', '%', $diskData);
-    echo ChartDraw::drawLineChart('load-chart', $this, 'Load Utilization', 'Load Utilization Percentage(%)', '%', $loadData);
+    echo ChartDraw::drawLineChart('cpu-chart', $this, $timezone, 'CPU Utilization', 'CPU Utilization Percentage(%)', '%', $cpuData);
+    echo ChartDraw::drawLineChart('ram-chart', $this, $timezone, 'RAM Utilization', 'RAM Utilization Percentage(%)', '%', $ramData);
+    echo ChartDraw::drawLineChart('disk-chart', $this, $timezone, 'Disk Utilization', 'Free Percentage of Disk(%)', '%', $diskData);
+    echo ChartDraw::drawLineChart('load-chart', $this, $timezone, 'Load Utilization', 'Load Utilization Percentage(%)', '%', $loadData);
 ?>
 				
 <div class="gototop">

@@ -9,6 +9,7 @@ $this->title = 'Stream Details';
 $this->params['breadcrumbs'][]=['label'=>'IPTV Monitor', 'url'=>['index']];
 $this->params['breadcrumbs'][] = ['label' => 'Streams Monitor', 'url' => ['streams-monitor', 'serverName'=>$request->get('serverName')]];
 $this->params['breadcrumbs'][] = $this->title;
+$timezone =  'Asia/Shanghai';
 $operation='
     var time = $("#date-range").val().split(" - ");
                 var startTime = Date.parse(new Date(time[0]));
@@ -107,10 +108,10 @@ $operation='
                         <?= Html::a('<i class="iconfont iconfont-blue icon-grid"></i>', ['stream-info-grid','streamName'=>$request->get('streamName'),'serverName'=>$request->get('serverName'),'streams'=>'','StreamInfoSearch[server]'=>$request->get('serverName'),'StreamInfoSearch[streamName]'=>$request->get('streamName')], ['class' => 'btn btn-default']);?>
                     </div>
                     
-                    <?= ChartDraw::drawLineChart('total-chart', $this, 'CPU Utilization of Stream', 'CPU Utilization Percentage of Process(%)', '%', $cpuData);?>
+                    <?= ChartDraw::drawLineChart('total-chart', $this, $timezone, 'CPU Utilization of Stream', 'CPU Utilization Percentage of Process(%)', '%', $cpuData);?>
                     <br/><br/>
                     
-                    <?= ChartDraw::drawLineChart('memory-chart', $this, 'RAM Utilization of Stream', 'RAM Utilization Percentage of Stream Process(%)', '%', $ramData);?>
+                    <?= ChartDraw::drawLineChart('memory-chart', $this, $timezone, 'RAM Utilization of Stream', 'RAM Utilization Percentage of Stream Process(%)', '%', $ramData);?>
 				</div>
 			</div>
 			<!-- /.panel-body -->

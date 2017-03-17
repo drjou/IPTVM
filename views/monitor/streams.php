@@ -9,7 +9,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Streams Monitor', 'url' => ['strea
 $this->params['breadcrumbs'][] = $this->title;
 
 
-
+$timezone =  'Asia/Shanghai';
 $operation = 'var time = $("#date-range").val().split(" - ");
                 var startTime = Date.parse(new Date(time[0]));
                 var endTime = Date.parse(new Date(time[1]));
@@ -47,12 +47,12 @@ $operation = 'var time = $("#date-range").val().split(" - ");
 </div>
 
 <?php
-echo ChartDraw::drawLineChart('total-chart', $this, 'Total Utilization of Stream Process', 'Total Utilization Percentage of Process(%)', '%', $totalData);
+echo ChartDraw::drawLineChart('total-chart', $this, $timezone, 'Total Utilization of Stream Process', 'Total Utilization Percentage of Process(%)', '%', $totalData);
 ?>
 <br/><br/>
 
 <?php
-echo ChartDraw::drawLineChart('memory-chart', $this, 'Memory Utilization of Stream Process', 'Memory Utilization Percentage of Stream Process(%)', '%', $memoryData);
+echo ChartDraw::drawLineChart('memory-chart', $this, $timezone, 'Memory Utilization of Stream Process', 'Memory Utilization Percentage of Stream Process(%)', '%', $memoryData);
 
 $this->registerJs("
     $(document).ready(function(){

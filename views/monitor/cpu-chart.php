@@ -8,7 +8,7 @@ $this->params['breadcrumbs'][]=['label'=>'IPTV Monitor', 'url'=>['index']];
 $this->params['breadcrumbs'][] = ['label' => 'Servers Monitor', 'url' => ['servers-status']];
 $this->params['breadcrumbs'][] = ['label' => 'Server Details', 'url' => ['server-detail','serverName'=>$request->get('serverName')]];
 $this->params['breadcrumbs'][] = $this->title;
-
+$timezone =  'Asia/Shanghai';
 
 $operation = 'var time = $("#date-range").val().split(" - ");
                 var startTime = Date.parse(new Date(time[0]));
@@ -37,4 +37,4 @@ $operation = 'var time = $("#date-range").val().split(" - ");
 <br/><br/>
 
 <?php
-echo ChartDraw::drawLineChart('linechart', $this, 'CPU Utilization', 'CPU Utilization Percentage(%)', '%', $data);
+echo ChartDraw::drawLineChart('linechart', $this, $timezone, 'CPU Utilization', 'CPU Utilization Percentage(%)', '%', $data);

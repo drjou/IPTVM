@@ -122,11 +122,11 @@ class ChartDraw
      * @param string $ySuffix y轴单位
      * @param array $data 折线图数据
      */
-    public static function drawLineChart($id, $file, $title, $yText, $ySuffix, $data, $subtitle='Click and drag to zoom in.Hold down shift key to pan.'){
+    public static function drawLineChart($id, $file, $timezone, $title, $yText, $ySuffix, $data, $subtitle='Click and drag to zoom in.Hold down shift key to pan.'){
         $file->registerJs("
             Highcharts.setOptions({
                 global:{
-                    useUTC:false
+                    timezone:'$timezone'
                 },
             });
         ");
