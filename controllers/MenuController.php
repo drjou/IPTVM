@@ -8,6 +8,7 @@ use app\models\Menu;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\HttpException;
+use yii\helpers\ArrayHelper;
 
 class MenuController extends Controller{
     
@@ -104,7 +105,8 @@ class MenuController extends Controller{
             Yii::info("update menu $model->menuName", 'administrator');
             return $this->redirect(['view', 'id' => $model->id]);
         }
-        $menu_items = array_diff($model->getMenuItems(), $model->childrenMenus, [$model->id => $model->menuName]);
+        $childrenMenus = ArrayHelper::map($model->childrenMenus, 'id', 'menuName');
+        $menu_items = array_diff($model->getMenuItems(), $childrenMenus, [$model->id => $model->menuName]);
         $model->parentName = $model->parentId;
         return $this->render('update',[
             'model' => $model,

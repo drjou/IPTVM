@@ -1,6 +1,7 @@
 <?php
 use yii\grid\GridView;
 use yii\helpers\Html;
+use app\models\Timezone;
 $this->title = 'StreamAccess Log';
 $this->params['breadcrumbs'][]=['label'=>'IPTV Monitor', 'url'=>['index']];
 $this->params['breadcrumbs'][] = $this->title;
@@ -32,8 +33,18 @@ $status = [
         'server', 
         'stream', 
         'Ip', 
-        'startTime', 
-        'endTime', 
+        [
+            'attribute' => 'startTime',
+            'value' => function($model){
+                return Timezone::date($model->startTime);
+            }
+        ],
+        [
+            'attribute' => 'endTime',
+            'value' => function($model){
+                return Timezone::date($model->endTime);
+            }
+        ], 
         'totalTime',
         [
             'class' => 'yii\grid\ActionColumn',

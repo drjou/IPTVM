@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\base\Widget;
+use app\models\Timezone;
 $this->title = 'Administrator ' . $model->realName;
 $this->params['breadcrumbs'][] = ['label' => 'Administrator List', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
@@ -26,9 +27,18 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'attribute' => 'type',
                                 'value' => $model->type ? 'Super Administrator' : 'Genernal Administrator',
                             ],
-                            'lastLoginTime',
-                            'createTime',
-                            'updateTime',
+                            [
+                                'attribute' => 'lastLoginTime',
+                                'value' => Timezone::date($model->lastLoginTime),
+                            ],
+                            [
+                                'attribute' => 'createTime',
+                                'value' => Timezone::date($model->createTime),
+                            ],
+                            [
+                                'attribute' => 'updateTime',
+                                'value' => Timezone::date($model->updateTime),
+                            ],
                         ],
                     ]) ?>
 				</div>

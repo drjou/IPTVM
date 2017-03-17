@@ -1,6 +1,7 @@
 <?php
 use yii\helpers\Html;
 use yii\grid\GridView;
+use app\models\Timezone;
 
 $request = Yii::$app->request;
 $this->title = 'CPU Grid';
@@ -43,10 +44,6 @@ echo GridView::widget([
             'filter' => $servers
         ],
         'ncpu',
-        [
-            'attribute' => 'recordTime',
-            'headerOptions' => ['width' => '180'],
-        ],
         'utilize',
         'user', 
         'system', 
@@ -56,7 +53,13 @@ echo GridView::widget([
         'nice', 
         'steal', 
         'guest',
-        'idle'
+        'idle',
+        [
+            'attribute' => 'recordTime',
+            'value' => function($model){
+                return Timezone::date($model->recordTime);
+            }
+        ],
     ]
 ]);
 ?>

@@ -2,6 +2,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\DetailView;
+use app\models\Timezone;
 $this->title = 'Language ' . $model->languageName;
 $this->params['breadcrumbs'][] = ['label' => 'Language List', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
@@ -27,8 +28,14 @@ $this->params['breadcrumbs'][] = $this->title;
 					    },
                         'attributes' => [
                             'languageName',
-                            'createTime',
-                            'updateTime',
+                            [
+                                'attribute' => 'createTime',
+                                'value' => Timezone::date($model->createTime),
+                            ],
+                            [
+                                'attribute' => 'updateTime',
+                                'value' => Timezone::date($model->updateTime),
+                            ],
                         ],
                     ]) ?>
 				</div>

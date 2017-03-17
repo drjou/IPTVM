@@ -33,7 +33,6 @@ class Server extends ActiveRecord{
                 'class' => TimestampBehavior::className(),
                 'createdAtAttribute' => 'createTime',
                 'updatedAtAttribute' => 'updateTime',
-                'value' => new Expression('NOW()')
             ]
         ];
     }
@@ -158,7 +157,7 @@ class Server extends ActiveRecord{
      * 获取该服务器中MySQL的通断状态
      */
     public function getMysql(){
-        return $this->hasOne(mysql::className(), ['server' => 'serverName']);
+        return $this->hasOne(MySql::className(), ['server' => 'serverName']);
     }
     
     

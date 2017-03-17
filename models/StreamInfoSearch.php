@@ -13,7 +13,7 @@ class StreamInfoSearch extends StreamInfo{
     public function rules()
     {
         return [
-            [['server', 'streamName', 'status', 'sourceStatus', 'total','user', 'system', 'memory', 'rss', 'readByte', 'writeByte', 'recordTime'], 'safe'],
+            [['server', 'streamName', 'status', 'sourceStatus', 'total','user', 'system', 'memory', 'rss', 'readByte', 'writeByte'], 'safe'],
         ];
     }
     /**
@@ -59,8 +59,7 @@ class StreamInfoSearch extends StreamInfo{
         ->andFilterWhere(['=', 'memory', $this->memory])
         ->andFilterWhere(['=', 'rss', $this->rss])
         ->andFilterWhere(['=', 'readByte', $this->readByte])
-        ->andFilterWhere(['=', 'writeByte', $this->writeByte])
-        ->andFilterWhere(['like', 'recordTime', $this->recordTime]);
+        ->andFilterWhere(['=', 'writeByte', $this->writeByte]);
         return $dataProvider;
     }
 }

@@ -5,7 +5,6 @@ use yii\db\ActiveRecord;
 use yii\data\ArrayDataProvider;
 use yii\web\NotFoundHttpException;
 use yii\behaviors\TimestampBehavior;
-use yii\db\Expression;
 
 class Account extends ActiveRecord{
     public $importFile;
@@ -29,7 +28,6 @@ class Account extends ActiveRecord{
                 'class' => TimestampBehavior::className(),
                 'createdAtAttribute' => 'createTime',
                 'updatedAtAttribute' => 'updateTime',
-                'value' => new Expression('NOW()'),
             ],
         ];
     }

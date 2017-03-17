@@ -75,7 +75,6 @@ $channelTypes = [
             },
             'filter' => Html::activeTextInput($searchModel, 'languageName', ['class' => 'form-control']),
         ],
-        'createTime',
         [
             'class' => 'yii\grid\ActionColumn',
             'header' => 'Operations',

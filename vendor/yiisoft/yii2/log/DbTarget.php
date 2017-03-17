@@ -77,7 +77,7 @@ class DbTarget extends Target
             $command->bindValues([
                 ':level' => $level,
                 ':category' => $category,
-                ':log_time' => date('Y-m-d H:i:s', $timestamp),
+                ':log_time' => $timestamp,
                 ':prefix' => $this->getMessagePrefix($message),
                 ':message' => $text,
             ])->execute();

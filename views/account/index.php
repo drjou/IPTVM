@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\base\Widget;
+use app\models\Timezone;
 $this->title = 'Account List';
 $this->params['breadcrumbs'][] = $this->title;
 $states = [
@@ -14,7 +15,7 @@ $states = [
 $enables = [
     0 => 'disabled',
     1 => 'enabled',
-]
+];
 ?>
 <p>
 	<div class="btn-group">
@@ -76,7 +77,12 @@ $enables = [
             },
             'filter' => $enables,
         ],
-        'createTime',
+        [
+            'attribute' => 'createTime',
+            'value' => function ($model){
+                return Timezone::date($model->createTime);
+            }
+        ],
         [
             'class' => 'yii\grid\ActionColumn',
             'header' => 'Operations',

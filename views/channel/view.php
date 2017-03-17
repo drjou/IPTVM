@@ -2,6 +2,7 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\DetailView;
+use app\models\Timezone;
 $this->title = 'Channel ' . $model->channelName;
 $this->params['breadcrumbs'][] = ['label' => 'Channel List', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
@@ -42,8 +43,14 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'format' => 'raw',
                                 'value' => Html::a($model->language->languageName, ['language/view', 'languageId' => $model->languageId], ['class' => 'profile-link','title' => 'view']),
                             ],
-                            'createTime',
-                            'updateTime',
+                            [
+                                'attribute' => 'createTime',
+                                'value' => Timezone::date($model->createTime),
+                            ],
+                            [
+                                'attribute' => 'updateTime',
+                                'value' => Timezone::date($model->updateTime),
+                            ],
                         ],
                     ]) ?>
 				</div>

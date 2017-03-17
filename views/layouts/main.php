@@ -8,6 +8,8 @@ use app\assets\AppAsset;
 use yii\helpers\Url;
 use yii\widgets\Breadcrumbs;
 use app\models\Menu;
+use yii\widgets\ActiveForm;
+use app\models\Timezone;
 
 AppAsset::register($this);
 ?>
@@ -42,6 +44,45 @@ AppAsset::register($this);
             <!-- /.navbar-header -->
     
             <ul class="nav navbar-top-links navbar-right">
+            	<li class="dropdown">
+            		<?php 
+            		     $current = Timezone::getCurrentTimezone();
+            		?>
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="javascript::void(0)">
+                        <svg class="icon" aria-hidden="true">
+                        	<use xlink:href="#<?=$current->icon ?>"></use>
+                        </svg> <?=$current->timezone ?> <i class="fa fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-timezone">
+                    	<?php 
+                        	$dependency = [
+                        	    'class' => 'yii\caching\DbDependency',
+                        	    'sql' => 'SELECT COUNT(timezone),MAX(updateTime) FROM timezone where status=1',
+                        	];
+                        	if($this->beginCache('timezone', ['duration' => 86400, 'dependency' => $dependency])){
+                        	    $timezones = Timezone::getAvailableTimezone();
+                        	    foreach ($timezones as $timezone){
+                        	        $url = Url::to(['/timezone/set-timezone', 'timezone' => $timezone->timezone]);
+                        	        echo '<li>
+                                        <a href="'. $url .'">
+                                            <svg class="icon" aria-hidden="true">
+                                            	<use xlink:href="#' . $timezone->icon . '"></use>
+                                            </svg> ' . $timezone->timezone . '
+                                        </a>
+                                    </li>
+                                    <li class="divider"></li>';
+                        	    }
+                        	    $this->endCache();
+                        	}
+                    	?>
+                        <li>
+                            <a class="text-center" href="#">
+                                <strong>Read All Messages</strong>
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
                 <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                         <i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>
@@ -69,7 +110,7 @@ AppAsset::register($this);
                         <?php
                             $dependency = [
                                 'class' => 'yii\caching\DbDependency',
-                                'sql' => 'SELECT SUM(id), MAX(updateTime) FROM menu',
+                                'sql' => 'SELECT COUNT(id), MAX(updateTime) FROM menu',
                             ];
                             //Yii::$app->cache->flush();
                             if($this->beginCache('menu_sidebar', ['duration' => 86400, 'dependency' => $dependency])){

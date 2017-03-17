@@ -69,7 +69,7 @@ class AdminController extends Controller{
     public function actionLogin(){
         //如果用户已登录，则直接跳转到主页
         if(!Yii::$app->user->isGuest){
-            return $this->redirect(['site/index']);
+            return $this->redirect(['monitor/index']);
         }
         
         $model = new LoginForm();

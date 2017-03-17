@@ -11,7 +11,7 @@ class AdminLogSearch extends AdminLog{
      */
     public function rules(){
         return [
-            [['prefix', 'log_time', 'message'], 'safe'],
+            [['prefix', 'message'], 'safe'],
         ];
     }
     /**
@@ -32,7 +32,6 @@ class AdminLogSearch extends AdminLog{
             return $dataProvider;
         }
         $query->andFilterWhere(['like', 'prefix', $this->prefix])
-        ->andFilterWhere(['like', 'log_time', $this->log_time])
         ->andFilterWhere(['like', 'message', $this->message]);
         return $dataProvider;
     }

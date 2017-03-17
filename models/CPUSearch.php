@@ -13,7 +13,7 @@ class CPUSearch extends CPU{
     public function rules()
     {
         return [
-            [['server','ncpu', 'recordTime', 'utilize', 'user', 'system', 'wait', 'hardIrq', 'softIrq', 'nice', 'steal', 'guest', 'idle'], 'safe'],
+            [['server','ncpu', 'utilize', 'user', 'system', 'wait', 'hardIrq', 'softIrq', 'nice', 'steal', 'guest', 'idle'], 'safe'],
         ];
     }
     /**
@@ -64,7 +64,6 @@ class CPUSearch extends CPU{
             return $dataProvider;
         }
         $query->andFilterWhere(['=', 'server', $this->server])
-        ->andFilterWhere(['like', 'recordTime', $this->recordTime])
         ->andFilterWhere(['=', 'ncpu', $this->ncpu])
         ->andFilterWhere(['=', 'utilize', $this->utilize])
         ->andFilterWhere(['=', 'user', $this->user])

@@ -37,8 +37,8 @@ class AccountProduct extends ActiveRecord{
      * 1表示未过期，0表示已过期
      */
     private function timeCompare($date){
-        $now = date("Y-m-d", time());
-        if(strtotime($now) < strtotime($date)){
+        $now = time();
+        if($now < $date){
             return 1;
         }
         return 0;

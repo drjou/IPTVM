@@ -1,6 +1,7 @@
 <?php
 use yii\grid\GridView;
 use yii\helpers\Html;
+use app\models\Timezone;
 $request = Yii::$app->request;
 $this->title = 'Nginx Info Grid';
 $this->params['breadcrumbs'][]=['label'=>'IPTV Monitor', 'url'=>['index']];
@@ -61,7 +62,12 @@ echo GridView::widget([
         'wait', 
         'qps', 
         'responseTime',
-        'recordTime'
+        [
+            'attribute' => 'recordTime',
+            'value' => function($model){
+                return Timezone::date($model->recordTime);
+            }
+        ],
     ]
 ]);
 ?>

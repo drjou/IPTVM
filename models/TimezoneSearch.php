@@ -4,19 +4,19 @@ namespace app\models;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
-class AdminSearch extends Admin{
+class TimezoneSearch extends Timezone{
     /**
-     * 设置搜索的规则，能进行搜索的属性必须safe
+     * 表单验证规则
      * {@inheritDoc}
-     * @see \app\models\Admin::rules()
+     * @see \app\models\Account::rules()
      */
     public function rules(){
         return [
-            [['userName', 'realName', 'email', 'type'], 'safe'],
+            [['timezone', 'isCurrent', 'status', 'continent', 'country', 'chinese'], 'safe'],
         ];
     }
     /**
-     * 设置不同场景下要验证的属性
+     * 每个场景要验证的属性
      * {@inheritDoc}
      * @see \yii\base\Model::scenarios()
      */
@@ -29,22 +29,25 @@ class AdminSearch extends Admin{
      * @return \yii\data\ActiveDataProvider
      */
     public function search($params){
-        $query = Admin::find();
+        $query = Timezone::find();
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
                 'pageSize' => 10,
-            ],
+            ]
         ]);
         $this->load($params);
         if(!$this->validate()){
             return $dataProvider;
         }
+    
+        $query->andFilterWhere(['like', 'timezone', $this->timezone])
+        ->andFilterWhere(['=', 'isCurrent', $this->isCurrent])
+        ->andFilterWhere(['=', 'status', $this->status])
+        ->andFilterWhere(['like', 'continent', $this->continent])
+        ->andFilterWhere(['like', 'country', $this->country])
+        ->andFilterWhere(['like', 'chinese', $this->chinese]);
         
-        $query->andFilterWhere(['like', 'userName', $this->userName])
-        ->andFilterWhere(['like', 'realName', $this->realName])
-        ->andFilterWhere(['like', 'email', $this->email])
-        ->andFilterWhere(['=', 'type', $this->type]);
         return $dataProvider;
     }
 }

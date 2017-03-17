@@ -11,7 +11,7 @@ class AgentLogSearch extends AgentLog{
      */
     public function rules(){
         return [
-            [['id', 'moduleName', 'server', 'status', 'detail', 'recordTime'], 'safe']
+            [['id', 'moduleName', 'server', 'status', 'detail'], 'safe']
         ];
     }
     /**
@@ -44,8 +44,7 @@ class AgentLogSearch extends AgentLog{
         ->andFilterWhere(['like', 'moduleName', $this->moduleName])
         ->andFilterWhere(['like', 'server', $this->server])
         ->andFilterWhere(['=', 'status', $this->status])
-        ->andFilterWhere(['like', 'detail', $this->detail])
-        ->andFilterWhere(['like', 'recordTime', $this->recordTime]);
+        ->andFilterWhere(['like', 'detail', $this->detail]);
         return $dataProvider;
     }
 }

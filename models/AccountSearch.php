@@ -12,7 +12,7 @@ class AccountSearch extends Account{
      */
     public function rules(){
         return [
-            [['accountId', 'state', 'enable', 'createTime'], 'safe'],
+            [['accountId', 'state', 'enable'], 'safe'],
         ];
     }
     /**
@@ -43,8 +43,7 @@ class AccountSearch extends Account{
         
         $query->andFilterWhere(['like', 'accountId', $this->accountId])
         ->andFilterWhere(['=', 'state', $this->state])
-        ->andFilterWhere(['=', 'enable', $this->enable])
-        ->andFilterWhere(['like', 'createTime', $this->createTime]);
+        ->andFilterWhere(['=', 'enable', $this->enable]);
         return $dataProvider;
     }
 }

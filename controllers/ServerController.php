@@ -147,7 +147,7 @@ class ServerController extends Controller{
                     $allServers = [$servers['Server']];
                 }
                 $rows = ArrayHelper::getColumn($allServers, function($element){
-                    $now = date('Y-m-d H:i:s', time());
+                    $now = time();
                     return [$element['serverName'], $element['serverIp'], $element['status'], $element['operatingSystem'], $now, $now];
                 });
                     $db = Yii::$app->db;

@@ -13,7 +13,7 @@ class RAMSearch extends RAM{
     public function rules()
     {
         return [
-            [['server' ,'recordTime', 'utilize', 'free', 'used', 'total', 'buffer', 'cache'], 'safe'],
+            [['server', 'utilize', 'free', 'used', 'total', 'buffer', 'cache'], 'safe'],
         ];
     }
     /**
@@ -63,7 +63,6 @@ class RAMSearch extends RAM{
             return $dataProvider;
         }
         $query->andFilterWhere(['=', 'server', $this->server])
-        ->andFilterWhere(['like', 'recordTime', $this->recordTime])
         ->andFilterWhere(['=', 'utilize', $this->utilize])
         ->andFilterWhere(['=', 'free', $this->free])
         ->andFilterWhere(['=', 'used', $this->used])

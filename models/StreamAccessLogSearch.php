@@ -11,7 +11,7 @@ class StreamAccessLogSearch extends StreamAccessLog{
      */
     public function rules(){
         return [
-            [['id', 'accountId', 'server', 'stream', 'Ip', 'startTime', 'endTime', 'totalTime'], 'safe']
+            [['id', 'accountId', 'server', 'stream', 'Ip', 'totalTime'], 'safe']
         ];
     }
     /**
@@ -45,8 +45,6 @@ class StreamAccessLogSearch extends StreamAccessLog{
         ->andFilterWhere(['like', 'server', $this->server])
         ->andFilterWhere(['like', 'stream', $this->stream])
         ->andFilterWhere(['like', 'Ip', $this->Ip])
-        ->andFilterWhere(['like', 'startTime', $this->startTime])
-        ->andFilterWhere(['like', 'endTime', $this->endTime])
         ->andFilterWhere(['like', 'totalTime', $this->totalTime]);
         return $dataProvider;
     }
