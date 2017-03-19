@@ -1,6 +1,7 @@
 <?php
 use app\models\ChartDraw;
 use yii\helpers\Html;
+use app\models\Timezone;
 
 $request = Yii::$app->request;
 $this->title = 'CPU Chart';
@@ -9,10 +10,11 @@ $this->params['breadcrumbs'][] = ['label' => 'Servers Monitor', 'url' => ['serve
 $this->params['breadcrumbs'][] = ['label' => 'Server Details', 'url' => ['server-detail','serverName'=>$request->get('serverName')]];
 $this->params['breadcrumbs'][] = $this->title;
 
+$timezone = Timezone::getCurrentTimezone();
 
 $operation = 'var time = $("#date-range").val().split(" - ");
-                var startTime = Date.parse(new Date(time[0]));
-                var endTime = Date.parse(new Date(time[1]));
+                var startTime = moment.tz(time[0], "'.$timezone->timezone.'").format("X");
+                var endTime = moment.tz(time[1], "'.$timezone->timezone.'").format("X");
                 $("#linechart").highcharts().showLoading();
                 $.get("index.php?r=monitor/update-line-info&serverName='.$request->get('serverName').'&type=CPU&startTime="+startTime+"&endTime="+endTime,
                         function(data,status){

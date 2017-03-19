@@ -1,6 +1,7 @@
 <?php
 namespace app\models;
 
+use Yii;
 use miloschuman\highcharts\Highcharts;
 use yii\web\JsExpression;
 use kartik\daterange\DateRangePicker;
@@ -123,10 +124,15 @@ class ChartDraw
      * @param array $data 折线图数据
      */
     public static function drawLineChart($id, $file, $title, $yText, $ySuffix, $data, $subtitle='Click and drag to zoom in.Hold down shift key to pan.'){
+        $timezone = Timezone::getCurrentTimezone();
         $file->registerJs("
             Highcharts.setOptions({
                 global:{
-                    useUTC:false
+                    getTimezoneOffset: function(timestamp){
+                        var zone = '".$timezone->timezone."',
+                            timezoneOffset = -moment.tz(timestamp, zone).utcOffset();
+                        return timezoneOffset;
+                    }
                 },
             });
         ");
@@ -135,7 +141,9 @@ class ChartDraw
             'scripts' => [
                 'highcharts-more',
                 'modules/boost',
-                'modules/no-data-to-display'
+                'modules/no-data-to-display',
+                'moment/moment',
+                'moment/moment-timezone-with-data',
             ],
             'options' => [
                 'chart' => [
@@ -252,6 +260,7 @@ class ChartDraw
         $range = explode(' - ', $defaultValue);
         $start = $range[0];
         $end = $range[1];
+        $timezone = Timezone::getCurrentTimezone();
         echo '<div class="drp-container left calendar">';
         echo DateRangePicker::widget([
             'id' => $id,
@@ -281,7 +290,7 @@ class ChartDraw
                 'startDate' => $start,
                 'endDate' => $end,
                 'minDate' => $minDate,
-                'maxDate' => new JsExpression('moment()')
+                'maxDate' => new JsExpression('moment().tz("'.$timezone->timezone.'").format()'),
             ],
         ]);
         echo '</div>';

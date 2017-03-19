@@ -38,6 +38,7 @@ use app\models\StreamAccessLogSearch;
 use app\models\StreamAccessLog;
 use app\models\NginxInfoSearch;
 use app\models\MysqlInfoSearch;
+use app\models\Timezone;
 
 class MonitorController extends Controller
 {
@@ -288,11 +289,11 @@ class MonitorController extends Controller
      */
     public function actionCpuChart($serverName)
     {
-        $startTime = date('Y-m-d H:i:s',time()-24*3600);
-        $endTime = date('Y-m-d H:i:s',time());
-        $data = $this->getCpuData($serverName, $startTime, $endTime);
+        $startTime = Timezone::date(time()-24*3600);
+        $endTime = Timezone::date(time());
+        $data = $this->getCpuData($serverName, time()-24*3600, time());
         $range = $startTime.' - '.$endTime;
-        $minDate = CPU::find()->where(['server'=>$serverName])->min('recordTime');
+        $minDate = Timezone::date(CPU::find()->where(['server'=>$serverName])->min('recordTime'));
         return $this->render('cpu-chart', [
             'data' => $data,
             'range' =>  $range,
@@ -692,8 +693,6 @@ class MonitorController extends Controller
      * @param string $endTime
      */
     public function actionUpdateLineInfo($serverName, $type, $startTime, $endTime){
-        $startTime = date('Y-m-d H:i:s',$startTime/1000);
-        $endTime = date('Y-m-d H:i:s',$endTime/1000);
         $response = Yii::$app->response;
         $response->format = \yii\web\Response::FORMAT_JSON;
         switch ($type){
@@ -881,9 +880,9 @@ class MonitorController extends Controller
     private function getChartDataByProperty($allData, $time, $property){
         $xCategories = ArrayHelper::getColumn($allData, $time);
         for ($i=0;$i<count($xCategories);$i++){
-            $xCategories[$i] = strtotime($xCategories[$i]);
-            $xCategories[$i] = date('Y-m-d H:i:00', $xCategories[$i]);
-            $xCategories[$i] = strtotime($xCategories[$i])*1000;
+            $xCategories[$i] = $xCategories[$i]*1000;
+            /* $xCategories[$i] = date('Y-m-d H:i:00', $xCategories[$i]);
+            $xCategories[$i] = strtotime($xCategories[$i])*1000; */
         }
         $data = array();
         $column = ArrayHelper::getColumn($allData, function ($element) use($property){
