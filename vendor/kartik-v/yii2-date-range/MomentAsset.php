@@ -28,7 +28,7 @@ class MomentAsset extends AssetBundle
     public function init()
     {
         $this->setSourcePath(__DIR__ . '/assets');
-        $this->setupAssets('js', ['js/moment']);
+        $this->setupAssets('js', ['js/moment', 'js/moment-timezone-with-data']);
         parent::init();
     }
 }

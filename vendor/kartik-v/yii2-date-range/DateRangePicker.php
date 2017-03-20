@@ -14,6 +14,7 @@ use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\web\JsExpression;
+use app\models\Timezone;
 
 /**
  * An advanced date range picker input for Yii Framework 2 based on bootstrap-daterangepicker plugin.
@@ -310,26 +311,27 @@ HTML;
             /** @noinspection PhpUnusedLocalVariableInspection */
             $msg = Yii::t('kvdrp', 'Select Date Range');
         }
+        $timezone = Timezone::getCurrentTimezone();
         if ($this->presetDropdown) {
             $this->initRangeExpr = true;
             $this->pluginOptions['ranges'] = [
-                Yii::t('kvdrp', "Today") => ["moment().startOf('day')", "moment()"],
+                Yii::t('kvdrp', "Today") => ["moment().tz('".$timezone->timezone."').startOf('day').format()", "moment().tz('".$timezone->timezone."').format()"],
                 Yii::t('kvdrp', "Yesterday") => [
-                    "moment().startOf('day').subtract(1,'days')",
-                    "moment().endOf('day').subtract(1,'days')"
+                    "moment().tz('".$timezone->timezone."').startOf('day').subtract(1,'days').format()",
+                    "moment().tz('".$timezone->timezone."').endOf('day').subtract(1,'days').format()"
                 ],
                 Yii::t('kvdrp', "Last {n} Days", ['n' => 7]) => [
-                    "moment().startOf('day').subtract(6, 'days')",
-                    "moment()"
+                    "moment().tz('".$timezone->timezone."').startOf('day').subtract(6, 'days').format()",
+                    "moment().tz('".$timezone->timezone."').format()"
                 ],
                 Yii::t('kvdrp', "Last {n} Days", ['n' => 30]) => [
-                    "moment().startOf('day').subtract(29, 'days')",
-                    "moment()"
+                    "moment().tz('".$timezone->timezone."').startOf('day').subtract(29, 'days').format()",
+                    "moment().tz('".$timezone->timezone."').format()"
                 ],
-                Yii::t('kvdrp', "This Month") => ["moment().startOf('month')", "moment().endOf('month')"],
+                Yii::t('kvdrp', "This Month") => ["moment().tz('".$timezone->timezone."').startOf('month').format()", "moment().tz('".$timezone->timezone."').endOf('month').format()"],
                 Yii::t('kvdrp', "Last Month") => [
-                    "moment().subtract(1, 'month').startOf('month')",
-                    "moment().subtract(1, 'month').endOf('month')"
+                    "moment().tz('".$timezone->timezone."').subtract(1, 'month').startOf('month').format()",
+                    "moment().tz('".$timezone->timezone."').subtract(1, 'month').endOf('month').format()"
                 ],
             ];
         }
