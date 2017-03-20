@@ -872,9 +872,8 @@ class MonitorController extends Controller
     private function getChartDataByProperty($allData, $time, $property){
         $xCategories = ArrayHelper::getColumn($allData, $time);
         for ($i=0;$i<count($xCategories);$i++){
-            $xCategories[$i] = $xCategories[$i]*1000;
-            /* $xCategories[$i] = date('Y-m-d H:i:00', $xCategories[$i]);
-            $xCategories[$i] = strtotime($xCategories[$i])*1000; */
+            $xCategories[$i] = date('Y-m-d H:i:00', $xCategories[$i]);
+            $xCategories[$i] = strtotime($xCategories[$i])*1000;
         }
         $data = array();
         $column = ArrayHelper::getColumn($allData, function ($element) use($property){
