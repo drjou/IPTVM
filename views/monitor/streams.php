@@ -1,6 +1,7 @@
 <?php
 use yii\helpers\Html;
 use app\models\ChartDraw;
+use app\models\Timezone;
 
 $request = Yii::$app->request;
 $this->title = 'Streams Utilization';
@@ -9,10 +10,10 @@ $this->params['breadcrumbs'][] = ['label' => 'Streams Monitor', 'url' => ['strea
 $this->params['breadcrumbs'][] = $this->title;
 
 
-$timezone =  'Asia/Shanghai';
+$timezone = Timezone::getCurrentTimezone();
 $operation = 'var time = $("#date-range").val().split(" - ");
-                var startTime = Date.parse(new Date(time[0]));
-                var endTime = Date.parse(new Date(time[1]));
+                var startTime = moment.tz(time[0], "'.$timezone->timezone.'").format("X");
+                var endTime = moment.tz(time[1], "'.$timezone->timezone.'").format("X");
                 $("#total-chart").highcharts().showLoading();
                 $("#memory-chart").highcharts().showLoading();
                 $.get("index.php?r=monitor/update-streams-data&serverName='.$request->get('serverName').'&streams='.$request->get('streams').'&startTime="+startTime+"&endTime="+endTime,
@@ -47,12 +48,12 @@ $operation = 'var time = $("#date-range").val().split(" - ");
 </div>
 
 <?php
-echo ChartDraw::drawLineChart('total-chart', $this, $timezone, 'Total Utilization of Stream Process', 'Total Utilization Percentage of Process(%)', '%', $totalData);
+echo ChartDraw::drawLineChart('total-chart', $this, 'Total Utilization of Stream Process', 'Total Utilization Percentage of Process(%)', '%', $totalData);
 ?>
 <br/><br/>
 
 <?php
-echo ChartDraw::drawLineChart('memory-chart', $this, $timezone, 'Memory Utilization of Stream Process', 'Memory Utilization Percentage of Stream Process(%)', '%', $memoryData);
+echo ChartDraw::drawLineChart('memory-chart', $this, 'Memory Utilization of Stream Process', 'Memory Utilization Percentage of Stream Process(%)', '%', $memoryData);
 
 $this->registerJs("
     $(document).ready(function(){

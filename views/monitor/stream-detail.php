@@ -4,16 +4,17 @@ use yii\widgets\DetailView;
 use yii\helpers\Url;
 use yii\helpers\Html;
 use app\models\ChartDraw;
+use app\models\Timezone;
 $request = Yii::$app->request;
 $this->title = 'Stream Details';
 $this->params['breadcrumbs'][]=['label'=>'IPTV Monitor', 'url'=>['index']];
 $this->params['breadcrumbs'][] = ['label' => 'Streams Monitor', 'url' => ['streams-monitor', 'serverName'=>$request->get('serverName')]];
 $this->params['breadcrumbs'][] = $this->title;
-$timezone =  'Asia/Shanghai';
+$timezone = Timezone::getCurrentTimezone();
 $operation='
     var time = $("#date-range").val().split(" - ");
-                var startTime = Date.parse(new Date(time[0]));
-                var endTime = Date.parse(new Date(time[1]));
+                var startTime = moment.tz(time[0], "'.$timezone->timezone.'").format("X");
+                var endTime = moment.tz(time[1], "'.$timezone->timezone.'").format("X");
                 $("#total-chart").highcharts().showLoading();
                 $("#memory-chart").highcharts().showLoading();
                 $.get("index.php?r=monitor/update-stream-data&serverName='.$request->get('serverName').'&streamName='.$request->get('streamName').'&startTime="+startTime+"&endTime="+endTime,
@@ -108,10 +109,10 @@ $operation='
                         <?= Html::a('<i class="iconfont iconfont-blue icon-grid"></i>', ['stream-info-grid','streamName'=>$request->get('streamName'),'serverName'=>$request->get('serverName'),'streams'=>'','StreamInfoSearch[server]'=>$request->get('serverName'),'StreamInfoSearch[streamName]'=>$request->get('streamName')], ['class' => 'btn btn-default']);?>
                     </div>
                     
-                    <?= ChartDraw::drawLineChart('total-chart', $this, $timezone, 'CPU Utilization of Stream', 'CPU Utilization Percentage of Process(%)', '%', $cpuData);?>
+                    <?= ChartDraw::drawLineChart('total-chart', $this, 'CPU Utilization of Stream', 'CPU Utilization Percentage of Process(%)', '%', $cpuData);?>
                     <br/><br/>
                     
-                    <?= ChartDraw::drawLineChart('memory-chart', $this, $timezone, 'RAM Utilization of Stream', 'RAM Utilization Percentage of Stream Process(%)', '%', $ramData);?>
+                    <?= ChartDraw::drawLineChart('memory-chart', $this, 'RAM Utilization of Stream', 'RAM Utilization Percentage of Stream Process(%)', '%', $ramData);?>
 				</div>
 			</div>
 			<!-- /.panel-body -->

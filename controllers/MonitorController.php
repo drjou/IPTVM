@@ -157,10 +157,10 @@ class MonitorController extends Controller
      */
     public function actionServersFault()
     {
-        $startTime = date('Y-m-d H:i:s',time()-24*3600);
-        $endTime = date('Y-m-d H:i:s',time());
-        $range = $startTime.' - '.$endTime;
-        $minDate = CPU::find()->min('recordTime');
+        $startTime = time()-24*3600;
+        $endTime = time();
+        $range = $this->getDateRange($startTime, $endTime);
+        $minDate = Timezone::date(CPU::find()->min('recordTime'));
         $threshold = Threshold::find()->one();
         $servers = Server::find()->asArray()->all();
         $data = [];
@@ -289,11 +289,11 @@ class MonitorController extends Controller
      */
     public function actionCpuChart($serverName)
     {
-        $startTime = Timezone::date(time()-24*3600);
-        $endTime = Timezone::date(time());
-        $data = $this->getCpuData($serverName, time()-24*3600, time());
-        $range = $startTime.' - '.$endTime;
+        $startTime = time()-24*3600;
+        $endTime = time();
+        $range = $this->getDateRange($startTime, $endTime);
         $minDate = Timezone::date(CPU::find()->where(['server'=>$serverName])->min('recordTime'));
+        $data = $this->getCpuData($serverName, $startTime, $endTime);
         return $this->render('cpu-chart', [
             'data' => $data,
             'range' =>  $range,
@@ -327,11 +327,11 @@ class MonitorController extends Controller
      */
     public function actionRamChart($serverName)
     {
-        $startTime = date('Y-m-d H:i:s',time()-24*3600);
-        $endTime = date('Y-m-d H:i:s',time());
+        $startTime = time()-24*3600;
+        $endTime = time();
+        $range = $this->getDateRange($startTime, $endTime);
+        $minDate = Timezone::date(RAM::find()->where(['server'=>$serverName])->min('recordTime'));
         $data = $this->getRamData($serverName, $startTime, $endTime);
-        $range = $startTime.' - '.$endTime;
-        $minDate = RAM::find()->where(['server'=>$serverName])->min('recordTime');
         return $this->render('ram-chart', [
             'data' => $data,
             'range' => $range,
@@ -362,11 +362,11 @@ class MonitorController extends Controller
      * @param string $serverName
      */
     public function actionDiskChart($serverName){
-        $startTime = date('Y-m-d H:i:s',time()-24*3600);
-        $endTime = date('Y-m-d H:i:s',time());
+        $startTime = time()-24*3600;
+        $endTime = time();
+        $range = $this->getDateRange($startTime, $endTime);
+        $minDate = Timezone::date(Disk::find()->where(['server'=>$serverName])->min('recordTime'));
         $data = $this->getDiskData($serverName, $startTime, $endTime);
-        $range = $startTime.' - '.$endTime;
-        $minDate = Disk::find()->where(['server'=>$serverName])->min('recordTime');
         return $this->render('disk-chart', [
             'data' => $data,
             'range' => $range,
@@ -398,11 +398,11 @@ class MonitorController extends Controller
      * @param string $serverName
      */
     public function actionLoadChart($serverName){
-        $startTime = date('Y-m-d H:i:s',time()-24*3600);
-        $endTime = date('Y-m-d H:i:s',time());
+        $startTime = time()-24*3600;
+        $endTime = time();
+        $range = $this->getDateRange($startTime, $endTime);
+        $minDate = Timezone::date(Load::find()->where(['server'=>$serverName])->min('recordTime'));
         $data = $this->getLoadData($serverName, $startTime, $endTime);
-        $range = $startTime.' - '.$endTime;
-        $minDate = Load::find()->where(['server'=>$serverName])->min('recordTime');
         return $this->render('load-chart', [
             'data' => $data,
             'range' => $range,
@@ -483,10 +483,10 @@ class MonitorController extends Controller
     public function actionStreams($serverName, $streams)
     {
         $server = new Server();
-        $startTime = date('Y-m-d H:i:s',time()-3600);
-        $endTime = date('Y-m-d H:i:s',time());
-        $range = $startTime.' - '.$endTime;
-        $minDate = CPU::find()->where(['server'=>$serverName])->min('recordTime');
+        $startTime = time()-24*3600;
+        $endTime = time();
+        $range = $this->getDateRange($startTime, $endTime);
+        $minDate = Timezone::date(CPU::find()->where(['server'=>$serverName])->min('recordTime'));
         $streamArr = explode(',', $streams);
         $data = [];
         for($i=0;$i<count($streamArr);$i++){
@@ -535,10 +535,10 @@ class MonitorController extends Controller
      * 传回不同服务器的相关数据
      */
     public function actionServers($servers){
-        $startTime = date('Y-m-d H:i:s',time()-24*3600);
-        $endTime = date('Y-m-d H:i:s',time());
-        $range = $startTime.' - '.$endTime;
-        $minDate = CPU::find()->min('recordTime');
+        $startTime = time()-24*3600;
+        $endTime = time();
+        $range = $this->getDateRange($startTime, $endTime);
+        $minDate = Timezone::date(CPU::find()->min('recordTime'));
         $realTimes = RealTime::find()->asArray()->all();
         $serverArr = explode(',', $servers);
         $data = [];
@@ -576,10 +576,10 @@ class MonitorController extends Controller
      */
     public function actionStreamDetail($serverName, $streamName){
         $model = Stream::findStreamByKey($streamName, $serverName);
-        $startTime = date('Y-m-d H:i:s',time()-24*3600);
-        $endTime = date('Y-m-d H:i:s',time());
-        $range = $startTime.' - '.$endTime;
-        $minDate = CPU::find()->where(['server'=>$serverName])->min('recordTime');
+        $startTime = time()-24*3600;
+        $endTime = time();
+        $range = $this->getDateRange($startTime, $endTime);
+        $minDate = Timezone::date(CPU::find()->where(['server'=>$serverName])->min('recordTime'));
         $cpuData = [
             ['name'=>'Server CPU','data'=>[]],
             ['name'=>'Stream CPU','data'=>[]]
@@ -598,11 +598,11 @@ class MonitorController extends Controller
     }
     
     public function actionMysqlChart($serverName){
-        $startTime = date('Y-m-d H:i:s',time()-24*3600);
-        $endTime = date('Y-m-d H:i:s',time());
+        $startTime = time()-24*3600;
+        $endTime = time();
+        $range = $this->getDateRange($startTime, $endTime);
+        $minDate = Timezone::date(MysqlInfo::find()->where(['server'=>$serverName])->min('recordTime'));
         $data = $this->getMysqlData($serverName, $startTime, $endTime);
-        $range = $startTime.' - '.$endTime;
-        $minDate = MysqlInfo::find()->where(['server'=>$serverName])->min('recordTime');
         $model = new Server();
         $model->serverName = $serverName;
         $status = MySql::find()->where(['server'=>$serverName])->one()->status;
@@ -617,11 +617,11 @@ class MonitorController extends Controller
     }
     
     public function actionNginxChart($serverName){
-        $startTime = date('Y-m-d H:i:s',time()-24*3600);
-        $endTime = date('Y-m-d H:i:s',time());
+        $startTime = time()-24*3600;
+        $endTime = time();
+        $range = $this->getDateRange($startTime, $endTime);
+        $minDate = Timezone::date(NginxInfo::find()->where(['server'=>$serverName])->min('recordTime'));
         $data = $this->getNginxData($serverName, $startTime, $endTime);
-        $range = $startTime.' - '.$endTime;
-        $minDate = NginxInfo::find()->where(['server'=>$serverName])->min('recordTime');
         $model = new Server();
         $model->serverName = $serverName;
         $status = Nginx::find()->where(['server'=>$serverName])->one()->status;
@@ -726,8 +726,6 @@ class MonitorController extends Controller
      * @param string $endTime
      */
     public function actionUpdateServersData($servers, $startTime, $endTime){
-        $startTime = date('Y-m-d H:i:s',$startTime/1000);
-        $endTime = date('Y-m-d H:i:s',$endTime/1000);
         $response = Yii::$app->response;
         $response->format = \yii\web\Response::FORMAT_JSON;
         $response->data = $this->getServersData($servers, $startTime, $endTime);
@@ -740,8 +738,6 @@ class MonitorController extends Controller
      * @param string $endTime
      */
     public function actionUpdateStreamsData($serverName, $streams, $startTime, $endTime){
-        $startTime = date('Y-m-d H:i:s',$startTime/1000);
-        $endTime = date('Y-m-d H:i:s',$endTime/1000);
         $response = Yii::$app->response;
         $response->format = \yii\web\Response::FORMAT_JSON;
         $response->data = $this->getStreamsData($serverName, $streams, $startTime, $endTime);
@@ -754,16 +750,12 @@ class MonitorController extends Controller
      * @param string $endTime
      */
     public function actionUpdateStreamData($serverName, $streamName, $startTime, $endTime){
-        $startTime = date('Y-m-d H:i:s',$startTime/1000);
-        $endTime = date('Y-m-d H:i:s',$endTime/1000);
         $response = Yii::$app->response;
         $response->format = \yii\web\Response::FORMAT_JSON;
         $response->data = $this->getStreamData($serverName, $streamName, $startTime, $endTime);
     }
     
     public function actionUpdateWarningLine($type, $startTime, $endTime){
-        $startTime = date('Y-m-d H:i:s',$startTime/1000);
-        $endTime = date('Y-m-d H:i:s',$endTime/1000);
         $threshold = Threshold::find()->one();
         $response = Yii::$app->response;
         $response->format = \yii\web\Response::FORMAT_JSON;
@@ -1284,14 +1276,14 @@ class MonitorController extends Controller
         $streamData=[];
         for($i=0;$i<count($servers);$i++){
             $rows = (new Query())
-            ->select(['DATE_FORMAT(DATE_FORMAT(recordTime,"%Y-%m-%d %H:%i"),"%Y-%m-%d %H:%i:%s") as time', 'count(if(si.status=0,true,null )) as count'])
+            ->select(['UNIX_TIMESTAMP(DATE_FORMAT(FROM_UNIXTIME(recordTime),"%Y-%m-%d %H:%i")) as time', 'count(if(si.status=0,true,null )) as count'])
             ->from('stream as s, stream_info as si')
             ->where('s.server=si.server and s.streamName=si.streamName and s.server="'.$servers[$i]['serverName'].'" and recordTime between "'.$startTime.'" and "'.$endTime.'"')
             ->groupBy('time,s.server')
             ->all();
             $data = [];
             for($j=0;$j<count($rows);$j++){
-                $time = strtotime($rows[$j]['time'])*1000;
+                $time = $rows[$j]['time']*1000;
                 array_push($data, [$time, $rows[$j]['count']+0]);
             }
             $streams = [
@@ -1309,7 +1301,7 @@ class MonitorController extends Controller
      */
     private function getStreamNames($startTime, $endTime){
         $deadStreams = (new Query())
-        ->select(['DATE_FORMAT(DATE_FORMAT(recordTime,"%Y-%m-%d %H:%i"),"%Y-%m-%d %H:%i:%s") as time', 's.server','s.streamName as sName'])
+        ->select(['UNIX_TIMESTAMP(DATE_FORMAT(FROM_UNIXTIME(recordTime),"%Y-%m-%d %H:%i")) as time', 's.server','s.streamName as sName'])
         ->from('stream as s, stream_info as si')
         ->where("si.status=0 and s.server=si.server and s.streamName=si.streamName and recordTime between '$startTime' and '$endTime'")
         ->orderBy(['recordTime' => SORT_ASC, 'server' => SORT_ASC, 'sName'=> SORT_ASC])
@@ -1318,7 +1310,7 @@ class MonitorController extends Controller
         $time = null;
         $server = null;
         for($i=0;$i<count($deadStreams);$i++){
-            $recordTime = ''.strtotime($deadStreams[$i]['time'])*1000;
+            $recordTime = ''.$deadStreams[$i]['time']*1000;
             $newServer = $deadStreams[$i]['server'];
             $streamName = $deadStreams[$i]['sName'];
             if($newServer==$server && $recordTime==$time){
@@ -1338,14 +1330,14 @@ class MonitorController extends Controller
      */
     private function getMySqlWarningData($startTime, $endTime){
         $rows = (new Query())
-        ->select(['DATE_FORMAT(DATE_FORMAT(recordTime,"%Y-%m-%d %H:%i"),"%Y-%m-%d %H:%i:%s") as time', 'count(if(status=0,true,null )) as count'])
+        ->select(['UNIX_TIMESTAMP(DATE_FORMAT(FROM_UNIXTIME(recordTime),"%Y-%m-%d %H:%i")) as time', 'count(if(status=0,true,null )) as count'])
         ->from(['mysql_info'])
         ->where('recordTime BETWEEN "'.$startTime.'" and "'.$endTime.'"')
         ->groupBy('time')
         ->all();
         $data = [];
         for($j=0;$j<count($rows);$j++){
-            $time = strtotime($rows[$j]['time'])*1000;
+            $time = $rows[$j]['time']*1000;
             array_push($data, [$time, $rows[$j]['count']+0]);
         }
         $mysql = [[
@@ -1361,7 +1353,7 @@ class MonitorController extends Controller
      */
     private function getMySqlServers($startTime, $endTime){
         $rows = (new Query())
-        ->select(['DATE_FORMAT(DATE_FORMAT(recordTime,"%Y-%m-%d %H:%i"),"%Y-%m-%d %H:%i:%s") as time', 'server'])
+        ->select(['UNIX_TIMESTAMP(DATE_FORMAT(FROM_UNIXTIME(recordTime),"%Y-%m-%d %H:%i")) as time', 'server'])
         ->from(['mysql_info'])
         ->where('status=0 and recordTime BETWEEN "'.$startTime.'" and "'.$endTime.'"')
         ->orderBy('time')
@@ -1369,7 +1361,7 @@ class MonitorController extends Controller
         $servers=[];
         $time=null;
         for($i=0;$i<count($rows);$i++){
-            $recordTime = ''.strtotime($rows[$i]['time'])*1000;
+            $recordTime = ''.$rows[$i]['time']*1000;
             $serverName = $rows[$i]['server'];
             if($recordTime==$time){
                 array_push($servers[$recordTime], $serverName);
@@ -1388,14 +1380,14 @@ class MonitorController extends Controller
      */
     private function getNginxWarningData($startTime, $endTime){
         $rows = (new Query())
-        ->select(['DATE_FORMAT(DATE_FORMAT(recordTime,"%Y-%m-%d %H:%i"),"%Y-%m-%d %H:%i:%s") as time', 'count(if(status=0,true,null )) as count'])
+        ->select(['UNIX_TIMESTAMP(DATE_FORMAT(FROM_UNIXTIME(recordTime),"%Y-%m-%d %H:%i")) as time', 'count(if(status=0,true,null )) as count'])
         ->from(['nginx_info'])
         ->where('recordTime BETWEEN "'.$startTime.'" and "'.$endTime.'"')
         ->groupBy('time')
         ->all();
         $data = [];
         for($j=0;$j<count($rows);$j++){
-            $time = strtotime($rows[$j]['time'])*1000;
+            $time = $rows[$j]['time']*1000;
             array_push($data, [$time, $rows[$j]['count']+0]);
         }
         $nginx = [[
@@ -1411,7 +1403,7 @@ class MonitorController extends Controller
      */
     private function getNginxServers($startTime, $endTime){
         $rows = (new Query())
-        ->select(['DATE_FORMAT(DATE_FORMAT(recordTime,"%Y-%m-%d %H:%i"),"%Y-%m-%d %H:%i:%s") as time', 'server'])
+        ->select(['UNIX_TIMESTAMP(DATE_FORMAT(FROM_UNIXTIME(recordTime),"%Y-%m-%d %H:%i")) as time', 'server'])
         ->from(['nginx_info'])
         ->where('status=0 and recordTime BETWEEN "'.$startTime.'" and "'.$endTime.'"')
         ->orderBy('time')
@@ -1419,7 +1411,7 @@ class MonitorController extends Controller
         $servers=[];
         $time=null;
         for($i=0;$i<count($rows);$i++){
-            $recordTime = ''.strtotime($rows[$i]['time'])*1000;
+            $recordTime = ''.$rows[$i]['time']*1000;
             $serverName = $rows[$i]['server'];
             if($recordTime==$time){
                 array_push($servers[$recordTime], $serverName);
@@ -1437,5 +1429,11 @@ class MonitorController extends Controller
     private function getServersForDrop(){
         $allServers = Server::find()->asArray()->all();
         return ArrayHelper::map($allServers, 'serverName', 'serverName');
+    }
+    
+    private function getDateRange($startTime, $endTime){
+        $startTime = Timezone::date($startTime);
+        $endTime = Timezone::date($endTime);
+        return $startTime.' - '.$endTime;
     }
 }

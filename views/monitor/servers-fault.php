@@ -1,20 +1,22 @@
 <?php
 use app\models\ChartDraw;
 use yii\helpers\Html;
+use app\models\Timezone;
 
 $this->params['breadcrumbs'][]=['label'=>'IPTV Monitor', 'url'=>['index']];
 $this->title = 'Servers Fault';
 $this->params['breadcrumbs'][] = $this->title;
 
-$timezone =  'Asia/Shanghai';
+$timezone = Timezone::getCurrentTimezone();
+
 $operationCPU = ChartDraw::operation('CPU', 'cpu-data-range', 'cpu-chart');
 $operationRAM = ChartDraw::operation('RAM', 'ram-data-range', 'ram-chart');
 $operationDisk = ChartDraw::operation('DISK', 'disk-data-range', 'disk-chart');
 $operationLoad = ChartDraw::operation('LOAD', 'load-data-range', 'load-chart');
 $operationStream = '
     var time = $("#stream-date-range").val().split(" - ");
-    var startTime = Date.parse(new Date(time[0]));
-    var endTime = Date.parse(new Date(time[1]));
+    var startTime = moment.tz(time[0], "'.$timezone->timezone.'").format("X");
+    var endTime = moment.tz(time[1], "'.$timezone->timezone.'").format("X");
     $("#stream-chart").highcharts().showLoading();
     $.get("index.php?r=monitor/update-warning-line&type=Stream&startTime="+startTime+"&endTime="+endTime,
         function(data,status){
@@ -30,8 +32,8 @@ $operationStream = '
 ';
 $operationMySql = '
     var time = $("#mysql-date-range").val().split(" - ");
-    var startTime = Date.parse(new Date(time[0]));
-    var endTime = Date.parse(new Date(time[1]));
+    var startTime = moment.tz(time[0], "'.$timezone->timezone.'").format("X");
+    var endTime = moment.tz(time[1], "'.$timezone->timezone.'").format("X");
     $("#mysql-chart").highcharts().showLoading();
     $.get("index.php?r=monitor/update-warning-line&type=MySql&startTime="+startTime+"&endTime="+endTime,
         function(data,status){
@@ -44,8 +46,8 @@ $operationMySql = '
 ';
 $operationNginx = '
     var time = $("#nginx-date-range").val().split(" - ");
-    var startTime = Date.parse(new Date(time[0]));
-    var endTime = Date.parse(new Date(time[1]));
+    var startTime = moment.tz(time[0], "'.$timezone->timezone.'").format("X");
+    var endTime = moment.tz(time[1], "'.$timezone->timezone.'").format("X");
     $("#nginx-chart").highcharts().showLoading();
     $.get("index.php?r=monitor/update-warning-line&type=Nginx&startTime="+startTime+"&endTime="+endTime,
         function(data,status){
@@ -77,7 +79,7 @@ $operationNginx = '
                     <br/><br/>
                     
                     <?php
-                        echo ChartDraw::drawLineChart('cpu-chart', $this, $timezone, 'CPU Utilization Beyond Threshold', 'CPU Utilization Percentage(%)', '%', $cpuData);
+                        echo ChartDraw::drawLineChart('cpu-chart', $this, 'CPU Utilization Beyond Threshold', 'CPU Utilization Percentage(%)', '%', $cpuData);
                     ?>
 				</div>
 			</div>
@@ -106,7 +108,7 @@ $operationNginx = '
                     <br/><br/>
                     
                     <?php
-                        echo ChartDraw::drawLineChart('ram-chart', $this, $timezone, 'RAM Utilization Beyond Threshold', 'RAM Utilization Percentage(%)', '%', $ramData);
+                        echo ChartDraw::drawLineChart('ram-chart', $this, 'RAM Utilization Beyond Threshold', 'RAM Utilization Percentage(%)', '%', $ramData);
                     ?>
 				</div>
 			</div>
@@ -135,7 +137,7 @@ $operationNginx = '
                     <br/><br/>
                     
                     <?php
-                        echo ChartDraw::drawLineChart('disk-chart', $this, $timezone, 'Disk Utilization Beyond Threshold', 'Free Percentage of Disk(%)', '%', $diskData);
+                        echo ChartDraw::drawLineChart('disk-chart', $this, 'Disk Utilization Beyond Threshold', 'Free Percentage of Disk(%)', '%', $diskData);
                     ?>
 				</div>
 			</div>
@@ -164,7 +166,7 @@ $operationNginx = '
                     <br/><br/>
                     
                     <?php
-                        echo ChartDraw::drawLineChart('load-chart', $this, $timezone, 'Load Utilization Beyond Threshold', 'Load Utilization Percentage(%)', '%', $loadData);
+                        echo ChartDraw::drawLineChart('load-chart', $this, 'Load Utilization Beyond Threshold', 'Load Utilization Percentage(%)', '%', $loadData);
                     ?>
 				</div>
 			</div>
@@ -193,7 +195,7 @@ $operationNginx = '
                     <br/><br/>
                     
                     <?php
-                        echo ChartDraw::drawLineChart('stream-chart', $this, $timezone, 'Disconnected Streams', 'The Numeber of Dead Streams', '', $streamData);
+                        echo ChartDraw::drawLineChart('stream-chart', $this, 'Disconnected Streams', 'The Numeber of Dead Streams', '', $streamData);
                     ?>
 				</div>
 			</div>
@@ -222,7 +224,7 @@ $operationNginx = '
                     <br/><br/>
                     
                     <?php
-                        echo ChartDraw::drawLineChart('mysql-chart', $this, $timezone, 'MySQL Fault', 'Disconnected Number of MySQL', '', $mySqlData);
+                        echo ChartDraw::drawLineChart('mysql-chart', $this, 'MySQL Fault', 'Disconnected Number of MySQL', '', $mySqlData);
                     ?>
 				</div>
 			</div>
@@ -251,7 +253,7 @@ $operationNginx = '
                     <br/><br/>
                     
                     <?php
-                        echo ChartDraw::drawLineChart('nginx-chart', $this, $timezone, 'Nginx Fault', 'Disconnected Number of Nginx', '', $nginxData);
+                        echo ChartDraw::drawLineChart('nginx-chart', $this, 'Nginx Fault', 'Disconnected Number of Nginx', '', $nginxData);
                     ?>
 				</div>
 			</div>

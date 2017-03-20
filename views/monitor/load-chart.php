@@ -1,6 +1,7 @@
 <?php
 use app\models\ChartDraw;
 use yii\helpers\Html;
+use app\models\Timezone;
 
 $request = Yii::$app->request;
 $this->title = 'Load Chart';
@@ -8,10 +9,10 @@ $this->params['breadcrumbs'][]=['label'=>'IPTV Monitor', 'url'=>['index']];
 $this->params['breadcrumbs'][] = ['label' => 'Servers Monitor', 'url' => ['servers-status']];
 $this->params['breadcrumbs'][] = ['label' => 'Server Details', 'url' => ['server-detail','serverName'=>$request->get('serverName')]];
 $this->params['breadcrumbs'][] = $this->title;
-$timezone =  'Asia/Shanghai';
+$timezone = Timezone::getCurrentTimezone();
 $operation = 'var time = $("#date-range").val().split(" - ");
-                var startTime = Date.parse(new Date(time[0]));
-                var endTime = Date.parse(new Date(time[1]));
+                var startTime = moment.tz(time[0], "'.$timezone->timezone.'").format("X");
+                var endTime = moment.tz(time[1], "'.$timezone->timezone.'").format("X");
                 $("#linechart").highcharts().showLoading();
                 $.get("index.php?r=monitor/update-line-info&serverName='.$request->get('serverName').'&type=LOAD&startTime="+startTime+"&endTime="+endTime,
                         function(data,status){
@@ -36,4 +37,4 @@ $operation = 'var time = $("#date-range").val().split(" - ");
 <br/><br/>
 
 <?php
-echo ChartDraw::drawLineChart('linechart', $this, $timezone, 'Load Utilization', 'Load Utilization', '', $data);
+echo ChartDraw::drawLineChart('linechart', $this, 'Load Utilization', 'Load Utilization', '', $data);

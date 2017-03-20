@@ -297,11 +297,12 @@ class ChartDraw
     }
     
     public static function operation($type, $dateRangId, $chartId){
+        $timezone = Timezone::getCurrentTimezone();
         return 
         '
                 var time = $("#'.$dateRangId.'").val().split(" - ");
-                var startTime = Date.parse(new Date(time[0]));
-                var endTime = Date.parse(new Date(time[1]));
+                var startTime = moment.tz(time[0], "'.$timezone->timezone.'").format("X");
+                var endTime = moment.tz(time[1], "'.$timezone->timezone.'").format("X");
                 $("#'.$chartId.'").highcharts().showLoading();
                 $.get("index.php?r=monitor/update-warning-line&type='.$type.'&startTime="+startTime+"&endTime="+endTime,
                         function(data,status){
