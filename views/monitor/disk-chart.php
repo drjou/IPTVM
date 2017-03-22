@@ -39,3 +39,9 @@ $operation = 'var time = $("#date-range").val().split(" - ");
 
 <?php
 echo ChartDraw::drawLineChart('linechart', $this, 'Disk Utilization', 'Used Percentage of Disk(%)', '%', $data);
+
+$this->registerJs("
+    $(document).ready(function(){
+    $operation
+});
+    ");

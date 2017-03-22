@@ -45,5 +45,6 @@ $this->registerJs("
             var server = $('#server-servername option:selected').text();
             location.href='index.php?r=monitor/nginx-chart&serverName='+server;
         });
+    $operation
     });
 ");

@@ -39,4 +39,8 @@ $operation = 'var time = $("#date-range").val().split(" - ");
 
 <?php
 echo ChartDraw::drawLineChart('linechart', $this, 'RAM Utilization', 'RAM Utilization Percentage(%)', '%', $data);
-
+$this->registerJs("
+    $(document).ready(function(){
+        $operation
+    });
+        ");

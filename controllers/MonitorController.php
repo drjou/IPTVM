@@ -293,7 +293,48 @@ class MonitorController extends Controller
         $endTime = time();
         $range = $this->getDateRange($startTime, $endTime);
         $minDate = Timezone::date(CPU::find()->where(['server'=>$serverName])->min('recordTime'));
-        $data = $this->getCpuData($serverName, $startTime, $endTime);
+        $data = [
+            [
+                'name' => 'utilize',
+                'data' => []
+            ],
+            [
+                'name' => 'user',
+                'data' => []
+            ],
+            [
+                'name' => 'system',
+                'data' => []
+            ],
+            [
+                'name' => 'wait',
+                'data' => []
+            ],
+            [
+                'name' => 'hardIrq',
+                'data' => []
+            ],
+            [
+                'name' => 'softIrq',
+                'data' => []
+            ],
+            [
+                'name' => 'nice',
+                'data' => []
+            ],
+            [
+                'name' => 'steal',
+                'data' => []
+            ],
+            [
+                'name' => 'guest',
+                'data' => []
+            ],
+            [
+                'name' => 'idle',
+                'data' => []
+            ]
+        ];;
         return $this->render('cpu-chart', [
             'data' => $data,
             'range' =>  $range,
@@ -331,7 +372,12 @@ class MonitorController extends Controller
         $endTime = time();
         $range = $this->getDateRange($startTime, $endTime);
         $minDate = Timezone::date(RAM::find()->where(['server'=>$serverName])->min('recordTime'));
-        $data = $this->getRamData($serverName, $startTime, $endTime);
+        $data = [
+            [
+                'name' => 'utilize',
+                'data' => []
+            ]
+        ];
         return $this->render('ram-chart', [
             'data' => $data,
             'range' => $range,
@@ -366,7 +412,16 @@ class MonitorController extends Controller
         $endTime = time();
         $range = $this->getDateRange($startTime, $endTime);
         $minDate = Timezone::date(Disk::find()->where(['server'=>$serverName])->min('recordTime'));
-        $data = $this->getDiskData($serverName, $startTime, $endTime);
+        $data = [
+            [
+                'name' => 'used',
+                'data' => []
+            ],
+            [
+                'name' => 'free',
+                'data' => []
+            ]
+        ];
         return $this->render('disk-chart', [
             'data' => $data,
             'range' => $range,
@@ -402,7 +457,20 @@ class MonitorController extends Controller
         $endTime = time();
         $range = $this->getDateRange($startTime, $endTime);
         $minDate = Timezone::date(Load::find()->where(['server'=>$serverName])->min('recordTime'));
-        $data = $this->getLoadData($serverName, $startTime, $endTime);
+        $data = [
+            [
+                'name' => 'load of 1 minute',
+                'data' => []
+            ],
+            [
+                'name' => 'load of 5 minute',
+                'data' => []
+            ],
+            [
+                'name' => 'load of 15 minute',
+                'data' => []
+            ]
+        ];
         return $this->render('load-chart', [
             'data' => $data,
             'range' => $range,
@@ -602,7 +670,24 @@ class MonitorController extends Controller
         $endTime = time();
         $range = $this->getDateRange($startTime, $endTime);
         $minDate = Timezone::date(MysqlInfo::find()->where(['server'=>$serverName])->min('recordTime'));
-        $data = $this->getMysqlData($serverName, $startTime, $endTime);
+        $data = [
+            [
+                'name' => 'totalConnections',
+                'data' => []
+            ],
+            [
+                'name' => 'activeConnections',
+                'data' => []
+            ],
+            [
+                'name' => 'qps',
+                'data' => []
+            ],
+            [
+                'name' => 'tps',
+                'data' => []
+            ],
+        ];
         $model = new Server();
         $model->serverName = $serverName;
         $status = MySql::find()->where(['server'=>$serverName])->one()->status;
@@ -621,7 +706,24 @@ class MonitorController extends Controller
         $endTime = time();
         $range = $this->getDateRange($startTime, $endTime);
         $minDate = Timezone::date(NginxInfo::find()->where(['server'=>$serverName])->min('recordTime'));
-        $data = $this->getNginxData($serverName, $startTime, $endTime);
+        $data = [
+            [
+                'name' => 'accept',
+                'data' => []
+            ],
+            [
+                'name' => 'handle',
+                'data' => []
+            ],
+            [
+                'name' => 'request',
+                'data' => []
+            ],
+            [
+                'name' => 'active',
+                'data' => []
+            ],
+        ];
         $model = new Server();
         $model->serverName = $serverName;
         $status = Nginx::find()->where(['server'=>$serverName])->one()->status;
@@ -975,6 +1077,10 @@ class MonitorController extends Controller
             [
                 'name' => 'used',
                 'data' => $this->getChartDataByProperty($diskData, 'recordTime', 'usedPercent')
+            ],
+            [
+                'name' => 'free',
+                'data' => $this->getChartDataByProperty($diskData, 'recordTime', 'freePercent')
             ]
         ];
     }

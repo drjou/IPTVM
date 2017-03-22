@@ -38,3 +38,9 @@ $operation = 'var time = $("#date-range").val().split(" - ");
 
 <?php
 echo ChartDraw::drawLineChart('linechart', $this, 'Load Utilization', 'Load Utilization', '', $data);
+
+$this->registerJs("
+    $(document).ready(function(){
+        $operation
+    });
+        ");

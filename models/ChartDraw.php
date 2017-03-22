@@ -307,7 +307,6 @@ class ChartDraw
                 $.get("index.php?r=monitor/update-warning-line&type='.$type.'&startTime="+startTime+"&endTime="+endTime,
                         function(data,status){
                              var obj = eval(data);
-                            console.log(obj);
                              for(var i=0;i<obj.length;i++){
                                 var series=$("#'.$chartId.'").highcharts().series[i];
                                 series.setData(obj[i].data,false);
