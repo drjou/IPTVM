@@ -10,6 +10,7 @@ class Stream extends ActiveRecord{
     public $importFile;
     const SCENARIO_SAVE = 'save';
     const SCENARIO_IMPORT = 'import';
+    const SCENARIO_CHANGE_STATUS = 'changeStatus';
     /**
      * 设置模型对应表名
      * @return string
@@ -56,6 +57,7 @@ class Stream extends ActiveRecord{
         return [
             self::SCENARIO_SAVE => ['streamName', 'source', 'server'],
             self::SCENARIO_IMPORT => ['importFile'],
+            self::SCENARIO_CHANGE_STATUS => ['status']
         ];
     }
     /**
@@ -79,6 +81,11 @@ class Stream extends ActiveRecord{
             throw new NotFoundHttpException("The stream $streamName on $server doesn't exist, please try the right way to access stream.");
         }
     }
+    
+    public static function findStreamsByServer($serverName){
+        return self::find()->where(['server'=>$serverName]);
+    }
+    
     /**
      * 获取对应的server的信息
      * @return ActiveQuery

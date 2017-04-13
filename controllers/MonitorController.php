@@ -122,7 +122,7 @@ class MonitorController extends Controller
             0 => 'DOWN',
             1 => 'UP'
         ];
-        return $this->render('index',[
+        return $this->render('index', [
             'servers' => $servers,
             'streams' => $streams,
             'mysqls' => $mysqls,
@@ -898,6 +898,267 @@ class MonitorController extends Controller
             'dataProvider' => $dataProvider,
         ]);
     }
+    /**
+     * stop串流程序
+     * @param string $serverName
+     * @return \yii\web\Response|string
+     */
+    public function actionStopStreaming($serverName){
+        if($this->getServerStatus($serverName)){
+            $obj = $this->sendCommand(1, $serverName);
+            $session = Yii::$app->session;
+            if($obj->status===1){
+                Yii::$app->db->createCommand()->update('stream', ['status' => 0], ['server'=>$serverName])->execute();
+                $session['result'] = 'Stop Streaming Successfully on '.$serverName;
+            }else{
+                $session['result'] = 'Failed to Stop Streaming on '.$serverName;
+                $session['description'] = $obj->description;
+            }
+            return $this->redirect(['streams-monitor', 'serverName'=>$serverName]);
+        }
+    }
+    /**
+     * start串流程序
+     * @param string $serverName
+     * @return \yii\web\Response|string
+     */
+    public function actionStartStreaming($serverName){
+        if($this->getServerStatus($serverName)){
+            $obj = $this->sendCommand(2, $serverName);
+            $session = Yii::$app->session;
+            if($obj->status===1){
+                Yii::$app->db->createCommand()->update('stream', ['status' => 1], ['server'=>$serverName])->execute();
+                $session['result'] = 'Start Streaming Successfully on '.$serverName;
+            }else{
+                $session['result'] = 'Failed to Start Streaming on '.$serverName;
+                $session['description'] = $obj->description;
+            }
+            return $this->redirect(['streams-monitor', 'serverName'=>$serverName]);
+        }
+    }
+    /**
+     * restart串流程序
+     * @param string $serverName
+     * @return \yii\web\Response|string
+     */
+    public function actionRestartStreaming($serverName){
+        if($this->getServerStatus($serverName)){
+            $obj = $this->sendCommand(3, $serverName);
+            $session = Yii::$app->session;
+            if($obj->status===1){
+                Yii::$app->db->createCommand()->update('stream', ['status' => 1], ['server'=>$serverName])->execute();
+                $session['result'] = 'Restart Streaming Successfully on '.$serverName;
+            }else{
+                $session['result'] = 'Failed to Restart Streaming on '.$serverName;
+                $session['description'] = $obj->description;
+            }
+            return $this->redirect(['streams-monitor', 'serverName'=>$serverName]);
+        }
+    }
+
+    /**
+     * stop某个串流
+     * @param string $streamName
+     * @param string $serverName
+     * @param string $source
+     * @param string $page
+     */
+    public function actionStopStream($streamName, $serverName, $source, $page){
+        if($this->getServerStatus($serverName)){
+            $obj = $this->sendCommand(4, $serverName, $streamName, $source);
+            $session = Yii::$app->session;
+            if($obj->status===1){
+                $model = Stream::findStreamByKey($streamName, $serverName);
+                $model->scenario = Stream::SCENARIO_CHANGE_STATUS;
+                $model->status = 0;
+                $model->save();
+                $session['result'] = 'Stop Stream '.$streamName.' on '.$serverName.' Successfully';
+            }else{
+                $session['result'] = 'Failed to Stop Stream '.$streamName.' on '.$serverName;
+                $session['description'] = $obj->description;
+            }
+            if($page==='index'){
+                return $this->redirect('index');
+            }else{
+                return $this->redirect(['streams-monitor', 'serverName'=>$serverName]);
+            }
+        }
+    }
+    /**
+     * start某个串流
+     * @param string $streamName
+     * @param string $serverName
+     * @param string $source
+     * @param string $page
+     */
+    public function actionStartStream($streamName, $serverName, $source, $page){
+        if($this->getServerStatus($serverName)){
+            $obj = $this->sendCommand(5, $serverName, $streamName, $source);
+            $session = Yii::$app->session;
+            if($obj->status===1){
+                $model = Stream::findStreamByKey($streamName, $serverName);
+                $model->scenario = Stream::SCENARIO_CHANGE_STATUS;
+                $model->status = 1;
+                $model->save();
+                $session['result'] = 'Start Stream '.$streamName.' on '.$serverName.' Successfully';
+            }else{
+                $session['result'] = 'Failed to Start Stream '.$streamName.' on '.$serverName;
+                $session['description'] = $obj->description;
+            }
+            if($page==='index'){
+                return $this->redirect('index');
+            }else{
+                return $this->redirect(['streams-monitor', 'serverName'=>$serverName]);
+            }
+        }
+    }
+    /**
+     * restart某个串流
+     * @param string $streamName
+     * @param string $serverName
+     * @param string $source
+     * @param string $page
+     */
+    public function actionRestartStream($streamName, $serverName, $source, $page){
+        if($this->getServerStatus($serverName)){
+            $obj = $this->sendCommand(6, $serverName, $streamName, $source);
+            $session = Yii::$app->session;
+            if($obj->status===1){
+                'Restart Stream '.$streamName.' on '.$serverName.' Successfully';
+            }else{
+                $session['result'] = 'Failed to Restart Stream '.$streamName.' on '.$serverName;
+                $session['description'] = $obj->description;
+            }
+            if($page==='index'){
+                return $this->redirect('index');
+            }else{
+                return $this->redirect(['streams-monitor', 'serverName'=>$serverName]);
+            }
+        }
+    }
+    /**
+     * stop Mysql
+     * @param string $serverName
+     */
+    public function actionStopMysql($serverName){
+        if($this->getServerStatus($serverName)){
+            $obj = $this->sendCommand(7, $serverName);
+            $session = Yii::$app->session;
+            if($obj->status===1){
+                $model = MySql::findMysqlByName($serverName);
+                $model->scenario = MySql::SCENARIO_CHANGE_STATUS;
+                $model->status = 0;
+                $model->save();
+                $session['result'] = 'Stop MySQL Successfully on '.$serverName;
+            }else{
+                $session['result'] = 'Failed to Stop MySQL on '.$serverName;
+                $session['description'] = $obj->description;
+            }
+            return $this->redirect('index');
+        }
+    }
+    /**
+     * start Mysql
+     * @param string $serverName
+     */
+    public function actionStartMysql($serverName){
+        if($this->getServerStatus($serverName)){
+            $obj = $this->sendCommand(8, $serverName);
+            $session = Yii::$app->session;
+            if($obj->status===1){
+                $model = MySql::findMysqlByName($serverName);
+                $model->scenario = MySql::SCENARIO_CHANGE_STATUS;
+                $model->status = 1;
+                $model->save();
+                $session['result'] = 'Start MySQL Successfully on '.$serverName;
+            }else{
+                $session['result'] = 'Failed to Start MySQL on '.$serverName;
+                $session['description'] = $obj->description;
+            }
+            return $this->redirect('index');
+        }
+    }
+    /**
+     * restart Mysql
+     * @param string $serverName
+     */
+    public function actionRestartMysql($serverName){
+        if($this->getServerStatus($serverName)){
+            $obj = $this->sendCommand(9, $serverName);
+            $session = Yii::$app->session;
+            if($obj->status===1){
+                $session['result'] = 'Restart MySQL Successfully on '.$serverName;
+            }else{
+                $session['result'] = 'Failed to Restart MySQL on '.$serverName;
+                $session['description'] = $obj->description;
+            }
+            return $this->redirect('index');
+        }
+    }
+
+    /**
+     * stop Nginx
+     * @param string $serverName
+     */
+    public function actionStopNginx($serverName){
+        if($this->getServerStatus($serverName)){
+            $obj = $this->sendCommand(10, $serverName);
+            $session = Yii::$app->session;
+            if($obj->status===1){
+                $model = Nginx::findNginxByName($serverName);
+                $model->scenario = Nginx::SCENARIO_CHANGE_STATUS;
+                $model->status = 0;
+                $model->save();
+                $session['result'] = 'Stop Nginx Successfully on '.$serverName;
+            }else{
+                $session['result'] = 'Failed to Stop Nginx on '.$serverName;
+                $session['description'] = $obj->description;
+            }
+            return $this->redirect('index');
+        }
+    }
+    /**
+     * start Nginx
+     * @param string $serverName
+     */
+    public function actionStartNginx($serverName){
+        if($this->getServerStatus($serverName)){
+            $obj = $this->sendCommand(11, $serverName);
+            $session = Yii::$app->session;
+            if($obj->status===1){
+                $model = Nginx::findNginxByName($serverName);
+                $model->scenario = Nginx::SCENARIO_CHANGE_STATUS;
+                $model->status = 1;
+                $model->save();
+                $session['result'] = 'Start Nginx Successfully on '.$serverName;
+            }else{
+                $session['result'] = 'Failed to Start Nginx on '.$serverName;
+                $session['description'] = $obj->description;
+            }
+            return $this->redirect('index');
+        }
+    }
+    /**
+     * restart Nginx
+     * @param string $serverName
+     */
+    public function actionRestartNginx($serverName){
+        if($this->getServerStatus($serverName)){
+            $obj = $this->sendCommand(12, $serverName);
+            $session = Yii::$app->session;
+            if($obj->status===1){
+                $model = Nginx::findNginxByName($serverName);
+                $model->scenario = Nginx::SCENARIO_CHANGE_STATUS;
+                $model->status = 1;
+                $model->save();
+                $session['result'] = 'Restart Nginx Successfully on '.$serverName;
+            }else{
+                $session['result'] = 'Failed to Restart Nginx on '.$serverName;
+                $session['description'] = $obj->description;
+            }
+            return $this->redirect('index');
+        }
+    }
     
     /**
      * 获取所有server的实时状态信息
@@ -1540,5 +1801,77 @@ class MonitorController extends Controller
         $startTime = Timezone::date($startTime);
         $endTime = Timezone::date($endTime);
         return $startTime.' - '.$endTime;
+    }
+    
+    /**
+     * 用socket发送json格式的命令，用以对串流程序，串流，MySql，Nginx进行控制
+     * @param integer $commandId
+     * 1:stop串流程序
+     * 2:start串流程序
+     * 3:restart串流程序
+     * 4:stop某个串流
+     * 5:start某个串流
+     * 6:restart某个串流
+     * 7:stop Mysql
+     * 8:start Mysql
+     * 9:restart Mysql
+     * 10:stop Nginx
+     * 11:start Nginx
+     * 12:restart Nginx
+     * @param string $serverName
+     * @param string $streamName
+     * 默认值是null, 只有对某个串流进行控制时需要该参数
+     * @param string $source
+     * 默认值是null, 只有对某个串流进行控制时需要该参数
+     */
+    private function sendCommand($commandId, $serverName, $streamName=null, $source=null){
+        $array = [
+            'action' => 0,
+            'command' => $commandId,
+            'executor' => Yii::$app->user->identity->userName
+        ];
+        if($commandId===4 || $commandId===5 || $commandId===6){
+            $array['streamName'] = $streamName;
+            $array['source'] = $source;
+        }
+//         $server = Server::findServerByName($serverName);
+//         $address = $server->serverIp;
+        $address = '10.134.97.40';
+        $port = 9000;
+        $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+        if($socket===false){
+            return $this->render('error', [
+                'title' => 'socket_create() failed',
+                'description' => socket_strerror(socket_last_error())
+            ]);
+        }
+        if(socket_connect($socket, $address, $port)===false){
+            return $this->render('error', [
+                'title' => 'socket_connect() failed',
+                'description' => socket_strerror(socket_strerror(socket_last_error($socket)))
+            ]);
+        }
+        $in = json_encode($array);
+        socket_write($socket, $in, strlen($in));
+        $out = socket_read($socket, 8192);
+        $obj = json_decode($out);
+        if($obj->status===0){
+            socket_close($socket);
+        }else{
+            $close = [
+                'action' => 0,
+                'command' => 13,
+                'executor' => Yii::$app->user->identity->userName
+            ];
+            $close = json_encode($close);
+            socket_write($socket, $close, strlen($close));
+            socket_close($socket);
+        }
+        return $obj;
+    }
+    
+    private function getServerStatus($serverName){
+        $model = Server::findServerByName($serverName);
+        return $model->status;
     }
 }

@@ -16,6 +16,15 @@ $status = [
 
 <?=Html::dropDownList('serverName', $model, $servers, ['id'=>'server-servername','class' => 'form-control','style'=>'width:100px;float:left']);?>
 &nbsp;&nbsp;&nbsp;
+<?= Html::a('Start IPTV Streaming', ['start-streaming', 'serverName'=>$serverName], 
+    ['class' => 'btn btn-success']) ?>
+    &nbsp;&nbsp;&nbsp;
+<?= Html::a('Stop IPTV Streaming', ['stop-streaming', 'serverName'=>$serverName], 
+    ['class' => 'btn btn-danger']) ?>
+    &nbsp;&nbsp;&nbsp;
+<?= Html::a('Restart IPTV Streaming', ['restart-streaming', 'serverName'=>$serverName], 
+    ['class' => 'btn btn-warning']) ?>
+<br/><br/>
 <?= Html::a('Generate Comparation Chart', '#', 
     ['class' => 'btn btn-success',
         'id' => 'create',
@@ -138,31 +147,37 @@ echo GridView::widget([
                     ]);
                 },
                 'switch' => function ($url, $model, $key) {
+                if($model->serverInfo->status !== 0){
                     if ($model->status == 0)
                         return Html::a('<i class="fa fa-power-off" style="color:#5cb85c;"></i>', [
-                            'switch',
-                            'streamName' => $key
+                            'start-stream', 'streamName' => $key, 'serverName' => $model->server, 'source' => $model->source, 'page' => 'streams-monitor'
                         ], [
                             'title' => 'Start'
                         ]);
                     return Html::a('<i class="fa fa-power-off" style="color:#d9534f;"></i>', [
-                        'switch',
-                        'streamName' => $key
+                        'stop-stream', 'streamName' => $key, 'serverName' => $model->server, 'source' => $model->source, 'page' => 'streams-monitor'
                     ], [
                         'title' => 'Stop'
                     ]);
+                }else{
+                    return Html::a('<i class="fa fa-power-off" style="color:gray;"></i>');
+                }
                 },
                 'restart' => function ($url, $model, $key) {
+                if($model->serverInfo->status !== 0){
                     if ($model->status == 0)
                         return '<span class="fa fa-refresh" style="color:gray;"></span>';
                     return Html::a('<span class="fa fa-refresh"></span>', [
-                        'restart',
-                        'streamName' => $key
+                        'restart-stream', 'streamName' => $key, 'serverName' => $model->server, 'source' => $model->source, 'page' => 'streams-monitor'
                     ], [
                         'title' => 'Restart'
                     ]);
+                }else{
+                    return Html::a('<i class="fa fa-refresh" style="color:gray;"></i>');
+                }
                 },
                 'play' => function ($url, $model, $key) {
+                if($model->serverInfo->status !== 0){
                     if ($model->status == 0)
                         return '<span class="fa fa-play-circle" style="color:gray;"></span>';
                     return Html::a('<span class="fa fa-play-circle"></span>', [
@@ -171,11 +186,67 @@ echo GridView::widget([
                     ], [
                         'title' => 'Delete'
                     ]);
+                }else{
+                    return Html::a('<i class="fa fa-play-circle" style="color:gray;"></i>');
+                }
                  },
              ],
         ]
     ]
 ])
+?>
+
+<?php 
+$session = Yii::$app->session;
+$result = $session['result'];
+$description = $session['description'];
+$session->remove('result');
+$session->remove('description');
+Modal::begin([
+    'id' => 'success-modal',
+    'header' => '<h4 class="modal-title">Result</h4>',
+    'footer' => Html::a('Close', '#', ['class' => 'btn btn-warning cancel', 'data-dismiss'=>"modal"])
+]);
+?>
+<div class="alert alert-success" role="alert">
+	<h3>
+        <?php echo $result?>
+    </h3>
+</div>
+<?php Modal::end();?>
+
+<?php 
+Modal::begin([
+    'id' => 'warning-modal',
+    'header' => '<h4 class="modal-title">Result</h4>',
+    'footer' => Html::a('Close', '#', ['class' => 'btn btn-warning cancel', 'data-dismiss'=>"modal"])
+]);
+?>
+<div class="alert alert-danger" role="alert">
+	<h3>
+        <?php echo $result?>
+    </h3><br/>
+    <p>
+    	<?php echo 'Reason:'.$description?>
+    </p>
+</div>
+<?php Modal::end();?>
+
+<?php 
+if($result!==null && $description===null){
+    $this->registerJs("
+        $(document).ready(function() {
+            $('#success-modal').modal('show');
+        });
+    ");
+}
+if($result!==null && $description!==null){
+    $this->registerJs("
+        $(document).ready(function() {
+            $('#warning-modal').modal('show');
+        });
+    ");
+}
 ?>
 
 <?php 

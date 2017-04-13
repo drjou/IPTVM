@@ -1,6 +1,7 @@
 <?php 
 use yii\grid\GridView;
 use yii\helpers\Html;
+use yii\bootstrap\Modal;
 $this->title = 'Monitor Dashboard';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -137,24 +138,36 @@ $this->params['breadcrumbs'][] = $this->title;
                                         ['title' => 'View']);
                                     },
                                     'switch' => function($url, $model, $key){
-                                    if($model->status == 0) return Html::a('<i class="fa fa-power-off" style="color:#5cb85c;"></i>',
-                                        ['switch', 'streamName' => $key],
-                                        ['title' => 'Start']);
-                                    return Html::a('<i class="fa fa-power-off" style="color:#d9534f;"></i>',
-                                        ['switch', 'streamName' => $key],
-                                        ['title' => 'Stop']);
+                                    if($model->serverInfo->status !== 0){
+                                        if($model->status == 0) return Html::a('<i class="fa fa-power-off" style="color:#5cb85c;"></i>',
+                                            ['start-stream', 'streamName' => $model->streamName, 'serverName' => $model->server, 'source' => $model->source, 'page' => 'index'],
+                                            ['title' => 'Start']);
+                                        return Html::a('<i class="fa fa-power-off" style="color:#d9534f;"></i>',
+                                            ['stop-stream', 'streamName' => $model->streamName, 'serverName' => $model->server, 'source' => $model->source, 'page' => 'index'],
+                                            ['title' => 'Stop']);
+                                    }else{
+                                        return Html::a('<i class="fa fa-power-off" style="color:gray;"></i>');
+                                    }
                                     },
                                     'restart' => function($url, $model, $key){
+                                    if($model->serverInfo->status !== 0){
                                         if($model->status == 0) return '<span class="fa fa-refresh" style="color:gray;"></span>';
                                         return Html::a('<span class="fa fa-refresh"></span>',
-                                        ['restart', 'streamName' => $key],
+                                        ['restart-stream', 'streamName' => $model->streamName, 'serverName' => $model->server, 'source' => $model->source, 'page' => 'index'],
                                         ['title' => 'Restart']);
+                                    }else{
+                                        return Html::a('<i class="fa fa-refresh" style="color:gray;"></i>');
+                                    }
                                     },
                                     'play' => function($url, $model, $key){
+                                    if($model->serverInfo->status !== 0){
                                         if($model->status == 0) return '<span class="fa fa-play-circle" style="color:gray;"></span>';
                                         return Html::a('<span class="fa fa-play-circle"></span>',
                                         ['play', 'streamName' => $key],
                                         ['title' => 'Delete',]);
+                                    }else{
+                                        return Html::a('<i class="fa fa-play-circle" style="color:gray;"></i>');
+                                    }
                                     },
                                 ],
                             ],
@@ -226,18 +239,26 @@ $this->params['breadcrumbs'][] = $this->title;
                                         ['title' => 'View']);
                                     },
                                     'switch' => function($url, $model, $key){
-                                    if($model->status == 0) return Html::a('<i class="fa fa-power-off" style="color:#5cb85c;"></i>',
-                                        ['switch', 'server' => $key],
-                                        ['title' => 'Start']);
-                                    return Html::a('<i class="fa fa-power-off" style="color:#d9534f;"></i>',
-                                        ['switch', 'server' => $key],
-                                        ['title' => 'Stop']);
+                                    if($model->serverInfo->status !== 0){
+                                        if($model->status == 0) return Html::a('<i class="fa fa-power-off" style="color:#5cb85c;"></i>',
+                                            ['start-mysql', 'serverName' => $key],
+                                            ['title' => 'Start']);
+                                        return Html::a('<i class="fa fa-power-off" style="color:#d9534f;"></i>',
+                                            ['stop-mysql', 'serverName' => $key],
+                                            ['title' => 'Stop']);
+                                    }else{
+                                        return Html::a('<i class="fa fa-power-off" style="color:gray;"></i>');
+                                    }
                                     },
                                     'restart' => function($url, $model, $key){
+                                    if($model->serverInfo->status !== 0){
                                         if($model->status == 0) return '<span class="fa fa-refresh" style="color:gray;"></span>';
                                         return Html::a('<span class="fa fa-refresh"></span>',
-                                        ['restart', 'server' => $key],
+                                        ['restart-mysql', 'serverName' => $key],
                                         ['title' => 'Restart']);
+                                    }else{
+                                        return Html::a('<i class="fa fa-refresh" style="color:gray;"></i>');
+                                    }
                                     },
                                 ],
                             ],
@@ -307,18 +328,26 @@ $this->params['breadcrumbs'][] = $this->title;
                                         ['title' => 'View']);
                                     },
                                     'switch' => function($url, $model, $key){
-                                    if($model->status == 0) return Html::a('<i class="fa fa-power-off" style="color:#5cb85c;"></i>',
-                                        ['switch', 'server' => $key],
-                                        ['title' => 'Start']);
-                                    return Html::a('<i class="fa fa-power-off" style="color:#d9534f;"></i>',
-                                        ['switch', 'server' => $key],
-                                        ['title' => 'Stop']);
+                                    if($model->serverInfo->status !== 0){
+                                        if($model->status == 0) return Html::a('<i class="fa fa-power-off" style="color:#5cb85c;"></i>',
+                                            ['start-nginx', 'serverName' => $key],
+                                            ['title' => 'Start']);
+                                        return Html::a('<i class="fa fa-power-off" style="color:#d9534f;"></i>',
+                                            ['stop-nginx', 'serverName' => $key],
+                                            ['title' => 'Stop']);
+                                    }else{
+                                        return Html::a('<i class="fa fa-power-off" style="color:gray;"></i>');
+                                    }
                                     },
                                     'restart' => function($url, $model, $key){
+                                    if($model->serverInfo->status !== 0){
                                         if($model->status == 0) return '<span class="fa fa-refresh" style="color:gray;"></span>';
                                         return Html::a('<span class="fa fa-refresh"></span>',
-                                        ['restart', 'server' => $key],
+                                        ['restart-nginx', 'serverName' => $key],
                                         ['title' => 'Restart']);
+                                    }else{
+                                        return Html::a('<i class="fa fa-refresh" style="color:gray;"></i>');
+                                    }
                                     },
                                 ],
                             ],
@@ -395,3 +424,55 @@ $this->params['breadcrumbs'][] = $this->title;
 	</div>
 	<!-- /.col-lg-12 -->
 </div>
+<?php 
+$session = Yii::$app->session;
+$result = $session['result'];
+$description = $session['description'];
+$session->remove('result');
+$session->remove('description');
+Modal::begin([
+    'id' => 'success-modal',
+    'header' => '<h4 class="modal-title">Result</h4>',
+    'footer' => Html::a('Close', '#', ['class' => 'btn btn-warning cancel', 'data-dismiss'=>"modal"])
+]);
+?>
+<div class="alert alert-success" role="alert">
+	<h3>
+        <?php echo $result?>
+    </h3>
+</div>
+<?php Modal::end();?>
+
+<?php 
+Modal::begin([
+    'id' => 'warning-modal',
+    'header' => '<h4 class="modal-title">Result</h4>',
+    'footer' => Html::a('Close', '#', ['class' => 'btn btn-warning cancel', 'data-dismiss'=>"modal"])
+]);
+?>
+<div class="alert alert-danger" role="alert">
+	<h3>
+        <?php echo $result?>
+    </h3><br/>
+    <p>
+    	<?php echo 'Reason:'.$description?>
+    </p>
+</div>
+<?php Modal::end();?>
+
+<?php 
+if($result!==null && $description===null){
+    $this->registerJs("
+        $(document).ready(function() {
+            $('#success-modal').modal('show');
+        });
+    ");
+}
+if($result!==null && $description!==null){
+    $this->registerJs("
+        $(document).ready(function() {
+            $('#warning-modal').modal('show');
+        });
+    ");
+}
+?>
