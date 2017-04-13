@@ -1839,18 +1839,7 @@ class MonitorController extends Controller
         $address = '10.134.97.40';
         $port = 9000;
         $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        if($socket===false){
-            return $this->render('error', [
-                'title' => 'socket_create() failed',
-                'description' => socket_strerror(socket_last_error())
-            ]);
-        }
-        if(socket_connect($socket, $address, $port)===false){
-            return $this->render('error', [
-                'title' => 'socket_connect() failed',
-                'description' => socket_strerror(socket_strerror(socket_last_error($socket)))
-            ]);
-        }
+        socket_connect($socket, $address, $port);
         $in = json_encode($array);
         socket_write($socket, $in, strlen($in));
         $out = socket_read($socket, 8192);
